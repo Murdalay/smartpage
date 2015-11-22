@@ -78,8 +78,8 @@ router.post(
   )
 );
 
-router.get('/verify/:sptoken', function(req, res, next) {
-  request.post('https://api.stormpath.com/v1/accounts/emailVerificationTokens/' + req.params.sptoken, function (error, response, body) {
+router.get('/verify/', function(req, res, next) {
+  request.post('https://api.stormpath.com/v1/accounts/emailVerificationTokens/' + req.query.sptoken, function (error, response, body) {
     if (error) { return next(error) }
     if (response.statusCode === 200) {
       console.log(body) // Show the HTML for the Google homepage. 
