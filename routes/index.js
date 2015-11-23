@@ -86,13 +86,8 @@ router.get('/verify/', function(req, res, next) {
 
   request.post({ url : _url + req.query.sptoken, 'auth': { 'user': _username, 'pass': _password, 'sendImmediately': false }}, 
     function (error, response, body) {
-      console.log(response) // Show the HTML for the Google homepage. 
-      console.log(_url+ req.query.sptoken) // Show the HTML for the Google homepage. 
-      console.log(body) // Show the HTML for the Google homepage. 
-      console.log(error) // Show the HTML for the Google homepage. 
     if (error) { return next(error) }
     if (response.statusCode === 200) {
-      console.log(body) // Show the HTML for the Google homepage. 
       return res.redirect('/login');
     } else {
       return res.redirect('/reg-error.html')
