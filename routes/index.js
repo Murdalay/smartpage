@@ -79,6 +79,7 @@ router.post(
 );
 
 router.get('/verify/', function(req, res, next) {
+    console.log(req.query);
   request.post('https://api.stormpath.com/v1/accounts/emailVerificationTokens/' + req.query.sptoken, function (error, response, body) {
     if (error) { return next(error) }
     if (response.statusCode === 200) {
