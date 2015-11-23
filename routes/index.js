@@ -84,7 +84,8 @@ router.get('/verify/', function(req, res, next) {
       _url = 'https://api.stormpath.com/v1/accounts/emailVerificationTokens/';
 
 
-  request.post(_url + req.query.sptoken, function (error, response, body) {
+  request.post({ url : _url + req.query.sptoken, 'auth': { 'user': _username, 'pass': _password, 'sendImmediately': false }}, 
+    function (error, response, body) {
       console.log(response) // Show the HTML for the Google homepage. 
       console.log(_url+ req.query.sptoken) // Show the HTML for the Google homepage. 
       console.log(body) // Show the HTML for the Google homepage. 
@@ -96,7 +97,7 @@ router.get('/verify/', function(req, res, next) {
     } else {
       return res.redirect('/reg-error.html')
     }
-  }).auth(_username, _password, false);
+  });
 });
 
 
