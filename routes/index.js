@@ -40,8 +40,13 @@ router.post('/register', function(req, res) {
   var email = req.body.email;
   var password = req.body.password;
 
+  console.log(email);
+  console.log(password);
+  console.log(req.body);
+
   // Grab user fields.
   if (!email || !password) {
+    console.log(!email || !password);
     return res.render('register', { title: 'Register', error: 'Email and password required.' });
   }
 
@@ -52,10 +57,12 @@ router.post('/register', function(req, res) {
   var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
     if (err) throw err;
 
+    var _mail = email.split('@');
+
     app.createAccount({
       givenName: 'null',
       surname: 'null',
-      username: 'null',
+      username:  Date.now() + Date.now(),
       email: email,
       password: password,
       customData : {
@@ -65,7 +72,18 @@ router.post('/register', function(req, res) {
       }
     }, function (err, createdAccount) {
       if (err) {
-        return res.render('register', {'title': 'Register', error: err.userMessage });
+
+        console.error(err);
+
+         return res.render('main', {
+                  block : 'container',
+                  bundle : 'main',
+                  title : 'Ошибка регистрации',
+                  active : [ false, false, false, false ],
+                  custom : {},
+                  inside: err
+              });
+
       } else {
           return res.redirect('/success.html');
         // passport.authenticate('stormpath')(req, res, function () {

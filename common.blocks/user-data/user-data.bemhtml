@@ -61,7 +61,7 @@ block('user-data')(content()(function(){
 						    mods : { width : 'available', theme : 'islands', size: 'xl' },
 						    name : 'username',
 						    placeholder : 'Введите значение',
-						    val : _user.username !== 'null' ? _user.username : ''
+						    val : typeof _user.username !== 'number' ? _user.username : ''
 						},
 						{
 						    block : 'field-title',
