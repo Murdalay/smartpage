@@ -62,7 +62,7 @@ router.post('/register', function(req, res) {
     app.createAccount({
       givenName: 'null',
       surname: 'null',
-      username:  Date.now() + Date.now(),
+      username:  'smartuser' + Date.now(),
       email: email,
       password: password,
       customData : {
