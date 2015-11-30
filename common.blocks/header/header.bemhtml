@@ -35,7 +35,7 @@ block('header')(content()(function(){
 						{
 						    block : 'menu',
 						    mods : { theme : 'islands', size : 'xl', mode : 'radio', top: true },
-						    content : menuItems
+						    content : _ctx.hideMenu ? '' : menuItems
 						},
 						{
 						    block : 'link',

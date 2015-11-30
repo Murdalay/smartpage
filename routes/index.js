@@ -57,8 +57,6 @@ router.post('/register', function(req, res) {
   var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
     if (err) throw err;
 
-    var _mail = email.split('@');
-
     app.createAccount({
       givenName: 'null',
       surname: 'null',
@@ -68,6 +66,7 @@ router.post('/register', function(req, res) {
       customData : {
         phone: null,
         template: null,
+        payed: false,
         social: {}
       }
     }, function (err, createdAccount) {
@@ -81,7 +80,7 @@ router.post('/register', function(req, res) {
                   title : 'Ошибка регистрации',
                   active : [ false, false, false, false ],
                   custom : {},
-                  inside: err
+                  inside: err.userMessage
               });
 
       } else {

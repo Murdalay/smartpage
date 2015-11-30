@@ -1,4 +1,8 @@
 block('container')(def()(function(){
+	var _activeMenuItems = this.ctx.active;
+
+	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
+
 			return applyCtx([
 				{
 				    block : 'page',
@@ -12,7 +16,9 @@ block('container')(def()(function(){
 					    { 
 					    	block :'header',
 					    	page : this.ctx.title,
-					    	active : this.ctx.active
+					    	active : this.ctx.active,
+					    	hideMenu : !_activeMenuItems
+
 					    },
 					    { 
 					    	block:'content-wrapper', content: [
