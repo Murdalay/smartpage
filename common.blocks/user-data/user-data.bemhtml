@@ -67,6 +67,10 @@ block('user-data')(content()(function(){
 						    val : _username.indexOf('smartuser') === -1 ? _user.username : ''
 						},
 						{
+						    block : 'small-caption',
+						    content : 'Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.ukraine.com.ua'
+						},
+						{
 						    block : 'field-title',
 						    content : 'Компания'
 						},
