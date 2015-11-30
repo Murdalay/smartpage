@@ -1,5 +1,6 @@
 block('user-data')(content()(function(){
 			var _user = this.ctx.user;
+			var _username = _user.username;
 			var _social = this.ctx.custom.social;
 
 			var isSocialFiled = function() {
@@ -61,7 +62,7 @@ block('user-data')(content()(function(){
 						    mods : { width : 'available', theme : 'islands', size: 'xl' },
 						    name : 'username',
 						    placeholder : 'Введите значение',
-						    val : _user.username.indexOf('smartuser') !== -1 ? _user.username : ''
+						    val : _username.indexOf('smartuser') === -1 ? _user.username : ''
 						},
 						{
 						    block : 'field-title',
