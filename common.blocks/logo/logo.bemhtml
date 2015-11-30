@@ -1,0 +1,9 @@
+block('logo')(content()(function(){
+	return [
+		{
+		    block : 'image',
+		    url : '/images/logo.png',
+		    height : 50
+		}
+	]
+}))

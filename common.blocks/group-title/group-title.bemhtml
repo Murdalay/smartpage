@@ -1,0 +1,1 @@
+block('group-title')(tag()('h2'))

@@ -1,0 +1,14 @@
+block('photo-frame')(content()(function(){
+
+			return [
+
+					{
+					    block : 'image',
+					    url : this.ctx.url ? '/' + this.ctx.url : '/images/avatar.png',
+					    width : 240
+					}
+			
+			]
+		}
+	)
+)

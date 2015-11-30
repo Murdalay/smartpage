@@ -1,0 +1,17 @@
+block('profile')(content()(function(){
+			return [
+	            {
+	              block : 'user-photo',
+	              url : this.ctx.photo
+	            },
+	            { 
+	              block : 'user-data',
+	              isfiled : this.ctx.uData.isfiled,
+	              user : this.ctx.uData.user,
+	              custom : this.ctx.uData.custom
+	            }
+			]
+		}
+	)
+)
+

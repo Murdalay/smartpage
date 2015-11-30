@@ -1,0 +1,57 @@
+block('user-photo')(def()(
+	function(){
+		applyCtx(
+			{
+			    block : 'column',
+			    content : 
+				{
+				    block : 'user-photo',
+				    content : [
+						{
+						    block : 'photo-frame',
+						    url : this.ctx.url && this.ctx.url !== 'null' ? this.ctx.url : null
+						},
+						{
+							block : 'user-photo',
+						    elem : 'upload',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'Фото'
+								},
+								{
+								    block : 'attach',
+								    mods : { theme : 'simple' },
+								    name : 'avatar',
+								    button : {
+								        block : 'button',
+								        mods : { theme : 'islands', size: 'xl' },
+								        icon : { block : 'icon', content : '<svg class="image" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M1 13v2h14v-2h-14zm13-7h-3v-5h-6v5.031l-3-.031 6 6 6-6z"/></svg>' },
+								        text: 'Выберите файл'
+								    },
+								    noFileText : 'Файл не выбран'
+								},
+								{
+								    block : 'user-photo',
+								    elem : 'caption',
+								    content : 'После загрузки, фотография будет обновлена во всех лендингах. Размер фотографии не должен превышать 500kb.'
+								}
+						    ]
+						},
+
+						{
+						    block : 'button',
+						    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+						    text : 'Загрузить фото'
+						}
+					]
+				}
+			}
+		)
+	}
+	
+	),
+	tag()('form'),
+	attrs()({ method : 'post', action : 'user/photo', enctype :'multipart/form-data' }),
+	js()(true)
+)

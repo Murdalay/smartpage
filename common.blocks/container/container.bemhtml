@@ -1,0 +1,43 @@
+block('container')(def()(function(){
+			return applyCtx([
+				{
+				    block : 'page',
+				    head: [
+				        { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_main.js' : '_main.js' },
+				        { elem : 'js', url : '/js/jquery.min.js' }
+				    ],
+				    styles : { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_main.css' : '_main.css' },
+				    title: this.ctx.title ? this.ctx.title : 'Dashboard',
+				    content : [
+					    { 
+					    	block :'header',
+					    	page : this.ctx.title,
+					    	active : this.ctx.active
+					    },
+					    { 
+					    	block:'content-wrapper', content: [
+							    { 
+							    	block: 'inner-wrapper',
+							    	content: [
+								    	{ 
+								    		block : 'section-title',
+								    		content : this.ctx.title
+								    	},
+								    	{ 
+								    		block : 'scroller',
+								    		content : this.ctx.inside
+								    	}
+							    	]
+							    },
+							    { 
+							    	block: 'container',
+							    	elem: 'back'
+							    }
+					    	]
+					    }
+				    ]
+				}
+			])
+		}
+	)
+)

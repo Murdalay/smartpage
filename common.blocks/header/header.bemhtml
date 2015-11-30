@@ -1,0 +1,52 @@
+block('header')(content()(function(){
+	var menuTitles = [{ title : 'Профиль пользователя', value : 'profile' }, { title : 'Оплата услуг', value : 'payment' }, { title : 'Редактор', value : 'edit' }, { title : 'Статистика', value : 'statistic'}],
+		menuItems = [],
+		_ctx = this.ctx,
+		_page = this.ctx.page;
+
+	menuTitles.forEach(function(title, index) {
+		menuItems.push(
+			{
+	            block : 'menu-item',
+	            val : title.value,
+	            mods : { 
+	            	top : true, 
+	            	type : 'link', 
+	            	checked : title.title === _page,  
+	            	disabled : !_ctx.active[index]
+	            },
+	            content : {
+	                block : 'link',
+	                url : '/dashboard/' + title.value,
+	                content : title.title
+	            }
+	        }
+        );
+	});
+
+			return [
+				{
+					block : 'content-wrapper',
+					content:
+					[
+						{
+							block : 'logo'
+						},
+						{
+						    block : 'menu',
+						    mods : { theme : 'islands', size : 'xl', mode : 'radio', top: true },
+						    content : menuItems
+						},
+						{
+						    block : 'link',
+						    mods : { theme : 'islands', logout : true },
+						    url : '/logout',
+						    content : 'Выход'
+						}
+					]
+				},
+			]
+		}
+	),
+	js()(true)
+)

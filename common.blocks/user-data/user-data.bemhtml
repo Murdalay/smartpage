@@ -1,0 +1,175 @@
+block('user-data')(content()(function(){
+			var _user = this.ctx.user;
+			var _social = this.ctx.custom.social;
+
+			var isSocialFiled = function() {
+				return typeof _social == 'object' && _social.type === 'facebook' || _social.type === 'vk' || _social.type === 'tweet'
+			};
+
+			var currentSocialVal = function(social) {
+				if(typeof _social == 'object' && _social.type === social) {
+					return _social.profile
+				} else {
+					return ''
+				}
+			};
+
+			return [
+				{
+				    block : 'column',
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Имя'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl' },
+						    name : 'name',
+						    placeholder : 'Введите значение',
+						    val : _user.givenName !== 'null' ? _user.givenName : ''
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Фамилия'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl' },
+						    name : 'surname',
+						    placeholder : 'Введите значение',
+						    val : _user.surname !== 'null' ? _user.surname : ''
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+
+						{
+						    block : 'field-title',
+						    content : 'Имя пользователя'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl' },
+						    name : 'username',
+						    placeholder : 'Введите значение',
+						    val : _user.username !== 'null' ? _user.username : ''
+						},
+						{
+						    block : 'field-title',
+						    content : 'Компания'
+						},
+						{
+						    block : 'select',
+						    mods : { mode : 'radio', theme : 'islands', size : 'xl' },
+						    name : 'company',
+						    val : 'helix',
+						    options : [
+						        { val : 'helix', text : 'Helix Inc.' }
+						    ]
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+						{
+						    block : 'group-title',
+						    content : 'Контакты'
+						},
+					    {
+						    block : 'column',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'E-mail'
+								},
+								{
+								    block : 'input',
+								    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : true },
+								    name : 'email',
+								    val : _user.email
+								}
+							]
+						},
+						{
+						    block : 'column',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'Номер телефона'
+								},
+								{
+								    block : 'input',
+								    mods : { width : 'available', theme : 'islands', size: 'xl' },
+								    name : 'phone',
+								    placeholder : '+380ХХХХХХХХХ',
+								    maxLength : 12,
+								    val : this.ctx.custom.phone ? this.ctx.custom.phone : ''
+								}
+							]
+					    }
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Социальные сети'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('vk') },
+						    name : 'vk',
+						    placeholder : 'VKontakte',
+						    val : currentSocialVal('vk')
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('facebook') },
+						    name : 'facebook',
+						    placeholder : 'Facebook',
+						    val : currentSocialVal('facebook')
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('tweet') },
+						    name : 'tweet',
+						    placeholder : 'Twitter',
+						    val : currentSocialVal('tweet')
+						},
+						{
+						    block : 'small-caption',
+						    content : 'Выберите одну из социальных сетей и введите ссылку на профиль'
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'right' : true },
+				    content : [
+						{
+						    block : 'button',
+						    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+						    text : 'Отправить'
+						}
+					]
+				}
+			]
+		}
+	),
+	tag()('form'),
+	attrs()({ method : 'post', action : 'user' }),
+	js()(true)
+)

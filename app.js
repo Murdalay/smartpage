@@ -1,6 +1,6 @@
 var Express = require('express');
 var ExpressBem = require('express-bem');
-var request = require('request');
+
 
 // create app and bem
 var app = Express();
@@ -57,6 +57,7 @@ var flash = require('connect-flash');
 var routes = require('./routes/index');
 var strategy = new StormpathStrategy();
 
+
 passport.use(strategy);
 passport.serializeUser(strategy.serializeUser);
 passport.deserializeUser(strategy.deserializeUser);
@@ -72,6 +73,10 @@ app.use(passport.session());
 app.use(flash());
 
 app.use('/', Express.static(path.join(__dirname, 'public')));
+app.use('/', Express.static(path.join(__dirname, 'desktop.bundles')));
+app.use('/libs', Express.static(path.join(__dirname, 'libs')));
+app.use('/photos', Express.static(path.join(__dirname, 'photos')));
+
 
 app.use(routes);
 

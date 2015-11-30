@@ -1,0 +1,1 @@
+block('section-title')(tag()('h1'))
