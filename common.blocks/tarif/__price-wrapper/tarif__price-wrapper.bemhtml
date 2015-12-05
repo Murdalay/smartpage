@@ -1,0 +1,1 @@
+block('tarif').elem('price-wrapper')()

@@ -4,6 +4,7 @@ var passport = require('passport');
 var stormpath = require('stormpath');
 var request = require('request');
 var multer  = require('multer');
+var dir;
 var uploader = multer({ dest: './photos/', 
   rename : function(fieldname, filename) {
       return filename;
@@ -33,6 +34,23 @@ router.get('/register', function(req, res) {
 function isProfileFiled (user) {
   return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
 }
+
+
+spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi8tIZ8y', { expand: 'customData' }, function(err, dirr) {
+    if (err) throw new Error(err);
+    
+    var _dir = {};
+
+    dir = dirr.customData;
+
+    for(key in dir) {
+      if(dir.hasOwnProperty(key)) {
+        _dir[key] = dir[key];
+      }
+    }
+    dir = _dir;
+});
+
 
 // Register a new user to Stormpath.
 router.post('/register', function(req, res) {
@@ -67,6 +85,8 @@ router.post('/register', function(req, res) {
         phone: null,
         template: null,
         payed: false,
+        payDates: false,
+        userSubcription : false,
         social: {}
       }
     }, function (err, createdAccount) {
@@ -77,6 +97,8 @@ router.post('/register', function(req, res) {
          return res.render('main', {
                   block : 'container',
                   bundle : 'main',
+                  domain: '.ukraine.com.ua',
+                  mods : { error  : true },
                   title : 'Ошибка регистрации',
                   active : [ false, false, false, false ],
                   custom : {},
@@ -149,10 +171,12 @@ router.get('/dashboard', function (req, res) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
   }
+    return res.redirect('/dashboard/profile');
 
   console.dir(req.user);
 
     spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      if (err) { return next(err) }
       console.log(account.customData);
     
         res.render('main', {
@@ -165,15 +189,85 @@ router.get('/dashboard', function (req, res) {
             {
               block : 'profile',
               uData : 
-              {
-                isfiled : {
-                  profile : isProfileFiled(req.user),
-                  template : !!account.customData.template
+                {
+                  isfiled : {
+                    profile : isProfileFiled(req.user),
+                    template : !!account.customData.template
+                  },
+                  user : req.user,
+                  custom : account.customData
                 },
-                user : req.user,
-                custom : account.customData
-              },
-              photo : account.customData.photo && account.customData.photo.path
+                photo : account.customData.photo && account.customData.photo.path
+            }
+          ],
+      });
+    });
+
+
+
+});
+
+router.get('/dashboard/profile', function (req, res) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+  console.dir(req.user);
+
+    spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      if (err) { return next(err) }
+      console.log(account.customData);
+    
+        res.render('main', {
+          block : 'container',
+          bundle : 'main',
+          title : 'Профиль пользователя',
+          active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.template, false ],
+          custom : account.customData,
+          inside: [
+            {
+              block : 'profile',
+              uData : 
+                {
+                  isfiled : {
+                    profile : isProfileFiled(req.user),
+                    template : !!account.customData.template
+                  },
+                  user : req.user,
+                  custom : account.customData
+                },
+                photo : account.customData.photo && account.customData.photo.path
+            }
+          ],
+      });
+    });
+
+
+
+});
+
+// Render the payment page.
+router.get('/dashboard/payment', function (req, res) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+
+    spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+        res.render('payment', {
+          block : 'container',
+          bundle : 'payment',
+          title : 'Оплата услуг',
+          active : [ true, true, !!account.customData.template, false ],
+          inside: [
+            {
+              block : 'pay',
+              appData : dir,
+              uData : {
+                  user : req.user,
+                  custom : account.customData,
+                  payed : account.customData.payed
+              }
             }
           ],
       });
@@ -184,7 +278,7 @@ router.get('/dashboard', function (req, res) {
 });
 
 
-router.post('/dashboard/user/photo', function(req, res, next){
+router.post('/dashboard/profile/user/photo', function(req, res, next){
   uploader(req, res, function (err) {
     if (err) {
       // An error occurred when uploading
@@ -220,10 +314,11 @@ router.post('/dashboard/user/photo', function(req, res, next){
   })
 });
 
-router.post('/dashboard/user', function (req, res, next) {
+router.post('/dashboard/profile/user', function (req, res, next) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
   }
+
 
   console.log(req.body);
 
@@ -258,31 +353,6 @@ router.post('/dashboard/user', function (req, res, next) {
     res.redirect('/dashboard');
   }
 });
-
-
-//   spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-
-  
-//       res.render('main', {
-//         block : 'container',
-//         inside: { 
-//           block : 'user-data',
-//           isfiled : {
-//             profile : isProfileFiled(req.user),
-//             template : !!account.customData.template
-//           },
-//           user : req.user,
-//           custom : account.customData
-
-//         },
-//         bundle : 'main',
-//         title : 'Профиль пользователя',
-//         active : [ true, isProfileFiled(req.user), !!account.customData.template, false ],
-//         custom : account.customData
-//     });
-//   // });
-
-
 
 });
 

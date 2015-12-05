@@ -1,0 +1,126 @@
+block('pay')(content()(function(){
+			var _user = this.ctx.uData.user;
+			var _username = _user.username + '';
+			var _payed = this.ctx.uData.custom.payed;
+			var _subscriptions = this.ctx.appData.subscriptions;
+			var _subscription = this.ctx.uData.custom.userSubcription;
+			var _defSubscription = this.ctx.appData.defaultSubcription;
+			var _domain = this.ctx.uData.custom.domain;
+
+
+			console.log(_subscriptions);
+
+
+
+			var isPayed = function() {
+				return !!_payed;
+			};
+
+			var getActiveSubcription = function(social) {
+				if(_subscription) {
+					return _subscription
+				} if(_defSubscription) {
+					return _defSubscription
+				}
+			};
+
+			return [
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+
+						{
+						    block : 'field-title',
+						    content : 'Адрес страницы'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : true },
+						    name : 'username',
+						    placeholder : 'Введите значение',
+						    val : _username && _username.indexOf('smartuser') === -1 ? _username + _domain : ''
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'right' : true },
+				    content : [
+						{
+							    block : 'subscription-status',
+								payed : _payed, 
+							    dates : this.ctx.uData.custom.payDates,
+							    messages : this.ctx.appData.messages
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Тарифный план'
+						},
+						{
+							    block : 'tarif',
+							    name : 'subscription',
+								val : getActiveSubcription(),
+								subscript : _subscriptions
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'right' : true },
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Номер кошелька HeilixMoney'
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl' },
+						    name : 'wallet',
+						    placeholder : 'Введите номер',
+						    maxLength : 13,
+						    val : !!this.ctx.uData.custom.wallet ? this.ctx.uData.custom.wallet : ''
+						}
+					]
+				},
+				{
+				    block : 'column',
+				    mods : { 'right' : true },
+				    content : [
+						{
+						    block : 'checkbox',
+						    mods : { theme : 'islands', checked : true, size : 'l' },
+						    name: 'autoRenew',
+						    val: true,
+						    text : 'Продлевать подписку'
+						},
+						{
+						    block : 'small-caption',
+						    content : 'Номер будет сохранен в базе, и, в дальнейшем, использован для нужд биллинга.'
+						}
+					]
+				},
+				{
+				    block : 'column',
+				    mods : { 'right' : true },
+				    content : [
+						{
+						    block : 'button',
+						    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+						    text : 'Отправить'
+						}
+					]
+				}
+			]
+		}
+	),
+	tag()('form'),
+	attrs()({ method : 'post', action : 'pay' }),
+	js()(true)
+)

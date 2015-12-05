@@ -1,0 +1,72 @@
+block('subscription-status')(content()(function(){
+			return [
+	            {
+	              elem : 'row',
+	              content : [
+		            {
+		              elem : 'title',
+		              mods : { red : true },
+		              content : this.ctx.messages.notPayed
+		            }
+	              ]
+	            }
+			]
+		}
+	),
+	match(function(){ return this.ctx.payed === 'waiting' })(content()(function(){
+		return [
+            {
+              elem : 'row',
+              content : [
+	            {
+	              elem : 'title',
+	              mods : { orange : true },
+	              content : this.ctx.messages.pending
+	            }
+              ]
+            }
+		]
+	})
+	),
+	match(function(){ return this.ctx.payed === 'active' })(content()(function(){
+		return [
+            {
+              elem : 'row',
+              content : [
+	            {
+	              elem : 'title',
+	              content : this.ctx.messages.payed
+	            }
+              ]
+            },
+            {
+              elem : 'row',
+              content : [
+	            {
+	              elem : 'text',
+	              content : 'С'
+	            },
+	            {
+	              elem : 'text',
+	              content : 'По'
+	            }
+              ]
+            },
+            {
+              elem : 'row',
+              content : [
+	            {
+	              elem : 'date',
+	              content : new Date(this.ctx.dates.payedFrom).toLocaleDateString('ru-RU')
+	            },
+	            {
+	              elem : 'date',
+	              content : new Date(this.ctx.dates.payedUntil).toLocaleDateString('ru-RU')
+	            }
+              ]
+            }
+		]
+	})
+),
+	tag()('table')
+)

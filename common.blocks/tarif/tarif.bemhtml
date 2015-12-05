@@ -1,0 +1,88 @@
+block('tarif')(content()(function(){
+			var _subscriptions = this.ctx.subscript;
+			var _payOptions = [];
+			var _payDescription = [];
+			var _val = this.ctx.val;
+
+			_subscriptions.forEach(function(subcript, index) {
+				_payOptions.push(
+			        { val : subcript.val, text : subcript.name }
+			    );
+
+				_payDescription.push(
+			        { 
+				        elem : 'plan',
+				        mods : { subscription : subcript.val, active : _val === subcript.val },
+			        	content : [
+					        { 
+						        elem : 'label',
+					        	content : subcript.name
+					        },
+					        { 
+						        elem : 'price-wrapper',
+					        	content : [
+							        { 
+								        block : 'basic-text',
+							        	content : 'Месячная подписка от '
+							        },
+							        { 
+								        elem : 'price',
+							        	content : '$' + subcript.cost.from
+							        },
+							        { 
+								        block : 'basic-text',
+							        	content : 'до'
+							        },
+							        { 
+								        elem : 'price',
+							        	content : '$' + subcript.cost.to
+							        }
+					        	]
+					        },
+					        { 
+						        elem : 'price-wrapper',
+					        	content : [
+							        { 
+								        block : 'basic-text',
+							        	content : 'Годовая подписка '
+							        },
+							        { 
+								        elem : 'price',
+							        	content : '$' + subcript.cost.year
+							        }
+					        	]
+					        },
+					        { 
+						        elem : 'description',
+					        	content : subcript.description
+					        },
+					        { 
+						        elem : 'price-wrapper',
+					        	content : [
+							        { 
+								        block : 'link',
+								        mods : { theme : 'islands' },
+								        url : subcript.example,
+							        	content : 'Образец шаблона'
+							        }
+					        	]
+					        }			        
+			        	]
+			        }
+			    );
+			});
+
+			return [
+				{
+					    block : 'select',
+					    mods : { mode : 'radio', theme : 'islands', size : 'xl' },
+					    name : 'subscription',
+						val : this.ctx.val,
+						options : _payOptions
+				},
+				_payDescription
+		    ]
+		}
+	),
+	js()(true)
+)

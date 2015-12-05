@@ -7,10 +7,10 @@ block('container')(def()(function(){
 				{
 				    block : 'page',
 				    head: [
-				        { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_main.js' : '_main.js' },
+				        { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.js' : '_main.js' },
 				        { elem : 'js', url : '/js/jquery.min.js' }
 				    ],
-				    styles : { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_main.css' : '_main.css' },
+				    styles : { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.css' : '_main.css' },
 				    title: this.ctx.title ? this.ctx.title : 'Dashboard',
 				    content : [
 					    { 
