@@ -108,7 +108,7 @@ block('pay')(content()(function(){
 				},
 				{
 				    block : 'column',
-				    mods : { 'right' : true },
+				    mods : { 'right' : true, align : 'right' },
 				    content : [
 						{
 						    block : 'button',
