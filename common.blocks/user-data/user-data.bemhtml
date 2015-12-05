@@ -177,6 +177,6 @@ block('user-data')(content()(function(){
 		}
 	),
 	tag()('form'),
-	attrs()({ method : 'post', action : 'user' }),
+	attrs()({ method : 'post', action : 'profile/user' }),
 	js()(true)
 )
