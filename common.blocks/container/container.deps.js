@@ -7,6 +7,7 @@
         { block : 'header' },
         { elem : 'back' },
         { block : 'content-wrapper' },
+        { block : 'jquery', elem : 'event', mods : { type : 'pointerpressrelease' } },
         { block : 'section-title' },
         { block : 'inner-wrapper' },
         { block : 'user-data' },
