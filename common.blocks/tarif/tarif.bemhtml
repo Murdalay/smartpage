@@ -63,6 +63,7 @@ block('tarif')(content()(function(){
 								        block : 'link',
 								        mods : { theme : 'islands' },
 								        url : subcript.example,
+								        target : '_blank',
 							        	content : 'Образец шаблона'
 							        }
 					        	]
