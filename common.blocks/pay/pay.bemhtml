@@ -5,12 +5,7 @@ block('pay')(content()(function(){
 			var _subscriptions = this.ctx.appData.subscriptions;
 			var _subscription = this.ctx.uData.custom.userSubcription;
 			var _defSubscription = this.ctx.appData.defaultSubcription;
-			var _domain = this.ctx.uData.custom.domain;
-
-
-			console.log(_subscriptions);
-
-
+			var _domain = this.ctx.appData.domain;
 
 			var isPayed = function() {
 				return !!_payed;
@@ -37,8 +32,6 @@ block('pay')(content()(function(){
 						{
 						    block : 'input',
 						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : true },
-						    name : 'username',
-						    placeholder : 'Введите значение',
 						    val : _username && _username.indexOf('smartuser') === -1 ? _username + _domain : ''
 						}
 				    ]
@@ -86,13 +79,32 @@ block('pay')(content()(function(){
 						    placeholder : 'Введите номер',
 						    maxLength : 13,
 						    val : !!this.ctx.uData.custom.wallet ? this.ctx.uData.custom.wallet : ''
-						}
-					]
-				},
-				{
-				    block : 'column',
-				    mods : { 'right' : true },
-				    content : [
+						},
+						{
+						    block : 'field-title',
+						    content : 'Срок подписки'
+						},
+						{
+						    block : 'radio-group',
+						    mods : { theme : 'islands', size : 'xl', type : 'button' },
+						    name : 'subscription-type',
+						    val : 'year',
+						    options : [
+						        { val : 'year', text : 'Годовая' },
+						        { val : 'month', text : 'Месячная' }
+						    ],
+						},
+						{
+						    block : 'field-title',
+						    content : 'Сумма'
+						},
+						{
+						    block : 'input',
+						    mods : { summ : true, width : 'available', theme : 'islands', size: 'xl', disabled : true },
+						    name : 'summ',
+						    mix: { block : 'margins', mods : { bottom : true, 'double' : true } },
+						    val : 0
+						},
 						{
 						    block : 'checkbox',
 						    mods : { theme : 'islands', checked : true, size : 'l' },
@@ -103,17 +115,18 @@ block('pay')(content()(function(){
 						{
 						    block : 'small-caption',
 						    content : 'Номер будет сохранен в базе, и, в дальнейшем, использован для нужд биллинга.'
-						}
-					]
-				},
-				{
-				    block : 'column',
-				    mods : { 'right' : true, align : 'right' },
-				    content : [
-						{
-						    block : 'button',
-						    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-						    text : 'Отправить'
+						},
+						{ 
+							block : 'align', 
+							mods : { right : true },
+							content : [
+								{
+								    block : 'button',
+								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+								    mix: [{ block : 'margins', mods : { top : true } }],
+								    text : 'Отправить'
+								}
+							]
 						}
 					]
 				}

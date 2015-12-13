@@ -34,8 +34,11 @@ provide(BEMDOM.decl(this.name, {
     	var _activeElem = this.elem('plan', 'active', true);
     	var _relevantElem = this.elem('plan', 'subscription', this._active);
 
-		this.delMod(_activeElem, 'active');
-		this.setMod(_relevantElem, 'active');
+		this.setMod('tarif', this._active);
+        
+
+        this.delMod(_activeElem, 'active');
+        this.setMod(_relevantElem, 'active');
     }
 }));
 

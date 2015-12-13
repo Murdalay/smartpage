@@ -11,6 +11,7 @@
         { block : 'section-title' },
         { block : 'inner-wrapper' },
         { block : 'user-data' },
+        { block : 'error' },
         { block : 'page', elem : 'js' },
         { block : 'page', elem : 'css' },
         { block : 'page', elem : 'meta' }

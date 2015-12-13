@@ -23,19 +23,11 @@ block('tarif')(content()(function(){
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : 'Месячная подписка от '
+							        	content : 'Месячная подписка'
 							        },
 							        { 
 								        elem : 'price',
 							        	content : '$' + subcript.cost.from
-							        },
-							        { 
-								        block : 'basic-text',
-							        	content : 'до'
-							        },
-							        { 
-								        elem : 'price',
-							        	content : '$' + subcript.cost.to
 							        }
 					        	]
 					        },
@@ -44,7 +36,7 @@ block('tarif')(content()(function(){
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : 'Годовая подписка '
+							        	content : 'Годовая подписка'
 							        },
 							        { 
 								        elem : 'price',

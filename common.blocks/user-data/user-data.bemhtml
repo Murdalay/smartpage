@@ -68,7 +68,7 @@ block('user-data')(content()(function(){
 						},
 						{
 						    block : 'small-caption',
-						    content : 'Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.ukraine.com.ua'
+						    content : 'Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com'
 						},
 						{
 						    block : 'field-title',

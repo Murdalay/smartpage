@@ -4,16 +4,42 @@ var passport = require('passport');
 var stormpath = require('stormpath');
 var request = require('request');
 var multer  = require('multer');
+var fs = require('fs');
 var dir;
-var uploader = multer({ dest: './photos/', 
+var uploader = multer({ 
+  dest : './photos/',
+
   rename : function(fieldname, filename) {
       return filename;
   },
-  onFileUploadStart: function (file) {
-    console.log(file.originalname + ' is starting ...')
+
+  limits : {
+    fileSize : 5242880  
   },
+
+  fileFilter : function(req, file, cb) {
+    var _oldFile = file.originalname;
+    
+    _oldFile = _oldFile.split('.');
+    var _ext = _oldFile[_oldFile.length - 1];
+
+
+    if(_ext !== 'png' && _ext !== 'jpg' && _ext !== 'bmp' && _ext !== 'gif') {
+      req.flash('error', dir.messages.errors.unsupported);
+
+      cb(null, false);
+    } else {
+      cb(null, true);
+    }
+  },
+
+
+  onFileUploadStart: function (file) {
+    console.log(file.originalname + ' is starting ...\n');
+  },
+
   onFileUploadComplete: function (file) {
-    console.log(file.fieldname + ' uploaded to  ' + file.path)
+    console.log(file.fieldname + ' uploaded to  ' + file.path);
     done=true;
   }
 }).single('avatar');
@@ -58,18 +84,11 @@ spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi
 //   var email = req.body.email;
 //   var password = req.body.password;
 
-//   console.log(email);
-//   console.log(password);
-//   console.log(req.body);
-
 //   // Grab user fields.
 //   if (!email || !password) {
 //     console.log(!email || !password);
 //     return res.render('register', { title: 'Register', error: 'Email and password required.' });
 //   }
-
-
-
 
 //   // Grab our app, then attempt to create this user's account.
 //   var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
@@ -82,11 +101,11 @@ spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi
 //       email: email,
 //       password: password,
 //       customData : {
-//         phone: null,
-//         template: null,
-//         payed: false,
+//         phone : null,
+//         template : null,
+//         payed : false,
+//         wallet : false,
 //         payDates: false,
-//         userSubcription : false,
 //         social: {}
 //       }
 //     }, function (err, createdAccount) {
@@ -97,7 +116,6 @@ spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi
 //          return res.render('main', {
 //                   block : 'container',
 //                   bundle : 'main',
-//                   domain: '.ukraine.com.ua',
 //                   mods : { error  : true },
 //                   title : 'Ошибка регистрации',
 //                   active : [ false, false, false, false ],
@@ -164,46 +182,12 @@ router.get('/restore/', function(req, res, next) {
 });
 
 
-
-
 // Render the dashboard page.
 router.get('/dashboard', function (req, res) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
   }
     return res.redirect('/dashboard/profile');
-
-  console.dir(req.user);
-
-    spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-      if (err) { return next(err) }
-      console.log(account.customData);
-    
-        res.render('main', {
-          block : 'container',
-          bundle : 'main',
-          title : 'Профиль пользователя',
-          active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.template, false ],
-          custom : account.customData,
-          inside: [
-            {
-              block : 'profile',
-              uData : 
-                {
-                  isfiled : {
-                    profile : isProfileFiled(req.user),
-                    template : !!account.customData.template
-                  },
-                  user : req.user,
-                  custom : account.customData
-                },
-                photo : account.customData.photo && account.customData.photo.path
-            }
-          ],
-      });
-    });
-
-
 
 });
 
@@ -212,38 +196,35 @@ router.get('/dashboard/profile', function (req, res) {
     return res.redirect('/login');
   }
 
-  console.dir(req.user);
-
-    spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-      if (err) { return next(err) }
-      console.log(account.customData);
-    
-        res.render('main', {
-          block : 'container',
-          bundle : 'main',
-          title : 'Профиль пользователя',
-          active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.template, false ],
-          custom : account.customData,
-          inside: [
-            {
-              block : 'profile',
-              uData : 
-                {
-                  isfiled : {
-                    profile : isProfileFiled(req.user),
-                    template : !!account.customData.template
-                  },
-                  user : req.user,
-                  custom : account.customData
+  spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+    if (err) { return next(err) }
+    console.log(account.customData);
+  
+      res.render('main', {
+        block : 'container',
+        bundle : 'main',
+        error : req.flash('error'),
+        info : req.flash('info'),
+        title : 'Профиль пользователя',
+        active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.template, false ],
+        custom : account.customData,
+        inside: [
+          {
+            block : 'profile',
+            uData : 
+              {
+                isfiled : {
+                  profile : isProfileFiled(req.user),
+                  template : !!account.customData.template
                 },
-                photo : account.customData.photo && account.customData.photo.path
-            }
-          ],
-      });
+                user : req.user,
+                custom : account.customData
+              },
+              photo : account.customData.photo && account.customData.photo.path
+          }
+        ],
     });
-
-
-
+  });
 });
 
 // Render the payment page.
@@ -252,26 +233,30 @@ router.get('/dashboard/payment', function (req, res) {
     return res.redirect('/login');
   }
 
-
-    spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-        res.render('payment', {
-          block : 'container',
-          bundle : 'payment',
-          title : 'Оплата услуг',
-          active : [ true, true, !!account.customData.template, false ],
-          inside: [
-            {
-              block : 'pay',
-              appData : dir,
-              uData : {
-                  user : req.user,
-                  custom : account.customData,
-                  payed : account.customData.payed
-              }
+  spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      res.render('payment', {
+        block : 'container',
+        error : req.flash('error'),
+        info : req.flash('info'),
+        bundle : 'payment',
+        title : 'Оплата услуг',
+        active : [ true, true, !!account.customData.template, false ],
+        inside: [
+          {
+            block : 'pay',
+            appData : dir,
+            js : {
+              subscriptions : dir.subscriptions
+            },
+            uData : {
+                user : req.user,
+                custom : account.customData,
+                payed : account.customData.payed
             }
-          ],
-      });
+          }
+        ],
     });
+  });
 });
 
 
@@ -279,33 +264,49 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
   uploader(req, res, function (err) {
     if (err) {
       // An error occurred when uploading
-      return next(err)
+      return next(err);
     }
 
-    console.log(req.file);
-
-    var _oldFile = req.file.originalname;
-    
-    _oldFile = _oldFile.split('.');
-    var _ext = _oldFile[1];
-
-    console.log(_oldFile);
-    console.log(_ext);
-    console.log(req.user);
-
-    if(_ext !== 'png' && _ext !== 'jpg' && _ext !== 'bmp' && _ext !== 'gif') {
-      res.status(500).send('Unsoported file type');
+    if(!req.file) {
+      res.redirect('/dashboard/profile');
     } else if(req.file.size > 524288)  {
-      res.status(500).send('File size limit is excceeded. It shuld not be bigger than 0.5mb');
-    } else  {
-      req.user.customData.photo = { path : req.file.path, ext : _ext };
-
-      req.user.customData.save(function (err) {
+      req.flash('error', dir.messages.errors.toBig);
+      res.redirect('/dashboard/profile');
+      fs.unlink(req.file.path, function(err) {
         if (err) {
-          next(err);
-        } else {
-          res.redirect('/dashboard');
+          // An error occurred when deleting old photo
+          console.log('Unable to delete oversized photo\n');
+          console.log(err);
         }
+      })
+    } else {
+      var _oldFile = req.file.originalname.split('.');
+      var _ext = _oldFile[_oldFile.length - 1];
+
+      spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+        if (err) { return next(err) }
+
+        // checking if photo is already assigned for the account and deleting the photo if so
+        var _oldPhoto = false;
+        account.customData.photo && (_oldPhoto = account.customData.photo.path);
+
+        req.user.customData.photo = { path : req.file.path, ext : _ext };
+
+        req.user.customData.save(function (err) {
+          if (err) {
+            next(err);
+          } else {
+            res.redirect('/dashboard/profile');
+
+            _oldPhoto && fs.unlink(_oldPhoto, function(err) {
+              if (err) {
+                // An error occurred when deleting old photo
+                console.log('Unable to delete old photo\n');
+                console.log(err);
+              }
+            })
+          }
+        });
       });
     }
   })

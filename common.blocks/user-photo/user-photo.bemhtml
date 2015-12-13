@@ -52,6 +52,6 @@ block('user-photo')(def()(
 	
 	),
 	tag()('form'),
-	attrs()({ method : 'post', action : 'user/photo', enctype :'multipart/form-data' }),
+	attrs()({ method : 'post', action : '/dashboard/profile/user/photo', enctype :'multipart/form-data' }),
 	js()(true)
 )

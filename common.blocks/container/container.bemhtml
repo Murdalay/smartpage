@@ -1,5 +1,9 @@
 block('container')(def()(function(){
 	var _activeMenuItems = this.ctx.active;
+	var _err = this.ctx.error && this.ctx.error.length ? {
+		block : 'error',
+		content : this.ctx.error
+	} : '';
 
 	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
 
@@ -8,14 +12,16 @@ block('container')(def()(function(){
 				    block : 'page',
 				    head: [
 				        { elem : 'js', url : '/js/jquery-1.8.3.min.js' },
+				        { elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
 				        { elem : 'js', url : '/js/jquery.mCustomScrollbar.min.js' },
+				        { elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
 				        { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.js' : '_main.js' }
 				    ],
 				    styles : { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.css' : '_main.css' },
 				    title: this.ctx.title ? this.ctx.title : 'Dashboard',
 				    content : [
 					    { 
-					    	block :'header',
+					    	block : 'header',
 					    	page : this.ctx.title,
 					    	active : this.ctx.active,
 					    	hideMenu : !_activeMenuItems
@@ -32,13 +38,14 @@ block('container')(def()(function(){
 								    	},
 								    	{ 
 								    		block : 'scroller',
-								    		content : this.ctx.inside
+								    		content : [_err, this.ctx.inside]
 								    	}
 							    	]
 							    },
 							    { 
-							    	block: 'container',
-							    	elem: 'back'
+							    	block : 'container',
+							    	elem : 'back',
+							    	mods : { error : this.ctx.error }
 							    }
 					    	]
 					    }
