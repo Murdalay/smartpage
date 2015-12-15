@@ -16,64 +16,15 @@
 	position: relative;
 }
 
-#u1250
-{
-	background-color: transparent;
-	position: relative;
-}
-
-#u1252-4
-{
-	border-style: solid;
-	border-color: #959595;
-	background-color: transparent;
-	color: #FFFFFF;
-	font-size: 22px;
-	text-align: center;
-	line-height: 26px;
-	letter-spacing: 0px;
-	font-family: Helvetica, Helvetica Neue, Arial, sans-serif;
-	position: relative;
-	border-width: 0px 0px 1px;
-}
-
-#u1253-6
-{
-	background-color: transparent;
-	text-align: center;
-	font-family: Helvetica, Helvetica Neue, Arial, sans-serif;
-	position: relative;
-}
-
-#u1253-2
-{
-	font-size: 15px;
-	text-transform: uppercase;
-	line-height: 18px;
-	color: #FFFFFF;
-}
-
-#u1253-4
-{
-	font-size: 11px;
-	line-height: 13px;
-	color: #959595;
-}
-
 #u3761-5
 {
 	background-color: transparent;
-	color: #FFFFFF;
-	font-size: 72px;
 	line-height: 86px;
+	font-size: 72px;
+	color: #FFFFFF;
 	font-family: '__Pe-icon-7-stroke_5';
 	font-weight: 400;
 	position: relative;
-}
-
-#u3761-3
-{
-	line-height: 0px;/* 0 for mixed font sized paras; applied on spans instead */
 }
 
 #u3761
@@ -85,5 +36,46 @@
 {
 	font-size: 80px;
 	line-height: 96px;
+}
+
+#u3942-6
+{
+	background-color: transparent;
+	line-height: 18px;
+	text-transform: uppercase;
+	font-size: 15px;
+	text-align: center;
+	color: #FFFFFF;
+	font-family: Helvetica, Helvetica Neue, Arial, sans-serif;
+	position: relative;
+}
+
+#u3761-3,#u3942-4
+{
+	line-height: 0px;/* 0 for mixed font sized paras; applied on spans instead */
+}
+
+#u3942
+{
+	font-size: 12px;
+	text-transform: none;
+	line-height: 14px;
+}
+
+#u3942-2
+{
+	line-height: 18px;
+}
+
+#u3942-3
+{
+	font-size: 14px;
+	line-height: 17px;
+}
+
+#u1250,#u3943
+{
+	background-color: transparent;
+	position: relative;
 }
 

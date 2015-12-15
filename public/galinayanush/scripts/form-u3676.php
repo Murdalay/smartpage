@@ -25,8 +25,8 @@ $form = array(
 		'unknown_method' => 'Неизвестный метод запроса сервера'
 	),
 	'email' => array(
-		'from' => 'office@raval.biz',
-		'to' => 'office@raval.biz'
+		'from' => 'yanushgalina62@gmail.com',
+		'to' => 'yanushgalina62@gmail.com'
 	),
 	'fields' => array(
 		'custom_U3682' => array(

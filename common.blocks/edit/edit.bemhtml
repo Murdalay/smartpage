@@ -4,6 +4,8 @@ block('edit')(content()(function(){
 			var _active = _custom.template;
 			var _subscriptions = this.ctx.appData.subscriptions;
 			var _activeSubscr;
+			var _fields = [];
+			var _fieldsForDouble = [];
 			var _extra;
 
 
@@ -17,67 +19,69 @@ block('edit')(content()(function(){
 
 			console.log(_extra);
 
-
-			var _fields = [];
-
 			_extra.forEach(function(field) {
-				var _elem;
-
 				if(field.type.indexOf('long') > -1) {
-					_elem = {
-					    block : 'textarea',
-					    mods : { width : 'available', theme : 'islands', size : 'xl' },
-					    name : field.id,
-					    val : _custom.extraFields && _custom.extraFields[field.id],
-					    placeholder : field.placeholder
-					}
+					_fieldsForDouble.push(						
+						{
+						    block : 'field-title',
+						    content : field.name
+						},
+						{
+						    block : 'textarea',
+						    mods : { width : 'available', theme : 'islands', size : 'l' },
+						    name : field.id,
+						    val : _custom.extraFields && _custom.extraFields[field.id],
+						    placeholder : field.placeholder
+						}
+					);
 				} else {
-					_elem = {
-					    block : 'input',
-					    mods : { width : 'available', theme : 'islands', size: 'xl' },
-					    val : _custom.extraFields && _custom.extraFields[field.id],
-					    placeholder : field.placeholder,
-					    name : field.id
-					}
+					_fields.push(						
+						{
+						    block : 'field-title',
+						    content : field.name
+						},
+						{
+						    block : 'input',
+						    mods : { width : 'available', theme : 'islands', size: 'xl' },
+						    val : _custom.extraFields && _custom.extraFields[field.id],
+						    placeholder : field.placeholder,
+						    name : field.id
+						}
+					);
 				}
-
-				_fields.push(						
-					{
-					    block : 'field-title',
-					    content : field.name
-					},
-					_elem
-				);
 
 			}.bind(this));
 
 			return [
 				{
 				    block : 'column',
-				    mods : { 'double' : true },
+				    mods : { 'double' : true, right : true },
+				    mix: [{ block : 'margins', mods : { top : true, 'double' : true } }],
 				    content : [
-
 						{
-						    block : 'column',
-						    content : [
-								{
-								    block : 'field-title',
-								    content : 'Активный шаблон'
-								}
-						    ]
+						    block : 'image',
+						    url : this.ctx.appData.pathToStatic + '/' + _activeSubscr.val + '.jpg'
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mix: [{ block : 'margins', mods : { none : true } }, { block : 'padding', mods : { clear : 'bottom' } }],
+				    content : [
+						{
+						    block : 'field-title',
+						    content : 'Активный шаблон'
 						},
 						{
-						    block : 'column',
-						    content : [
-								{
-								    block : 'group-title',
-								    content : _activeSubscr.name
-								}
-						    ]
+						    block : 'group-title',
+						    mix: [{ block : 'margins', mods : { none : true } }],
+
+						    content : _activeSubscr.name
 						}
 				    ]
 				},
 				
+
 				{
 				    block : 'column',
 				    content : [
@@ -94,6 +98,13 @@ block('edit')(content()(function(){
 								}
 							]
 						}
+					]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true, right : true },
+				    content : [
+						_fieldsForDouble
 					]
 				}
 			]
