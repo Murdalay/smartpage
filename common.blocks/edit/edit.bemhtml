@@ -1,0 +1,105 @@
+block('edit')(content()(function(){
+			var _user = this.ctx.uData.user;
+			var _custom = this.ctx.uData.custom;
+			var _active = _custom.template;
+			var _subscriptions = this.ctx.appData.subscriptions;
+			var _activeSubscr;
+			var _extra;
+
+
+			_subscriptions.forEach(function(subscr){
+					console.log(subscr);
+				if(subscr.val === _active) {
+					_activeSubscr = subscr;
+				}
+			});
+			_extra = _activeSubscr.extraFields;
+
+			console.log(_extra);
+
+
+			var _fields = [];
+
+			_extra.forEach(function(field) {
+				var _elem;
+
+				if(field.type.indexOf('long') > -1) {
+					_elem = {
+					    block : 'textarea',
+					    mods : { width : 'available', theme : 'islands', size : 'xl' },
+					    name : field.id,
+					    val : _custom.extraFields && _custom.extraFields[field.id],
+					    placeholder : field.placeholder
+					}
+				} else {
+					_elem = {
+					    block : 'input',
+					    mods : { width : 'available', theme : 'islands', size: 'xl' },
+					    val : _custom.extraFields && _custom.extraFields[field.id],
+					    placeholder : field.placeholder,
+					    name : field.id
+					}
+				}
+
+				_fields.push(						
+					{
+					    block : 'field-title',
+					    content : field.name
+					},
+					_elem
+				);
+
+			}.bind(this));
+
+			return [
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+
+						{
+						    block : 'column',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'Активный шаблон'
+								}
+						    ]
+						},
+						{
+						    block : 'column',
+						    content : [
+								{
+								    block : 'group-title',
+								    content : _activeSubscr.name
+								}
+						    ]
+						}
+				    ]
+				},
+				
+				{
+				    block : 'column',
+				    content : [
+						_fields,
+						{ 
+							block : 'align', 
+							mods : { right : true },
+							content : [
+								{
+								    block : 'button',
+								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+								    mix: [{ block : 'margins', mods : { top : true } }],
+								    text : 'Отправить'
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	),
+	tag()('form'),
+	attrs()({ method : 'post' }),
+	js()(true)
+)

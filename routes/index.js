@@ -206,7 +206,7 @@ router.get('/dashboard/profile', function (req, res) {
         error : req.flash('error'),
         info : req.flash('info'),
         title : 'Профиль пользователя',
-        active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.template, false ],
+        active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.payed, !!account.customData.statistic ],
         custom : account.customData,
         inside: [
           {
@@ -240,7 +240,7 @@ router.get('/dashboard/payment', function (req, res) {
         info : req.flash('info'),
         bundle : 'payment',
         title : 'Оплата услуг',
-        active : [ true, true, !!account.customData.template, false ],
+        active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
         inside: [
           {
             block : 'pay',
@@ -259,6 +259,62 @@ router.get('/dashboard/payment', function (req, res) {
   });
 });
 
+// Render the payment page.
+router.get('/dashboard/edit', function (req, res) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+  spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      res.render('edit', {
+        block : 'container',
+        error : req.flash('error'),
+        info : req.flash('info'),
+        bundle : 'edit',
+        title : 'Редактор',
+        active : [ true, true, true, !!account.customData.statistic ],
+        inside: [
+          {
+            block : 'edit',
+            appData : dir,
+            js : {
+              subscriptions : dir.subscriptions
+            },
+            uData : {
+                user : req.user,
+                custom : account.customData,
+                payed : account.customData.payed
+            }
+          }
+        ],
+    });
+  });
+});
+
+
+router.post('/dashboard/edit', function (req, res, next) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+  req.user.customData.extraFields || (req.user.customData.extraFields = {});
+
+  for (key in req.body) {
+    req.user.customData.extraFields[key] = req.body[key];
+  }
+  
+  // saving custom fields
+
+  req.user.customData.save(function (err) {
+    if (err) {
+      next(err);
+    } else {
+      res.redirect('/dashboard/edit');
+    }
+  });
+
+});
+
 
 router.post('/dashboard/profile/user/photo', function(req, res, next){
   uploader(req, res, function (err) {
@@ -267,16 +323,16 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
       return next(err);
     }
 
-    if(!req.file) {
+    if (!req.file) {
       res.redirect('/dashboard/profile');
-    } else if(req.file.size > 524288)  {
+    } else if (req.file.size > 524288) {
       req.flash('error', dir.messages.errors.toBig);
       res.redirect('/dashboard/profile');
       fs.unlink(req.file.path, function(err) {
         if (err) {
           // An error occurred when deleting old photo
           console.log('Unable to delete oversized photo\n');
-          console.log(err);
+          console.warn(err);
         }
       })
     } else {
@@ -302,7 +358,7 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
               if (err) {
                 // An error occurred when deleting old photo
                 console.log('Unable to delete old photo\n');
-                console.log(err);
+                console.warn(err);
               }
             })
           }
@@ -316,9 +372,6 @@ router.post('/dashboard/profile/user', function (req, res, next) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
   }
-
-
-  console.log(req.body);
 
   // saving default fields
   req.user.givenName = req.body.name;
@@ -345,12 +398,12 @@ router.post('/dashboard/profile/user', function (req, res, next) {
   }
 
   req.user.customData.save(function (err) {
-  if (err) {
-    next(err);
-  } else {
-    res.redirect('/dashboard');
-  }
-});
+    if (err) {
+      next(err);
+    } else {
+      res.redirect('/dashboard');
+    }
+  });
 
 });
 

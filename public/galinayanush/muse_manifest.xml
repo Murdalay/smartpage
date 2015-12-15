@@ -1,0 +1,150 @@
+<manifest alg="2" build="2015.0.2.310" opt="false" iceEnabled="true" iceMarkupVersion="2" exportTarget="other" domain="sport.luckybrand.kiev.ua" resolutions="1x" timestamp="1449057624296">
+  <folder name="css">
+    <file name="site_global.css" crc="84880209"/>
+    <file name="master_______-a.css" crc="239318750" ref="index"/>
+    <file name="index.css" crc="4284969799" ref="index"/>
+    <file name="iefonts_index.css" crc="4233855941" ref="index"/>
+  </folder>
+  <folder name="fonts">
+    <file name="fontawesome-webfont1.woff" crc="4005222151"/>
+    <file name="fontawesome-webfont1.eot" crc="69270328"/>
+    <file name="fontawesome-webfont1.svg" crc="347027170"/>
+    <file name="pe-icon-7-stroke1.woff" crc="3895352034"/>
+    <file name="pe-icon-7-stroke1.eot" crc="3767532406"/>
+    <file name="pe-icon-7-stroke1.svg" crc="4289137902"/>
+  </folder>
+  <folder name="assets">
+    <file name="fon.mp4" crc="427122274" seo="true" mt="1447848257000"/>
+    <file name="fon.webm" crc="3949841888" seo="true" mt="1447012916000"/>
+    <file name="fon.jpg" crc="3822176261" seo="true" mt="1446840814000"/>
+  </folder>
+  <folder name="scripts">
+    <file name="museredirect.js" crc="3899419633" ref="tablet>index:index"/>
+    <file name="jquery-1.8.3.min.js" crc="196614522" ref="tablet>index:index"/>
+    <file name="museutils.js" crc="275725342" ref="tablet>index:index"/>
+    <file name="jquery.musepolyfill.bgsize.js" crc="185257658" ref="tablet>index:index"/>
+    <file name="pie.js" crc="3827607177" ref="tablet>index:index"/>
+    <file name="jquery.watch.js" crc="3999102769" ref="tablet>index:index"/>
+    <file name="webpro.js" crc="3883484123" ref="tablet>index:index"/>
+    <file name="musewpdisclosure.js" crc="404074387" ref="tablet>index:index"/>
+    <file name="musewpslideshow.js" crc="360574455" ref="tablet>index:index"/>
+    <file name="jquery.museoverlay.js" crc="342093292" ref="tablet>index:index"/>
+    <file name="touchswipe.js" crc="4218319045" ref="tablet>index:index"/>
+    <file name="form_check.php" crc="3932029206" ref="tablet>index:index"/>
+    <file name="form_throttle.php" crc="314685628" ref="tablet>index:index"/>
+    <file name="form_process.php" crc="401030677" ref="tablet>index:index"/>
+    <file name="form-u3676.php" crc="164262550" ref="tablet>index"/>
+    <file name="jquery.scrolleffects.js" crc="206645848" ref="index"/>
+    <file name="form-u1170.php" crc="350970662" ref="index"/>
+  </folder>
+  <folder name="images">
+    <file name="helixcapital-favicon.ico" crc="4053858266" ref="tablet>index"/>
+    <file name="56406f79543830955465d2d4_partner.jpg" crc="58300189" ref="tablet>index"/>
+    <file name="helix-logo.png" crc="174083315" seo="true" ref="tablet>index:index"/>
+    <file name="x9jkl8furmi-ieu2947-fr.png" crc="4109548049" ref="tablet>index"/>
+    <file name="x9jkl8furmi.jpg" crc="448388904" ref="tablet>index:index"/>
+    <file name="video-call.png" crc="259990473" seo="true" ref="tablet>index:index"/>
+    <file name="phone325 (1).png" crc="390754330" seo="true" ref="tablet>index:index"/>
+    <file name="x9jkl8furmi-ieu2996-fr.png" crc="473142749" ref="tablet>index:index"/>
+    <file name="vk.png" crc="3831522109" seo="true" ref="tablet>index"/>
+    <file name="facebook2.png" crc="4120826897" seo="true" ref="tablet>index:index"/>
+    <file name="instagram19.png" crc="481576960" seo="true" ref="tablet>index:index"/>
+    <file name="twitter1 (1).png" crc="4046820458" seo="true" ref="tablet>index:index"/>
+    <file name="youtube18.png" crc="273771434" seo="true" ref="tablet>index:index"/>
+    <file name="unknown-14.png" crc="264738743" seo="true" ref="tablet>index"/>
+    <file name="unknown-17.png" crc="3767113594" seo="true" ref="tablet>index"/>
+    <file name="unknown-16.png" crc="1965900" seo="true" ref="tablet>index"/>
+    <file name="unknown-15.png" crc="334358563" seo="true" ref="tablet>index"/>
+    <file name="verification5.png" crc="4039188365" seo="true" ref="tablet>index"/>
+    <file name="map.svg" crc="4101527677" ref="tablet>index:index"/>
+    <file name="map_poster_.png" crc="3909410761" ref="tablet>index"/>
+    <file name="unknown-24.png" crc="41925307" seo="true" ref="tablet>index:index"/>
+    <file name="unknown-19229x315.jpg" crc="44857104" seo="true" ref="tablet>index"/>
+    <file name="unknown-28229x315.jpg" crc="4072995477" seo="true" ref="tablet>index"/>
+    <file name="75smko9do6e238x279.jpg" crc="3896690138" seo="true" ref="tablet>index"/>
+    <file name="dc3915rosik229x317.jpg" crc="350876471" seo="true" ref="tablet>index"/>
+    <file name="syhdagmvtqu229x317.jpg" crc="167061504" seo="true" ref="tablet>index"/>
+    <file name="xeljhevgcae229x317.jpg" crc="3878497745" seo="true" ref="tablet>index"/>
+    <file name="unknown-19.jpg" crc="3890189148" seo="true" ref="tablet>index:index"/>
+    <file name="blank.gif" crc="4208392903" ref="tablet>index:index"/>
+    <file name="unknown-28.jpg" crc="3790053624" seo="true" ref="tablet>index:index"/>
+    <file name="75smko9do6e.jpg" crc="3914502563" seo="true" ref="tablet>index:index"/>
+    <file name="dc3915rosik.jpg" crc="363953345" seo="true" ref="tablet>index:index"/>
+    <file name="syhdagmvtqu.jpg" crc="190732649" seo="true" ref="tablet>index:index"/>
+    <file name="xeljhevgcae.jpg" crc="4056743919" seo="true" ref="tablet>index:index"/>
+    <file name="loading.gif" crc="3815509949" ref="tablet>index:index"/>
+    <file name="helixfemely.jpg" crc="3922475786" ref="tablet>index:index"/>
+    <file name="freehelix.jpg" crc="204521631" ref="tablet>index:index"/>
+    <file name="helix_home2.jpg" crc="149857911" ref="tablet>index"/>
+    <file name="academy.jpg" crc="4070572509" ref="tablet>index:index"/>
+    <file name="csvoveohz44.jpg" crc="4221815981" ref="tablet>index:index"/>
+    <file name="helixtravel.jpg" crc="4110055380" ref="tablet>index:index"/>
+    <file name="helixspa.jpg" crc="341915592" ref="tablet>index:index"/>
+    <file name="startup.jpg" crc="203771702" ref="tablet>index:index"/>
+    <file name="1428513789_slide7.jpg" crc="213182958" ref="tablet>index:index"/>
+    <file name="l7nbbda9zmc.jpg" crc="3956851235" ref="tablet>index:index"/>
+    <file name="kpirjlb4cgk (1).jpg" crc="3946826373" ref="tablet>index:index"/>
+    <file name="-_tq63rtdbi.jpg" crc="4284386735" ref="tablet>index:index"/>
+    <file name="1428232393_maxresdefault.jpg" crc="3852442327" ref="tablet>index:index"/>
+    <file name="2015-09-10-02-19-04-maksim-blazhkun-chelovek-kotory-j-stal-liderom-ili-lider-kotory-j-ostalsya-chelovekom-korrespondentnet_.jpg" crc="100379182" seo="true" ref="tablet>index:index"/>
+    <file name="thumb-crop-u3312.jpg" crc="273907545" ref="tablet>index"/>
+    <file name="58a46cbd0a45b8c4bfe55928fafd8799-crop-u3314.jpg" crc="228573920" ref="tablet>index"/>
+    <file name="5211d9a27421334d134c04ba379c23ae-crop-u3307.jpg" crc="4127495729" ref="tablet>index"/>
+    <file name="djrt092xzkk222x223.jpg" crc="4262615460" seo="true" ref="tablet>index"/>
+    <file name="hmkwox-y_k0-crop-u3331.jpg" crc="4136091338" ref="tablet>index"/>
+    <file name="l7nbbda9zmc-crop-u3333.jpg" crc="393243552" ref="tablet>index"/>
+    <file name="djrt092xzkk.jpg" crc="150633124" seo="true" ref="tablet>index:index"/>
+    <file name="hmkwox-y_k0.jpg" crc="404945307" seo="true" ref="tablet>index:index"/>
+    <file name="l7nbbda9zmc-crop-u3322.jpg" crc="4060245633" ref="tablet>index"/>
+    <file name="bchanger-crop-u3661.jpg" crc="3812642050" ref="tablet>index"/>
+    <file name="premii.jpg" crc="3923382271" seo="true" ref="tablet>index:index"/>
+    <file name="fb.png" crc="4266706519" seo="true" ref="tablet>index:index"/>
+    <file name="vk2.png" crc="4259765125" seo="true" ref="tablet>index"/>
+    <file name="mail59.png" crc="457989619" seo="true" ref="tablet>index:index"/>
+    <file name="u3692-17.png" crc="72798737" ref="tablet>index"/>
+    <file name="u3692-17-r.png" crc="4111558182" ref="tablet>index"/>
+    <file name="u3692-17-m.png" crc="4111558182" ref="tablet>index"/>
+    <file name="u3692-17-fs.png" crc="401401821" ref="tablet>index"/>
+    <file name="raster_dot-u133-fr.png" crc="4244485820" ref="index"/>
+    <file name="b (1).png" crc="111891423" seo="true" ref="index"/>
+    <file name="side.png" crc="3788748521" seo="true" ref="index"/>
+    <file name="x9jkl8furmi-u1838-fr.jpg" crc="316076947" ref="index"/>
+    <file name="mouse white.png" crc="222464593" seo="true" ref="index"/>
+    <file name="untitled-2-e1429618140163.png" crc="3851258360" seo="true" ref="index"/>
+    <file name="unknown-19170x233.jpg" crc="510432477" seo="true" ref="index"/>
+    <file name="unknown-28170x233.jpg" crc="388919199" seo="true" ref="index"/>
+    <file name="75smko9do6e-crop-u428.jpg" crc="153373224" ref="index"/>
+    <file name="dc3915rosik169x233.jpg" crc="4171964686" seo="true" ref="index"/>
+    <file name="syhdagmvtqu169x233.jpg" crc="4047904336" seo="true" ref="index"/>
+    <file name="xeljhevgcae169x233.jpg" crc="377838106" seo="true" ref="index"/>
+    <file name="helix_home1.jpg" crc="90767997" ref="index"/>
+    <file name="1swuyumalqu.jpg" crc="4122405190" ref="index"/>
+    <file name="5x3io1mmx2k.jpg" crc="3949545338" ref="index"/>
+    <file name="focus.svg" crc="453416012" ref="index"/>
+    <file name="focus_poster_.png" crc="329273696" ref="index"/>
+    <file name="dengi.svg" crc="3862084001" ref="index"/>
+    <file name="dengi_poster_.png" crc="255384644" ref="index"/>
+    <file name="forbes.svg" crc="155865322" ref="index"/>
+    <file name="forbes_poster_.png" crc="172046039" ref="index"/>
+    <file name="djrt092xzkk-crop-u2441.jpg" crc="465637368" ref="index"/>
+    <file name="hmkwox-y_k0-crop-u2439.jpg" crc="3856388254" ref="index"/>
+    <file name="l7nbbda9zmc347x195.jpg" crc="4028400781" seo="true" ref="index"/>
+    <file name="l7nbbda9zmc2.jpg" crc="4198316728" seo="true" ref="index"/>
+    <file name="slide1.jpg" crc="3937691672" seo="true" ref="index"/>
+    <file name="bchanger-crop-u1145.jpg" crc="4263901190" ref="index"/>
+    <file name="b (2).png" crc="3807244350" seo="true" ref="index"/>
+    <file name="u1180-17.png" crc="4050339280" ref="index"/>
+    <file name="u1180-17-r.png" crc="247587769" ref="index"/>
+    <file name="u1180-17-m.png" crc="247587769" ref="index"/>
+    <file name="u1180-17-fs.png" crc="265035847" ref="index"/>
+    <file name="1swuyumalqu2.jpg" crc="3877098674" seo="true" ref="index"/>
+  </folder>
+  <folder name="tablet">
+    <folder name="css">
+      <file name="index.css" crc="4289352134" ref="tablet>index"/>
+      <file name="iefonts_index.css" crc="3776356228" ref="tablet>index"/>
+    </folder>
+    <file name="index.html" crc="139278333" seo="true" mt="1448976309065" redirect="true"/>
+  </folder>
+  <file name="index.html" crc="189902618" seo="true" mt="1449057496395" redirect="true"/>
+</manifest>
