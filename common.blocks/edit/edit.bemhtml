@@ -84,8 +84,13 @@ block('edit')(content()(function(){
 
 				{
 				    block : 'column',
+				    content : _fields
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true, right : true },
 				    content : [
-						_fields,
+						_fieldsForDouble,
 						{ 
 							block : 'align', 
 							mods : { right : true },
@@ -98,13 +103,6 @@ block('edit')(content()(function(){
 								}
 							]
 						}
-					]
-				},
-				{
-				    block : 'column',
-				    mods : { 'double' : true, right : true },
-				    content : [
-						_fieldsForDouble
 					]
 				}
 			]

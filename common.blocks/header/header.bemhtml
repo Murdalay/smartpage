@@ -2,9 +2,14 @@ block('header')(content()(function(){
 	var menuTitles = [{ title : 'Профиль пользователя', value : 'profile' }, { title : 'Оплата услуг', value : 'payment' }, { title : 'Редактор', value : 'edit' }, { title : 'Статистика', value : 'statistic'}],
 		menuItems = [],
 		_ctx = this.ctx,
-		_page = this.ctx.page;
+		_page = this.ctx.page,
+		_active;
 
 	menuTitles.forEach(function(title, index) {
+		if (title.title === _page) {
+			_active = title.value
+		}
+
 		menuItems.push(
 			{
 	            block : 'menu-item',
@@ -12,7 +17,6 @@ block('header')(content()(function(){
 	            mods : { 
 	            	top : true, 
 	            	type : 'link', 
-	            	checked : title.title === _page,  
 	            	disabled : !_ctx.active[index]
 	            },
 	            content : {
@@ -24,17 +28,17 @@ block('header')(content()(function(){
         );
 	});
 
-			return [
+	return [
 				{
 					block : 'content-wrapper',
-					content:
-					[
+					content: [
 						{
 							block : 'logo'
 						},
 						{
 						    block : 'menu',
 						    mods : { theme : 'islands', size : 'xl', mode : 'radio', top: true },
+						    val : _active ? _active : '',
 						    content : _ctx.hideMenu ? '' : menuItems
 						},
 						{
@@ -44,7 +48,7 @@ block('header')(content()(function(){
 						    content : 'Выход'
 						}
 					]
-				},
+				}
 			]
 		}
 	),
