@@ -259,7 +259,7 @@ router.get('/dashboard/payment', function (req, res) {
   });
 });
 
-// Render the payment page.
+// Render the edit page.
 router.get('/dashboard/edit', function (req, res) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
@@ -277,13 +277,38 @@ router.get('/dashboard/edit', function (req, res) {
           {
             block : 'edit',
             appData : dir,
-            js : {
-              subscriptions : dir.subscriptions
-            },
             uData : {
                 user : req.user,
                 custom : account.customData,
                 payed : account.customData.payed
+            }
+          }
+        ],
+    });
+  });
+});
+
+// Render the statistics page.
+router.get('/dashboard/statistics', function (req, res) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+  spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      res.render('statistics', {
+        block : 'container',
+        error : req.flash('error'),
+        info : req.flash('info'),
+        bundle : 'statistics',
+        title : 'Статистика',
+        active : [ true, true, true, true ],
+        inside: [
+          {
+            block : 'statistics',
+            appData : dir,
+            uData : {
+                user : req.user,
+                custom : account.customData
             }
           }
         ],

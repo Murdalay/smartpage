@@ -1,4 +1,5 @@
-block('edit')(content()(function(){
+block('statistics')(content()(function(){
+			var _user = this.ctx.uData.user;
 			var _custom = this.ctx.uData.custom;
 			var _active = _custom.template;
 			var _subscriptions = this.ctx.appData.subscriptions;
