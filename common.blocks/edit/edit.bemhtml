@@ -30,7 +30,7 @@ block('edit')(content()(function(){
 						    block : 'textarea',
 						    mods : { width : 'available', theme : 'islands', size : 'l' },
 						    name : field.id,
-						    val : _custom.extraFields && _custom.extraFields[field.id],
+						    val : _custom && _custom.extraFields ? _custom.extraFields[field.id] : '',
 						    placeholder : field.placeholder
 						}
 					);
@@ -43,7 +43,7 @@ block('edit')(content()(function(){
 						{
 						    block : 'input',
 						    mods : { width : 'available', theme : 'islands', size: 'xl' },
-						    val : _custom.extraFields && _custom.extraFields[field.id],
+						    val : _custom && _custom.extraFields ? _custom.extraFields[field.id] : '',
 						    placeholder : field.placeholder,
 						    name : field.id
 						}
