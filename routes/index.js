@@ -86,8 +86,7 @@ router.post('/register', function(req, res) {
 
   // Grab user fields.
   if (!email || !password) {
-    console.log(!email || !password);
-    return res.render('register', { title: 'Register', error: 'Email and password required.' });
+    return res.redirect('/reg-error-nodata.html');
   }
 
   var _mailRegexp = /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
