@@ -9,6 +9,7 @@ npm-debug.log
 # bem
 .bem/cache/
 .enb/tmp/
+photos/
 *bundles*/*/*.*
 !*bundles*/*/*.bemdecl.js
 *bundles*/*/*.*.bemdecl.js
