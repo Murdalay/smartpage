@@ -1,1 +1,6 @@
-block('column')()
+block('column')(cls()(
+		function() {
+			return this.isLast() ? 'column_last' : ''
+		}
+	)
+)

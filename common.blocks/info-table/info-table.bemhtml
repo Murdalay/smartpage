@@ -1,0 +1,12 @@
+block('info-table')(
+	tag()('table'),
+	content()(function() {
+			return {
+				block : 'info-table',
+				elem : 'tbody',
+				content : applyNext()
+			}
+		}
+	),
+	elem('tbody')(tag()('tbody'))
+)

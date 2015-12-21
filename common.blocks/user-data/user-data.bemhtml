@@ -20,33 +20,40 @@ block('user-data')(content()(function(){
 			return [
 				{
 				    block : 'column',
+				    mods : { 'double' : true },
+				    mix: [{ block : 'padding', mods : { clear : 'bottom' } }],
 				    content : [
 						{
-						    block : 'field-title',
-						    content : 'Имя'
+						    block : 'column',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'Имя'
+								},
+								{
+								    block : 'input',
+								    mods : { width : 'available', theme : 'islands', size: 'xl' },
+								    name : 'name',
+								    placeholder : 'Введите значение',
+								    val : _user.givenName !== 'null' ? _user.givenName : ''
+								}
+						    ]
 						},
 						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl' },
-						    name : 'name',
-						    placeholder : 'Введите значение',
-						    val : _user.givenName !== 'null' ? _user.givenName : ''
-						}
-				    ]
-				},
-				{
-				    block : 'column',
-				    content : [
-						{
-						    block : 'field-title',
-						    content : 'Фамилия'
-						},
-						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl' },
-						    name : 'surname',
-						    placeholder : 'Введите значение',
-						    val : _user.surname !== 'null' ? _user.surname : ''
+						    block : 'column',
+						    content : [
+								{
+								    block : 'field-title',
+								    content : 'Фамилия'
+								},
+								{
+								    block : 'input',
+								    mods : { width : 'available', theme : 'islands', size: 'xl' },
+								    name : 'surname',
+								    placeholder : 'Введите значение',
+								    val : _user.surname !== 'null' ? _user.surname : ''
+								}
+						    ]
 						}
 				    ]
 				},

@@ -289,7 +289,7 @@ router.get('/dashboard/edit', function (req, res) {
 });
 
 // Render the statistics page.
-router.get('/dashboard/statistics', function (req, res) {
+router.get('/dashboard/statistic', function (req, res) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
   }

@@ -65,6 +65,11 @@ a {
   color: #00e;
 }
 
+ .logo {
+  padding-top: 5px;
+  padding-bottom: 5px;
+ }
+
 .button {
   display: inline-block;
   margin-top: 11px;
@@ -975,26 +980,6 @@ a {
   margin-bottom: 0px;
   font-size: 32px;
   line-height: 36px;
-}
-
-.logo-title {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-top: 2px;
-  font-family: Exo, sans-serif;
-  color: white;
-  font-size: 36px;
-  cursor: pointer;
-}
-
-.logo-subtitle {
-  padding-bottom: 2px;
-  opacity: 0.5;
-  font-family: Montserrat, sans-serif;
-  color: white;
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
 .simple-page-header {
@@ -2765,10 +2750,7 @@ html.w-mod-js *[data-ix="page-header-title-2"] {
   .page-header-title.small {
     font-size: 28px;
   }
-  .logo-title {
-    font-size: 32px;
-    line-height: 41px;
-  }
+
   .simple-page-header {
     padding: 105px 25px 25px;
   }

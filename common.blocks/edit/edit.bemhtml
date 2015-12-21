@@ -1,4 +1,5 @@
 block('edit')(content()(function(){
+			var _messages = this.ctx.appData.messages;
 			var _custom = this.ctx.uData.custom;
 			var _active = _custom.template;
 			var _subscriptions = this.ctx.appData.subscriptions;
@@ -55,7 +56,7 @@ block('edit')(content()(function(){
 				{
 				    block : 'column',
 				    mods : { 'double' : true, right : true },
-				    mix: [{ block : 'margins', mods : { top : true, 'double' : true } }],
+				    mix: [{ block : 'margins', mods : { top : true, 'double' : true } }, { block : 'padding', mods : { clear : 'bottom' }}],
 				    content : [
 						{
 						    block : 'image',
@@ -69,7 +70,7 @@ block('edit')(content()(function(){
 				    content : [
 						{
 						    block : 'field-title',
-						    content : 'Активный шаблон'
+						    content : _messages.activeTemplate
 						},
 						{
 						    block : 'group-title',

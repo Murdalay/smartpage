@@ -1,0 +1,6 @@
+block('info-table').elem('cell')(
+	tag()('td'),
+	elemMod('double', true)(attrs()({ 'colspan' : 2 })),
+	elemMod('triple', true)(attrs()({ 'colspan' : 3 })),
+	elemMod('header', true)(tag()('th'))
+)

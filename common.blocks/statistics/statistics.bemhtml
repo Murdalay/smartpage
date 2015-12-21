@@ -1,114 +1,117 @@
 block('statistics')(content()(function(){
-			var _user = this.ctx.uData.user;
 			var _custom = this.ctx.uData.custom;
-			var _active = _custom.template;
-			var _subscriptions = this.ctx.appData.subscriptions;
-			var _activeSubscr;
-			var _fields = [];
-			var _fieldsForDouble = [];
-			var _extra;
+			var _stat = _custom.statistic;
+			var _dates = _stat.visits;
+			var _messages = this.ctx.appData.messages;
+			var _visitTypes = _messages.visitStatistic;
+			var _visitsStat = {};
+			var _visits = [];
+			var _now = new Date;
+			var _dayBefore = _now.getTime() - 86400000;
+			var _monthBefore = _now.setMonth(_now.getMonth - 1);
 
 
-			_subscriptions.forEach(function(subscr){
-					console.log(subscr);
-				if(subscr.val === _active) {
-					_activeSubscr = subscr;
+			_dates && _dates.forEach(function(date){
+				if(date > _dayBefore) {
+					_visitsStat.todayVisits || (_visitsStat.todayVisits = 0);
+					_visitsStat.todayVisits += 1;
+				}
+
+				if(date > _monthBefore) {
+					_visitsStat.thisMonthVisits || (_visitsStat.thisMonthVisits = 0);
+					_visitsStat.thisMonthVisits += 1;
 				}
 			});
-			_extra = _activeSubscr.extraFields;
 
-			console.log(_extra);
-
-			_extra.forEach(function(field) {
-				if(field.type.indexOf('long') > -1) {
-					_fieldsForDouble.push(						
-						{
-						    block : 'field-title',
-						    content : field.name
-						},
-						{
-						    block : 'textarea',
-						    mods : { width : 'available', theme : 'islands', size : 'l' },
-						    name : field.id,
-						    val : _custom.extraFields && _custom.extraFields[field.id],
-						    placeholder : field.placeholder
-						}
-					);
-				} else {
-					_fields.push(						
-						{
-						    block : 'field-title',
-						    content : field.name
-						},
-						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl' },
-						    val : _custom.extraFields && _custom.extraFields[field.id],
-						    placeholder : field.placeholder,
-						    name : field.id
-						}
-					);
-				}
-
-			}.bind(this));
+			_dates && (_visitsStat.totalVisits = _dates.length);
+			_dates && _dates.length > 0 && (_visitsStat.lastVisit = new Date(_dates[_dates.length - 1]).toLocaleDateString('ru-RU'));
+			
+			for(type in _visitTypes) {
+				_visits.push(
+					{
+					    elem : 'row',
+					    content : [
+						    {
+						    	elem : 'cell',
+							    content : _visitTypes[type]
+						    },
+						    {
+						    	elem : 'cell',
+							    content : _visitsStat[type] ? _visitsStat[type] : _messages.noData
+						    }
+					    ]
+					}
+				)
+			}
 
 			return [
 				{
 				    block : 'column',
-				    mods : { 'double' : true, right : true },
-				    mix: [{ block : 'margins', mods : { top : true, 'double' : true } }],
+				    mods : { 'triple' : true },
 				    content : [
 						{
-						    block : 'image',
-						    url : this.ctx.appData.pathToStatic + '/' + _activeSubscr.val + '.jpg'
-						}
-				    ]
-				},
-				{
-				    block : 'column',
-				    mix: [{ block : 'margins', mods : { none : true } }, { block : 'padding', mods : { clear : 'bottom' } }],
-				    content : [
-						{
-						    block : 'field-title',
-						    content : 'Активный шаблон'
-						},
-						{
-						    block : 'group-title',
 						    mix: [{ block : 'margins', mods : { none : true } }],
 
-						    content : _activeSubscr.name
+						    block : 'group-title',
+						    content : _messages.profileStat
 						}
 				    ]
 				},
-				
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+						{
+						    block : 'info-table',
+
+						    content : [
+								{
+								    elem : 'row',
+								    content : [
+									    {
+									    	elem : 'cell',
+										    content : _messages.creationDate
+									    },
+									    {
+									    	elem : 'cell',
+										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
+									    }
+								    ]
+								},
+								{
+								    elem : 'row',
+								    content : [
+									    {
+									    	elem : 'cell',
+										    content : _messages.creationDate
+									    },
+									    {
+									    	elem : 'cell',
+										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
+									    }
+								    ]
+								}
+						    ]
+						}
+				    ]
+				},
 
 				{
 				    block : 'column',
-				    content : _fields
-				},
-				{
-				    block : 'column',
-				    mods : { 'double' : true, right : true },
+				    mods : { 'triple' : true },
 				    content : [
-						_fieldsForDouble,
-						{ 
-							block : 'align', 
-							mods : { right : true },
-							content : [
-								{
-								    block : 'button',
-								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-								    mix: [{ block : 'margins', mods : { top : true } }],
-								    text : 'Отправить'
-								}
-							]
+						{
+						    block : 'group-title',
+						    content : _messages.visitorsStat
+						},
+						{
+						    block : 'info-table',
+						    content : _visits
 						}
-					]
+				    ]
 				}
 			]
 		}
 	),
-	tag()('form'),
-	attrs()({ method : 'post' }),
 	js()(true)
 )
