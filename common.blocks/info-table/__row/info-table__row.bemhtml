@@ -2,7 +2,12 @@ block('info-table').elem('row')(
 	tag()('tr'),
 	cls()(
 		function() {
-			console.log(this.position);
+			Number.isInteger = Number.isInteger || function(value) {
+			    return typeof value === "number" && 
+			           isFinite(value) && 
+			           Math.floor(value) === value;
+			};
+
 			return Number.isInteger(this.position / 2) ? 'info-table__row_even' : ''
 
 		}
