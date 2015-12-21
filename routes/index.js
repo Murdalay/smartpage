@@ -103,9 +103,10 @@ router.post('/register', function(req, res) {
       customData : {
         phone : null,
         template : null,
-        payed : false,
-        wallet : false,
-        payDates: false,
+        payed : null,
+        bonus : null,
+        wallet : null,
+        payDates: null,
         social: {}
       }
     }, function (err, createdAccount) {

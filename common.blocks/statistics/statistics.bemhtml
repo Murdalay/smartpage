@@ -2,6 +2,7 @@ block('statistics')(content()(function(){
 			var _custom = this.ctx.uData.custom;
 			var _stat = _custom.statistic;
 			var _dates = _stat.visits;
+			var _dir = this.ctx.appData;
 			var _messages = this.ctx.appData.messages;
 			var _visitTypes = _messages.visitStatistic;
 			var _visitsStat = {};
@@ -83,11 +84,11 @@ block('statistics')(content()(function(){
 								    content : [
 									    {
 									    	elem : 'cell',
-										    content : _messages.creationDate
+										    content : _messages.activeBonus
 									    },
 									    {
 									    	elem : 'cell',
-										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
+										    content : _custom.bonus ? _dir.bonus[_custom.bonus] : _messages.noBonus
 									    }
 								    ]
 								}
