@@ -79,65 +79,62 @@ spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi
 
 
 // Register a new user to Stormpath.
-// router.post('/register', function(req, res) {
+router.post('/register', function(req, res) {
 
-//   var email = req.body.email;
-//   var password = req.body.password;
+  var email = req.body.email;
+  var password = req.body.password;
 
-//   // Grab user fields.
-//   if (!email || !password) {
-//     console.log(!email || !password);
-//     return res.render('register', { title: 'Register', error: 'Email and password required.' });
-//   }
+  // Grab user fields.
+  if (!email || !password) {
+    console.log(!email || !password);
+    return res.render('register', { title: 'Register', error: 'Email and password required.' });
+  }
 
-//   // Grab our app, then attempt to create this user's account.
-//   var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
-//     if (err) throw err;
+  // Grab our app, then attempt to create this user's account.
+  var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
+    if (err) throw err;
 
-//     app.createAccount({
-//       givenName: 'null',
-//       surname: 'null',
-//       username:  'smartuser' + Date.now(),
-//       email: email,
-//       password: password,
-//       customData : {
-//         phone : null,
-//         template : null,
-//         payed : false,
-//         wallet : false,
-//         payDates: false,
-//         social: {}
-//       }
-//     }, function (err, createdAccount) {
-//       if (err) {
+    app.createAccount({
+      givenName: 'null',
+      surname: 'null',
+      username:  'smartuser' + Date.now(),
+      email: email,
+      password: password,
+      customData : {
+        phone : null,
+        template : null,
+        payed : false,
+        wallet : false,
+        payDates: false,
+        social: {}
+      }
+    }, function (err, createdAccount) {
+      if (err) {
 
-//         console.error(err);
+        console.error(err);
 
-//          return res.render('main', {
-//                   block : 'container',
-//                   bundle : 'main',
-//                   mods : { error  : true },
-//                   title : 'Ошибка регистрации',
-//                   active : [ false, false, false, false ],
-//                   custom : {},
-//                   inside: err.userMessage
-//               });
+         return res.render('main', {
+                  block : 'container',
+                  bundle : 'main',
+                  mods : { error  : true },
+                  title : 'Ошибка регистрации',
+                  active : [ false, false, false, false ],
+                  custom : {},
+                  inside: err.userMessage
+              });
 
-//       } else {
-//           return res.redirect('/success.html');
-//         // passport.authenticate('stormpath')(req, res, function () {
-//         //   return res.redirect('/dashboard');
-//         // });
-//       }
-//     });
+      } else {
+          return res.redirect('/success.html');
+        // passport.authenticate('stormpath')(req, res, function () {
+        //   return res.redirect('/dashboard');
+        // });
+      }
+    });
 
-//   });
+  });
 
-// });
+});
 
-
-// Render the login page.
-  // res.render('login', { title: 'Login', error: req.flash('error')[0] });
 
 
 // Logout the user, then redirect to the home page.
