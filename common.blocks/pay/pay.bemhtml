@@ -6,6 +6,7 @@ block('pay')(content()(function(){
 			var _subscription = this.ctx.uData.custom.userSubcription;
 			var _defSubscription = this.ctx.appData.defaultSubcription;
 			var _domain = this.ctx.appData.domain;
+			var _messages = this.ctx.appData.messages;
 
 			var isPayed = function() {
 				return !!_payed;
@@ -70,28 +71,24 @@ block('pay')(content()(function(){
 				    content : [
 						{
 						    block : 'field-title',
-						    content : 'Номер кошелька HeilixMoney'
+						    content : 'Срок подписки'
 						},
 						{
 						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl' },
-						    name : 'wallet',
-						    placeholder : 'Введите номер',
-						    maxLength : 13,
-						    val : !!this.ctx.uData.custom.wallet ? this.ctx.uData.custom.wallet : ''
-						},
-						{
-						    block : 'field-title',
-						    content : 'Срок подписки'
+						    mods : { number : true, width : 'available', theme : 'islands', size: 'xl' },
+						    name : 'durration',
+						    maxLength : 2,
+						    val : 1
 						},
 						{
 						    block : 'radio-group',
 						    mods : { theme : 'islands', size : 'xl', type : 'button' },
 						    name : 'subscription-type',
 						    val : 'year',
+						    mix: [{ block : 'margins', mods : { top : true } }],
 						    options : [
-						        { val : 'year', text : 'Годовая' },
-						        { val : 'month', text : 'Месячная' }
+						        { val : 'year', text : 'Год' },
+						        { val : 'month', text : 'Месяц' }
 						    ],
 						},
 						{
@@ -110,11 +107,11 @@ block('pay')(content()(function(){
 						    mods : { theme : 'islands', checked : true, size : 'l' },
 						    name: 'autoRenew',
 						    val: true,
-						    text : 'Продлевать подписку'
+						    text : _messages.pay.autoRenew
 						},
 						{
 						    block : 'small-caption',
-						    content : 'Номер будет сохранен в базе, и, в дальнейшем, использован для нужд биллинга.'
+						    content : _messages.pay.weWillFindYou
 						},
 						{ 
 							block : 'align', 
@@ -124,7 +121,7 @@ block('pay')(content()(function(){
 								    block : 'button',
 								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
 								    mix: [{ block : 'margins', mods : { top : true } }],
-								    text : 'Отправить'
+								    text : 'Подать заявку'
 								}
 							]
 						}

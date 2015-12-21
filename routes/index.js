@@ -90,6 +90,23 @@ router.post('/register', function(req, res) {
     return res.render('register', { title: 'Register', error: 'Email and password required.' });
   }
 
+  var _mailRegexp = /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
+
+  var _isMail = _mailRegexp.test(email);
+
+  if(!_isMail) {
+    return res.render('main', {
+          block : 'container',
+          bundle : 'main',
+          mods : { error  : true },
+          title : 'Ошибка регистрации',
+          active : [ false, false, false, false ],
+          custom : {},
+          inside: dir.messages.errors.notMail
+      }); 
+  }
+
+
   // Grab our app, then attempt to create this user's account.
   var app = spClient.getApplication(process.env['STORMPATH_APP_HREF'], function(err, app) {
     if (err) throw err;
@@ -105,7 +122,7 @@ router.post('/register', function(req, res) {
         template : null,
         payed : null,
         bonus : null,
-        wallet : null,
+        billing : null,
         payDates: null,
         social: {}
       }
@@ -336,6 +353,30 @@ router.post('/dashboard/edit', function (req, res, next) {
     }
   });
 
+});
+
+router.post('/dashboard/pay', function (req, res, next) {
+  if (!req.user || req.user.status !== 'ENABLED') {
+    return res.redirect('/login');
+  }
+
+  req.user.customData.payRequest || (req.user.customData.payRequest = {});
+
+  for (key in req.body) {
+    req.user.customData.payRequest[key] = req.body[key];
+  }
+  
+  // saving custom fields
+
+  req.user.customData.payed || (req.user.customData.payed = 'waiting');
+  req.user.customData.save(function (err) {
+    if (err) {
+      next(err);
+    } else {
+      req.flash('info', dir.messages.pay.thanks);
+      res.redirect('/dashboard/payment');
+    }
+  });
 });
 
 

@@ -20,7 +20,7 @@ block('user-data')(content()(function(){
 			return [
 				{
 				    block : 'column',
-				    mods : { 'double' : true },
+				    mods : { right : true, 'double' : true },
 				    mix: [{ block : 'padding', mods : { clear : 'bottom' } }],
 				    content : [
 						{
@@ -59,7 +59,7 @@ block('user-data')(content()(function(){
 				},
 				{
 				    block : 'column',
-				    mods : { 'double' : true },
+				    mods : { right : true, 'double' : true },
 				    content : [
 
 						{
@@ -94,7 +94,7 @@ block('user-data')(content()(function(){
 				},
 				{
 				    block : 'column',
-				    mods : { 'double' : true },
+				    mods : { right : true, 'double' : true },
 				    content : [
 						{
 						    block : 'group-title',
@@ -136,7 +136,7 @@ block('user-data')(content()(function(){
 				},
 				{
 				    block : 'column',
-				    mods : { 'double' : true },
+				    mods : { right : true, 'double' : true },
 				    content : [
 						{
 						    block : 'field-title',
@@ -166,19 +166,19 @@ block('user-data')(content()(function(){
 						{
 						    block : 'small-caption',
 						    content : 'Выберите одну из социальных сетей и введите ссылку на профиль'
+						},
+						{
+						    block : 'column',
+						    mods : { 'right' : true, align : 'right' },
+						    content : [
+								{
+								    block : 'button',
+								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+								    text : 'Отправить'
+								}
+							]
 						}
 				    ]
-				},
-				{
-				    block : 'column',
-				    mods : { 'right' : true, align : 'right' },
-				    content : [
-						{
-						    block : 'button',
-						    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-						    text : 'Отправить'
-						}
-					]
 				}
 			]
 		}
