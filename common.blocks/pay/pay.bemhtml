@@ -107,11 +107,11 @@ block('pay')(content()(function(){
 						    mods : { theme : 'islands', checked : true, size : 'l' },
 						    name: 'autoRenew',
 						    val: true,
-						    text : _messages.pay.autoRenew
+						    text : _messages ? _messages.pay.autoRenew : ''
 						},
 						{
 						    block : 'small-caption',
-						    content : _messages.pay.weWillFindYou
+						    content :  _messages ? _messages.pay.weWillFindYou : ''
 						},
 						{ 
 							block : 'align', 
