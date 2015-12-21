@@ -8,7 +8,7 @@ block('edit')(content()(function(){
 			var _fieldsForDouble = [];
 			var _extra;
 
-
+			_active || _active = this.ctx.uData.custom.payRequest.subscription;
 			_subscriptions.forEach(function(subscr){
 					console.log(subscr);
 				if(subscr.val === _active) {
