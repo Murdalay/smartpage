@@ -1,0 +1,17 @@
+block('page')(
+
+    elem('head').content()(function() {
+        return [
+            applyNext(),
+            {
+                elem : 'meta',
+                attrs : {
+                    name : 'viewport',
+                    content : 'maximum-scale=1,initial-scale=1,user-scalable=0'
+                }
+            },
+            { elem : 'meta', attrs : { name : 'format-detection', content : 'telephone=no' } },
+            { elem : 'link', attrs : { name : 'apple-mobile-web-app-capable', content : 'yes' } }
+        ];
+    })
+);
