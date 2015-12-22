@@ -45,6 +45,7 @@ var uploader = multer({
 }).single('avatar');
 
 // Initialize our Stormpath client.
+var dirUrl = 'https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi8tIZ8y';
 var apiKey = new stormpath.ApiKey(
   process.env['STORMPATH_API_KEY_ID'],
   process.env['STORMPATH_API_KEY_SECRET']
@@ -62,7 +63,7 @@ function isProfileFiled (user) {
 }
 
 
-spClient.getDirectory('https://api.stormpath.com/v1/directories/14CzfxWB2inuWwRi8tIZ8y', { expand: 'customData' }, function(err, dirr) {
+spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
     if (err) throw new Error(err);
     
     var _dir = {};
@@ -436,37 +437,50 @@ router.post('/dashboard/profile/user', function (req, res, next) {
     return res.redirect('/login');
   }
 
+  spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
+    directory.getAccounts({ username: req.body.username }, function(err, accounts) {
+    accounts.each(function(account, cb) {
+
+      req.flash('error', dir.messages.username + ' ' + req.body.username + ' ' + dir.messages.errors.alreadyExists);
+      return res.redirect('/dashboard/profile');
+
+    }, function(err) {
   // saving default fields
-  req.user.givenName = req.body.name;
-  req.user.surname = req.body.surname;
-  req.user.username = req.body.username;
+      req.user.givenName = req.body.name;
+      req.user.surname = req.body.surname;
+      req.user.username = req.body.username;
 
-  req.user.save(function (err) {
-    if (err) {
-      next(err);
-    }
+      req.user.save(function (err) {
+        if (err) {
+          next(err);
+        }
+      });
+
+      // saving custom fields
+      req.user.customData.phone = req.body.phone;
+
+      if(req.body.vk) {
+        req.user.customData.social = { type : 'vk', profile : req.body.vk };
+      } else if(req.body.facebook) {
+        req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
+      } else if(req.body.tweet) {
+        req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
+      } else {
+        req.user.customData.social = {};
+      }
+
+      req.user.customData.save(function (err) {
+        if (err) {
+          next(err);
+        } else {
+          res.redirect('/dashboard');
+        }
+      });
+    }.bind(this));
+  }.bind(this));
   });
+
   
-  // saving custom fields
-  req.user.customData.phone = req.body.phone;
-
-  if(req.body.vk) {
-    req.user.customData.social = { type : 'vk', profile : req.body.vk };
-  } else if(req.body.facebook) {
-    req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
-  } else if(req.body.tweet) {
-    req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
-  } else {
-    req.user.customData.social = {};
-  }
-
-  req.user.customData.save(function (err) {
-    if (err) {
-      next(err);
-    } else {
-      res.redirect('/dashboard');
-    }
-  });
 
 });
 
