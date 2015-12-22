@@ -1,5 +1,18 @@
 var Express = require('express');
 var ExpressBem = require('express-bem');
+var watch = require('node-watch');
+var path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var passport = require('passport');
+var StormpathStrategy = require('passport-stormpath');
+var session = require('express-session');
+var flash = require('connect-flash');
+var exec = require('child_process').exec;
+
+
+
 
 
 // create app and bem
@@ -14,7 +27,29 @@ app.bem = bem.bindTo(app);
 
 if (process.env.NODE_ENV !== 'production') {
   bem.usePlugin(process.env.EXPRESS_BEM_MAKER === 'enb' ? 'express-bem-enb-make' : 'express-bem-tools-make',
-    {verbosity: 'debug'});
+    { verbosity: 'debug'});
+
+    var filter = function(pattern, fn) {
+    return function(filename) {
+      if (pattern.test(filename)) {
+        fn(filename);
+      }
+    }
+  }
+   
+  // only watch for js files 
+  watch(path.join(__dirname, 'common.blocks'), filter(/\.js$|\.styl$|\.bemhtml$/, function(filename) {
+    console.log(filename);
+
+    var child = exec('bem make desktop.bundles/main',
+    function (error, stdout, stderr) {
+      console.log('stdout: ' + stdout);
+      console.log('stderr: ' + stderr);
+      if (error !== null) {
+        console.log('exec error: ' + error);
+      }
+    });
+  }));
 }
 
 // register engines
@@ -45,14 +80,7 @@ bem.engine('fullstack', '.bem', ['.bemhtml.js', '.bemtree.js'], function (name, 
 // set default engine extension
 app.set('view engine', '.bem');
 
-var path = require('path');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var passport = require('passport');
-var StormpathStrategy = require('passport-stormpath');
-var session = require('express-session');
-var flash = require('connect-flash');
+
 
 var routes = require('./routes/index');
 var strategy = new StormpathStrategy();
@@ -94,7 +122,7 @@ app.use(routes);
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('index', {
+        res.render('main', {
             block : 'page',
             content: err.message
         });
