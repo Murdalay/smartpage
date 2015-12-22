@@ -34,14 +34,15 @@ block('user-photo')(def().match(!this.ctx._wrapped)(function() {
 							    block : 'user-photo',
 							    elem : 'caption',
 							    content : 'После загрузки, фотография будет обновлена во всех лендингах. Размер фотографии не должен превышать 500kb.'
+							},
+
+							{
+							    block : 'button',
+							    mix : [{ block: 'margins', mods : { top : true, 'double' : true } }],
+							    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+							    text : 'Загрузить фото'
 							}
 					    ]
-					},
-
-					{
-					    block : 'button',
-					    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-					    text : 'Загрузить фото'
 					}
 				]
 			}

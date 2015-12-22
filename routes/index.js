@@ -437,47 +437,60 @@ router.post('/dashboard/profile/user', function (req, res, next) {
     return res.redirect('/login');
   }
 
-  spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
-    directory.getAccounts({ username: req.body.username }, function(err, accounts) {
-    accounts.each(function(account, cb) {
+  if(req.user.username !== req.body.username){
+    spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
+      directory.getAccounts({ username: req.body.username }, function(err, accounts) {
+      accounts.each(function(account, cb) {
 
-      req.flash('error', dir.messages.username + ' ' + req.body.username + ' ' + dir.messages.errors.alreadyExists);
-      return res.redirect('/dashboard/profile');
+        req.flash('error', dir.messages.username + ' ' + req.body.username + ' ' + dir.messages.errors.alreadyExists);
+        return res.redirect('/dashboard/profile');
 
-    }, function(err) {
-  // saving default fields
-      req.user.givenName = req.body.name;
-      req.user.surname = req.body.surname;
-      req.user.username = req.body.username;
+      }, function(err) {
+        // saving default fields
+        req.user.givenName = req.body.name;
+        req.user.surname = req.body.surname;
+        req.user.username = req.body.username;
 
-      req.user.save(function (err) {
-        if (err) {
-          next(err);
-        }
+        req.user.save(function (err) {
+          if (err) {
+            next(err);
+          }
+        });
       });
 
-      // saving custom fields
-      req.user.customData.phone = req.body.phone;
-
-      if(req.body.vk) {
-        req.user.customData.social = { type : 'vk', profile : req.body.vk };
-      } else if(req.body.facebook) {
-        req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
-      } else if(req.body.tweet) {
-        req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
-      } else {
-        req.user.customData.social = {};
-      }
-
-      req.user.customData.save(function (err) {
-        if (err) {
-          next(err);
-        } else {
-          res.redirect('/dashboard');
-        }
-      });
+      }.bind(this));
     }.bind(this));
-  }.bind(this));
+  } else {
+    req.user.givenName = req.body.name;
+    req.user.surname = req.body.surname;
+
+    req.user.save(function (err) {
+      if (err) {
+        next(err);
+      }
+    });
+  }
+
+  // saving custom fields
+  req.user.customData.phone = req.body.phone;
+
+  if(req.body.vk) {
+    req.user.customData.social = { type : 'vk', profile : req.body.vk };
+  } else if(req.body.facebook) {
+    req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
+  } else if(req.body.tweet) {
+    req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
+  } else {
+    req.user.customData.social = {};
+  }
+
+  req.user.customData.save(function (err) {
+    if (err) {
+      next(err);
+    } else {
+      res.redirect('/dashboard');
+    }
+
   });
 
   
