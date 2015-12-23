@@ -1,1 +1,5 @@
-exports.blocks = [];
+exports.blocks = [
+    {
+        "name": "enter"
+    }
+];
