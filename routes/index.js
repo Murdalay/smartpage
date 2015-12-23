@@ -196,6 +196,26 @@ router.get('/restore/', function(req, res, next) {
   res.redirect('/404.html')
 });
 
+router.get('/admin', function(req, res, next) {
+  res.render('enter', {
+        block : 'enter',
+        bundle : 'enter',
+        error : req.flash('error'),
+        info : req.flash('info'),
+
+        firstInput: {
+          name : 'login',
+          placeholder : 'Имя пользователя'
+        },
+        secondInput: {
+          name : 'password',
+          placeholder : 'Пароль'
+        },
+
+        title : 'Вход для администраторов'
+    });
+  });
+
 
 // Render the dashboard page.
 router.get('/dashboard', function (req, res) {
@@ -237,7 +257,7 @@ router.get('/dashboard/profile', function (req, res) {
               },
               photo : account.customData.photo && account.customData.photo.path
           }
-        ],
+        ]
     });
   });
 });

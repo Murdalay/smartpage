@@ -1,0 +1,10 @@
+block('form')(
+	tag()('form'),
+	attrs()(function(){
+		return { 
+			method : 'post', 
+			action : this.ctx.url ? this.ctx.url : '',
+			name : this.ctx.name ? this.ctx.name : '' 
+		}
+	})
+);
