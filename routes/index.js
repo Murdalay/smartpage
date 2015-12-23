@@ -456,45 +456,65 @@ router.post('/dashboard/profile/user', function (req, res, next) {
             next(err);
           }
         });
+
+        // saving custom fields
+        req.user.customData.phone = req.body.phone;
+
+        if(req.body.vk) {
+          req.user.customData.social = { type : 'vk', profile : req.body.vk };
+        } else if(req.body.facebook) {
+          req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
+        } else if(req.body.tweet) {
+          req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
+        } else {
+          req.user.customData.social = {};
+        }
+
+        req.user.customData.save(function (err) {
+          if (err) {
+            next(err);
+          } else {
+            return res.redirect('/dashboard/profile');
+          }
+
+        });
       });
 
       }.bind(this));
     }.bind(this));
   } else {
-    req.user.givenName = req.body.name;
-    req.user.surname = req.body.surname;
+        req.user.givenName = req.body.name;
+        req.user.surname = req.body.surname;
 
-    req.user.save(function (err) {
-      if (err) {
-        next(err);
+        req.user.save(function (err) {
+          if (err) {
+            console.log(err)
+            next(err);
+          }
+        });
+
+      // saving custom fields
+      req.user.customData.phone = req.body.phone;
+
+      if(req.body.vk) {
+        req.user.customData.social = { type : 'vk', profile : req.body.vk };
+      } else if(req.body.facebook) {
+        req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
+      } else if(req.body.tweet) {
+        req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
+      } else {
+        req.user.customData.social = {};
       }
-    });
+
+      req.user.customData.save(function (err) {
+        if (err) {
+          next(err);
+        } else {
+          return res.redirect('/dashboard/profile');
+        }
+
+      });
   }
-
-  // saving custom fields
-  req.user.customData.phone = req.body.phone;
-
-  if(req.body.vk) {
-    req.user.customData.social = { type : 'vk', profile : req.body.vk };
-  } else if(req.body.facebook) {
-    req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
-  } else if(req.body.tweet) {
-    req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
-  } else {
-    req.user.customData.social = {};
-  }
-
-  req.user.customData.save(function (err) {
-    if (err) {
-      next(err);
-    } else {
-      res.redirect('/dashboard');
-    }
-
-  });
-
-  
-
 });
 
 module.exports = router;
