@@ -1,14 +1,25 @@
 block('container')(def()(function(){
 	var _activeMenuItems = this.ctx.active;
+	var _bundle = this.ctx.bundle;
 	var _err = this.ctx.error && this.ctx.error.length ? {
 		block : 'error',
 		content : this.ctx.error
 	} : '';
 
 	var _info = this.ctx.info && this.ctx.info.length ? {
-	block : 'info-message',
-	content : this.ctx.info
-	} : '';
+		block : 'info-message',
+		content : this.ctx.info
+		} : '';
+
+	var _menu = this.ctx.menu,
+		menuTitles = _menu ? _menu.items : '',
+		_title = '';
+
+	menuTitles && menuTitles.forEach(function(title, index) {
+		if (title.value === _bundle) {
+			_title = title.title
+		}
+	});
 
 	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
 
@@ -20,14 +31,16 @@ block('container')(def()(function(){
 				        { elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
 				        { elem : 'js', url : '/js/jquery.mCustomScrollbar.min.js' },
 				        { elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
-				        { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.js' : '_main.js' }
+				        { elem : 'js', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.js' : '_main.js' }
 				    ],
-				    styles : { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.css' : '_main.css' },
-				    title: this.ctx.title ? this.ctx.title : 'Dashboard',
+				    styles : { elem : 'css', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.css' : '_main.css' },
+				    title: this.ctx.title ? this.ctx.title : _title ? _title : 'Dashboard',
 				    content : [
 					    { 
 					    	block : 'header',
-					    	page : this.ctx.title,
+					    	page : _title,
+					    	menu : this.ctx.menu,
+					    	logout : this.ctx.messages ? this.ctx.messages.logout : '',
 					    	active : this.ctx.active,
 					    	hideMenu : !_activeMenuItems
 
@@ -39,7 +52,7 @@ block('container')(def()(function(){
 							    	content: [
 								    	{ 
 								    		block : 'section-title',
-								    		content : this.ctx.title
+								    		content : _title
 								    	},
 								    	{ 
 								    		block : 'scroller',

@@ -1,13 +1,14 @@
 block('header')(content()(function(){
-	var menuTitles = [{ title : 'Профиль пользователя', value : 'profile' }, { title : 'Оплата услуг', value : 'payment' }, { title : 'Редактор', value : 'edit' }, { title : 'Статистика', value : 'statistic'}],
-		menuItems = [],
+	var menuItems = [],
 		_ctx = this.ctx,
 		_page = this.ctx.page,
+		_menu = this.ctx.menu,
+		menuTitles = _menu ? _menu.items : '',
 		_active;
 
-	menuTitles.forEach(function(title, index) {
+	menuTitles && menuTitles.forEach(function(title, index) {
 		if (title.title === _page) {
-			_active = title.value
+			_active = title.value;
 		}
 
 		menuItems.push(
@@ -21,7 +22,7 @@ block('header')(content()(function(){
 	            },
 	            content : {
 	                block : 'link',
-	                url : '/dashboard/' + title.value,
+	                url : _menu.basePath + '/' + title.value,
 	                content : title.title
 	            }
 	        }
@@ -45,7 +46,7 @@ block('header')(content()(function(){
 						    block : 'link',
 						    mods : { theme : 'islands', logout : true },
 						    url : '/logout',
-						    content : 'Выход'
+						    content : this.ctx.logout
 						}
 					]
 				}

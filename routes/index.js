@@ -219,11 +219,11 @@ router.get('/admin', function(req, res, next) {
 
         firstInput: {
           name : 'login',
-          placeholder : 'Email'
+          placeholder : dir.messages.email
         },
         secondInput: {
           name : 'password',
-          placeholder : 'Пароль'
+          placeholder : dir.messages.password
         },
 
         title : dir.messages.adminLogin
@@ -269,12 +269,13 @@ router.get('/dashboard/profile', function (req, res) {
     if (err) { return next(err) }
     console.log(account.customData);
   
-      res.render('main', {
+      res.render('profile', {
         block : 'container',
-        bundle : 'main',
+        bundle : 'profile',
         error : req.flash('error'),
         info : req.flash('info'),
-        title : 'Профиль пользователя',
+        menu : dir.menuUserAdmin,
+        messages : dir.messages,
         active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.payed, !!account.customData.statistic ],
         custom : account.customData,
         inside: [
@@ -307,8 +308,9 @@ router.get('/dashboard/payment', function (req, res) {
         block : 'container',
         error : req.flash('error'),
         info : req.flash('info'),
+        menu : dir.menuUserAdmin,
+        messages : dir.messages,
         bundle : 'payment',
-        title : 'Оплата услуг',
         active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
         inside: [
           {
@@ -340,8 +342,9 @@ router.get('/dashboard/edit', function (req, res) {
         block : 'container',
         error : req.flash('error'),
         info : req.flash('info'),
+        menu : dir.menuUserAdmin,
+        messages : dir.messages,
         bundle : 'edit',
-        title : 'Редактор',
         active : [ true, true, true, !!account.customData.statistic ],
         inside: [
           {
@@ -365,12 +368,13 @@ router.get('/dashboard/statistic', function (req, res) {
   }
 
   spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-      res.render('statistics', {
+      res.render('statistic', {
         block : 'container',
         error : req.flash('error'),
         info : req.flash('info'),
-        bundle : 'statistics',
-        title : 'Статистика',
+        menu : dir.menuUserAdmin,
+        messages : dir.messages,
+        bundle : 'statistic',
         active : [ true, true, true, true ],
         inside: [
           {
@@ -436,7 +440,7 @@ router.post('/dashboard/pay', function (req, res, next) {
   });
 });
 
-
+// photo upload handling
 router.post('/dashboard/profile/user/photo', function(req, res, next){
   uploader(req, res, function (err) {
     if (err) {
@@ -492,6 +496,11 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 router.post('/dashboard/profile/user', function (req, res, next) {
   if (!req.user || req.user.status !== 'ENABLED') {
     return res.redirect('/login');
+  }
+
+  if (!req.body.username) {
+        req.flash('error', dir.messages.errors.mustFillUsername);
+        return res.redirect('/dashboard/profile');
   }
 
   if(req.user.username !== req.body.username){
