@@ -6,7 +6,7 @@ block('tarif')(content()(function(){
 			var _messages = this.ctx.messages.pay;
 
 
-			_subscriptions.forEach(function(subcript, index) {
+			_subscriptions && _subscriptions.forEach(function(subcript, index) {
 				_payOptions.push(
 			        { val : subcript.val, text : subcript.name }
 			    );
