@@ -73,7 +73,7 @@ block('pay')(content()(function(){
 				    content : [
 						{
 						    block : 'field-title',
-						    content : _messages ? _messages.pay.subscriptionDuration : ''
+						    content : _messages && _messages.pay ? _messages.pay.subscriptionDuration : ''
 						},
 						{
 						    block : 'input',
