@@ -26,7 +26,7 @@ block('tarif')(content()(function(){
 									    mix : [{ block : 'align', mods : { 'float' :'right' } }],
 								        target : '_blank',
 									    url : subcript.example,
-									    text : _messages.templateExample
+									    text : _messages ? _messages.templateExample : ''
 									}
 					        	]
 					        },
@@ -36,7 +36,7 @@ block('tarif')(content()(function(){
 							        { 
 								        block : 'basic-text',
 								        mods : { bold : true },
-							        	content : _messages.templatePrice
+							        	content : _messages ? _messages.templatePrice : ''
 							        },
 							        { 
 								        elem : 'price',
@@ -49,7 +49,7 @@ block('tarif')(content()(function(){
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : _messages.monthSubscription
+							        	content : _messages ? _messages.monthSubscription : ''
 							        },
 							        { 
 								        elem : 'price',
@@ -62,7 +62,7 @@ block('tarif')(content()(function(){
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : _messages.yearSubscription
+							        	content : _messages ? _messages.yearSubscription : ''
 							        },
 							        { 
 								        elem : 'price',
