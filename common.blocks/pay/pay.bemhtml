@@ -1,9 +1,10 @@
 block('pay')(content()(function(){
 			var _user = this.ctx.uData.user;
 			var _username = _user.username + '';
-			var _payed = this.ctx.uData.custom.payed;
+			var _custom = this.ctx.uData.custom;
+			var _payed = _custom.payed;
+			var _subscription = _custom.userSubcription;
 			var _subscriptions = this.ctx.appData.subscriptions;
-			var _subscription = this.ctx.uData.custom.userSubcription;
 			var _defSubscription = this.ctx.appData.defaultSubcription;
 			var _domain = this.ctx.appData.domain;
 			var _messages = this.ctx.appData.messages;
@@ -45,7 +46,7 @@ block('pay')(content()(function(){
 							    block : 'subscription-status',
 								payed : _payed, 
 							    dates : this.ctx.uData.custom.payDates,
-							    messages : this.ctx.appData.messages
+							    messages : _messages
 						}
 				    ]
 				},
@@ -55,11 +56,12 @@ block('pay')(content()(function(){
 				    content : [
 						{
 						    block : 'field-title',
-						    content : 'Тарифный план'
+						    content : _messages.plan
 						},
 						{
 							    block : 'tarif',
 							    name : 'subscription',
+							    messages : _messages,
 								val : getActiveSubcription(),
 								subscript : _subscriptions
 						}
@@ -71,7 +73,7 @@ block('pay')(content()(function(){
 				    content : [
 						{
 						    block : 'field-title',
-						    content : 'Срок подписки'
+						    content : _messages.pay.subscriptionDuration
 						},
 						{
 						    block : 'input',
@@ -87,13 +89,13 @@ block('pay')(content()(function(){
 						    val : 'year',
 						    mix: [{ block : 'margins', mods : { top : true } }],
 						    options : [
-						        { val : 'year', text : 'Год' },
-						        { val : 'month', text : 'Месяц' }
+						        { val : 'year', text : _messages.year },
+						        { val : 'month', text : _messages.month }
 						    ],
 						},
 						{
 						    block : 'field-title',
-						    content : 'Сумма'
+						    content : _messages.pay.sum
 						},
 						{
 						    block : 'input',
@@ -121,7 +123,7 @@ block('pay')(content()(function(){
 								    block : 'button',
 								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
 								    mix: [{ block : 'margins', mods : { top : true } }],
-								    text : 'Подать заявку'
+								    text : _messages.pay.makeRequest
 								}
 							]
 						}

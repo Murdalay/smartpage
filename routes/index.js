@@ -53,10 +53,7 @@ var apiKey = new stormpath.ApiKey(
 
 var spClient = new stormpath.Client({ apiKey: apiKey });
 
-// Render the registration page.
-router.get('/register', function(req, res) {
-  res.render('register', { title: 'Register', error: req.flash('error')[0] });
-});
+
 
 function isProfileFiled (user) {
   return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
@@ -76,6 +73,41 @@ spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
       }
     }
     dir = _dir;
+    
+    // Authenticate a user.
+    router.post(
+      '/login',
+      passport.authenticate(
+        'stormpath',
+        {
+          successRedirect: '/dashboard/profile',
+          failureRedirect: '/login',
+          failureFlash: dir.messages.errors.logError
+        }
+      )
+    );
+
+});
+
+// Render the registration page.
+router.get('/register', function(req, res) {
+    res.render('enter', {
+        block : 'enter',
+        bundle : 'enter',
+        error : req.flash('error')[0],
+        info : req.flash('info'),
+
+        firstInput: {
+          name : 'email',
+          placeholder : dir.messages.email
+        },
+        secondInput: {
+          name : 'password',
+          placeholder : dir.messages.password
+        },
+
+        title : dir.messages.register
+    });
 });
 
 
@@ -95,15 +127,8 @@ router.post('/register', function(req, res) {
   var _isMail = _mailRegexp.test(email);
 
   if(!_isMail) {
-    return res.render('main', {
-          block : 'container',
-          bundle : 'main',
-          mods : { error  : true },
-          title : 'Ошибка регистрации',
-          active : [ false, false, false, false ],
-          custom : {},
-          inside: dir.messages.errors.notMail
-      }); 
+      req.flash('error', dir.messages.errors.notMail);
+      return res.redirect('/register');
   }
 
 
@@ -130,16 +155,19 @@ router.post('/register', function(req, res) {
       if (err) {
 
         console.error(err);
+        var _message;
 
-         return res.render('main', {
-                  block : 'container',
-                  bundle : 'main',
-                  mods : { error  : true },
-                  title : 'Ошибка регистрации',
-                  active : [ false, false, false, false ],
-                  custom : {},
-                  inside: err.userMessage
-              });
+        for (code in dir.messages.errors.apiCodes) {
+          if(code == err.code + '') {
+            _message = dir.messages.errors.apiCodes[code];
+            break
+          }
+        }
+
+        _message || (_message = err.userMessage);
+
+        req.flash('error', _message);
+        return res.redirect('/register');
 
       } else {
           return res.redirect('/success.html');
@@ -148,9 +176,7 @@ router.post('/register', function(req, res) {
         // });
       }
     });
-
   });
-
 });
 
 
@@ -162,19 +188,6 @@ router.get('/logout', function(req, res) {
 });
 
 
-// Authenticate a user.
-router.post(
-  '/login',
-  passport.authenticate(
-    'stormpath',
-    {
-      successRedirect: '/dashboard',
-      failureRedirect: '/log-error.html',
-      failureFlash: 'Invalid email or password.',
-    }
-  )
-);
-
 router.get('/verify/', function(req, res, next) {
   var _username = process.env['STORMPATH_API_KEY_ID'],
       _password = process.env['STORMPATH_API_KEY_SECRET'],
@@ -185,6 +198,7 @@ router.get('/verify/', function(req, res, next) {
     function (error, response, body) {
     if (error) { return next(error) }
     if (response.statusCode === 200) {
+      req.flash('info', dir.messages.verifySuccess);
       return res.redirect('/login');
     } else {
       return res.redirect('/reg-error.html')
@@ -205,14 +219,34 @@ router.get('/admin', function(req, res, next) {
 
         firstInput: {
           name : 'login',
-          placeholder : 'Имя пользователя'
+          placeholder : 'Email'
         },
         secondInput: {
           name : 'password',
           placeholder : 'Пароль'
         },
 
-        title : 'Вход для администраторов'
+        title : dir.messages.adminLogin
+    });
+  });
+
+router.get('/login', function(req, res, next) {
+  res.render('enter', {
+        block : 'enter',
+        bundle : 'enter',
+        error : req.flash('error')[0],
+        info : req.flash('info'),
+
+        firstInput: {
+          name : 'username',
+          placeholder : dir.messages.email
+        },
+        secondInput: {
+          name : 'password',
+          placeholder : dir.messages.password
+        },
+
+        title : dir.messages.login
     });
   });
 
@@ -281,7 +315,8 @@ router.get('/dashboard/payment', function (req, res) {
             block : 'pay',
             appData : dir,
             js : {
-              subscriptions : dir.subscriptions
+              subscriptions : dir.subscriptions,
+              bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
             },
             uData : {
                 user : req.user,
@@ -385,6 +420,8 @@ router.post('/dashboard/pay', function (req, res, next) {
   for (key in req.body) {
     req.user.customData.payRequest[key] = req.body[key];
   }
+
+  req.user.customData.payRequest.date = Date.now();
   
   // saving custom fields
 

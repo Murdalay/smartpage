@@ -10,6 +10,7 @@
         { block : 'jquery', elem : 'event', mods : { type : 'pointerpressrelease' } },
         { block : 'section-title' },
         { block : 'inner-wrapper' },
+        { block : 'info-message' },
         { block : 'user-data' },
         { block : 'error' },
         { block : 'page', elem : 'js' },

@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== 'production') {
   watch(path.join(__dirname, 'common.blocks'), filter(/\.js$|\.styl$|\.bemhtml$/, function(filename) {
     console.log(filename);
 
-    var child = exec('bem make desktop.bundles/main',
+    var child = exec('bem make desktop.bundles/payment',
     function (error, stdout, stderr) {
       console.log('stdout: ' + stdout);
       console.log('stderr: ' + stderr);

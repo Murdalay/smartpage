@@ -5,6 +5,11 @@ block('container')(def()(function(){
 		content : this.ctx.error
 	} : '';
 
+	var _info = this.ctx.info && this.ctx.info.length ? {
+	block : 'info-message',
+	content : this.ctx.info
+	} : '';
+
 	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
 
 			return applyCtx([
@@ -38,7 +43,7 @@ block('container')(def()(function(){
 								    	},
 								    	{ 
 								    		block : 'scroller',
-								    		content : [_err, this.ctx.inside]
+								    		content : [_err, _info, this.ctx.inside]
 								    	}
 							    	]
 							    },

@@ -87,7 +87,7 @@ block('user-data')(content()(function(){
 						    name : 'company',
 						    val : 'helix',
 						    options : [
-						        { val : 'helix', text : 'Helix Inc.' }
+						        { val : 'helix', text : 'HELIX Capital Investment LTD' }
 						    ]
 						}
 				    ]

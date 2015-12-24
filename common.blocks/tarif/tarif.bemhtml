@@ -3,6 +3,8 @@ block('tarif')(content()(function(){
 			var _payOptions = [];
 			var _payDescription = [];
 			var _val = this.ctx.val;
+			var _messages = this.ctx.messages.pay;
+
 
 			_subscriptions.forEach(function(subcript, index) {
 				_payOptions.push(
@@ -16,14 +18,38 @@ block('tarif')(content()(function(){
 			        	content : [
 					        { 
 						        elem : 'label',
-					        	content : subcript.name
+					        	content : [
+						        	subcript.name,
+							        {
+									    block : 'button',
+									    mods : { theme : 'islands', size : 'm', type : 'link' },
+									    mix : [{ block : 'align', mods : { 'float' :'right' } }],
+								        target : '_blank',
+									    url : subcript.example,
+									    text : _messages.templateExample
+									}
+					        	]
 					        },
 					        { 
 						        elem : 'price-wrapper',
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : 'Месячная подписка'
+								        mods : { bold : true },
+							        	content : _messages.templatePrice
+							        },
+							        { 
+								        elem : 'price',
+							        	content : '$' + subcript.cost.price
+							        }
+					        	]
+					        },
+					        { 
+						        elem : 'price-wrapper',
+					        	content : [
+							        { 
+								        block : 'basic-text',
+							        	content : _messages.monthSubscription
 							        },
 							        { 
 								        elem : 'price',
@@ -36,7 +62,7 @@ block('tarif')(content()(function(){
 					        	content : [
 							        { 
 								        block : 'basic-text',
-							        	content : 'Годовая подписка'
+							        	content : _messages.yearSubscription
 							        },
 							        { 
 								        elem : 'price',
@@ -47,19 +73,7 @@ block('tarif')(content()(function(){
 					        { 
 						        elem : 'description',
 					        	content : subcript.description
-					        },
-					        { 
-						        elem : 'price-wrapper',
-					        	content : [
-							        { 
-								        block : 'link',
-								        mods : { theme : 'islands' },
-								        url : subcript.example,
-								        target : '_blank',
-							        	content : 'Образец шаблона'
-							        }
-					        	]
-					        }			        
+					        }
 			        	]
 			        }
 			    );

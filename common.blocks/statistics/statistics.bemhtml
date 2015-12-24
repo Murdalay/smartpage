@@ -88,7 +88,7 @@ block('statistics')(content()(function(){
 									    },
 									    {
 									    	elem : 'cell',
-										    content : _custom.bonus ? _dir.bonus[_custom.bonus] : _messages.noBonus
+										    content : _custom.bonus ? _dir.bonus[_custom.bonus].description : _messages.noBonus
 									    }
 								    ]
 								}
