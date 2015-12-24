@@ -95,7 +95,7 @@ block('pay')(content()(function(){
 						},
 						{
 						    block : 'field-title',
-						    content : _messages.pay.sum
+						    content : _messages && _messages.pay ? _messages.pay.sum : ''
 						},
 						{
 						    block : 'input',
@@ -123,7 +123,7 @@ block('pay')(content()(function(){
 								    block : 'button',
 								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
 								    mix: [{ block : 'margins', mods : { top : true } }],
-								    text : _messages.pay.makeRequest
+								    text : _messages && _messages.pay ? _messages.pay.makeRequest : ''
 								}
 							]
 						}
