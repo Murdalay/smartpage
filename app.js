@@ -122,7 +122,7 @@ app.use(routes);
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('main', {
+        res.render('global-error', {
             block : 'page',
             content: err.message
         });

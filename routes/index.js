@@ -87,6 +87,19 @@ spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
       )
     );
 
+    // Authenticate a admin.
+    router.post(
+      '/admin',
+      passport.authenticate(
+        'stormpath',
+        {
+          successRedirect: '/admin/home',
+          failureRedirect: '/admin',
+          failureFlash: dir.messages.errors.logError
+        }
+      )
+    );
+
 });
 
 // Render the registration page.
@@ -218,7 +231,7 @@ router.get('/admin', function(req, res, next) {
         info : req.flash('info'),
 
         firstInput: {
-          name : 'login',
+          name : 'username',
           placeholder : dir.messages.email
         },
         secondInput: {
@@ -230,6 +243,79 @@ router.get('/admin', function(req, res, next) {
     });
   });
 
+// admin dashboard
+router.get('/admin/home', function(req, res, next) {
+
+  if (!req.user || req.user.status !== 'ENABLED') {
+    req.flash('error', 'Какая-то бодяга с авторизацией (');
+    return res.redirect('/admin');
+  }
+
+  spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+      account.getGroups({ name: 'editors' }, function(err, groups) {
+        groups.each(function(group, cb) {
+          group && group.getDirectory({ expand:'accounts' }, function(err, directory) {
+
+              directory.getAccounts({ expand:'customData' }, function(err, accounts) {
+                var _selection = [];
+            console.log(accounts);
+                accounts.sortBy(function(application, callback) {
+                  application.getCustomData(function(err, customData) {
+                    console.log(customData.payRequest);
+                    //filter
+                    callback(null, customData.payRequest && customData.payRequest.date ? customData.payRequest.date : !customData.payed );
+                  });
+
+                  }, function(err, results) {
+                  if(err) { req.flash('error', err) }
+
+                    console.log('\nand new order is :\n');
+                    console.log(results);
+                    // results is now the array of application sorted by
+
+
+
+                    res.render('admin', {
+                      block : 'container',
+                      error : req.flash('error'),
+                      info : req.flash('info'),
+                      menu : dir.menuUserAdmin,
+                      messages : dir.messages,
+                      bundle : 'admin',
+                      active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
+                      inside: [
+                        {
+                          block : 'adm-payrequests',
+                          appData : dir,
+                          js : {
+                            subscriptions : dir.subscriptions,
+                            bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
+                          },
+                          uData : {
+                              user : req.user,
+                              custom : account.customData,
+                              payed : account.customData.payed
+                          }
+                        }
+                      ]
+                    });
+                    // application name
+                });
+              });
+
+
+          });
+
+        }, function(err) {
+          console.log('Finished iterating over groups.');
+          req.flash('error', 'Печалька, но вы не админ (');
+          return res.redirect('/admin');
+        });
+      });
+  });
+});
+
+//user login page
 router.get('/login', function(req, res, next) {
   res.render('enter', {
         block : 'enter',
@@ -258,7 +344,7 @@ router.get('/dashboard', function (req, res) {
   }
     return res.redirect('/dashboard/profile');
 
-});
+  });
 
 router.get('/dashboard/profile', function (req, res) {
   if (!req.user || req.user.status !== 'ENABLED') {
@@ -326,7 +412,7 @@ router.get('/dashboard/payment', function (req, res) {
                 payed : account.customData.payed
             }
           }
-        ],
+        ]
     });
   });
 });
