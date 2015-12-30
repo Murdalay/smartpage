@@ -155,6 +155,7 @@ function getMergedProperty(group, base, property) {
 }
 
 
+
 function isProfileFiled (user) {
 	return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
 }
