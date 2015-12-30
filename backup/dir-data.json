@@ -1,0 +1,262 @@
+{
+  "Endpoints": {
+    "login": {
+      "url": "/login",
+      "successRedirect": "/dashboard/profile",
+      "failureRedirect": "/login",
+      "extra": {
+        "secondInputName": "password",
+        "firstInputName": "username"
+      }
+    },
+    "register": {
+      "url": "/register",
+      "successRedirect": "/success.html",
+      "failureRedirect": "/register",
+      "extra": {
+        "secondInputName": "username",
+        "firstInputName": "email"
+      }
+    },
+    "dLayers": {
+      "tech": "true"
+    }
+  },
+  "bonus": {
+    "monthForFree": {
+      "type": "time",
+      "val": 1,
+      "description": "Месяц бесплатного обслуживания"
+    },
+    "tenPercentOff": {
+      "type": "discount",
+      "val": 10,
+      "description": "Скидка 10%"
+    }
+  },
+  "defaultSubcription": "start",
+  "domain": "sp-helix.com",
+  "menuUserAdmin": {
+    "basePath": "/dashboard",
+    "items": [
+      {
+        "title": "Личные данные",
+        "value": "profile"
+      },
+      {
+        "title": "Оплата услуг",
+        "value": "payment"
+      },
+      {
+        "title": "Редактор",
+        "value": "edit"
+      },
+      {
+        "title": "Статистика",
+        "value": "statistic"
+      }
+    ]
+  },
+  "messages": {
+    "errors": {
+      "toBig": "Файл слишком велик. Размер файла не должен превышать 0.5мб",
+      "alreadyExists": "к сожалению уже занято. Попробуйте другие варианты.",
+      "unsupported": "Данный тип файла не поддерживается. Допустимы файлы в форматах png, jpg или gif",
+      "notMail": "Адрес электронной почты содержит недопустимые символы",
+      "logError": "Неверный адрес электронной почты или пароль",
+      "apiCodes": {
+        "400": "Пароль должен содержать минимум 1 цифру, 1 букву в верхнем регистре и 1 букву в нижнем",
+        "2001": "В системе уже зарегистрирован такой адрес электронной почты. Используйте другой",
+        "2007": "Пароль короче минимально допустимой длинны"
+      },
+      "mustFillUsername": "Имя пользователя должно быть обязательно указано"
+    },
+    "pay": {
+      "forBilling": "Номер будет сохранен в базе, и, в дальнейшем, использован для нужд биллинга.",
+      "weWillFindYou": "После подачи заявки с вами свяжется наш менеджер для уточнения деталей заказа.",
+      "autoRenew": "Автоматически продлевать подписку",
+      "sum": "Сумма",
+      "makeRequest": "Подать заявку",
+      "monthSubscription": "Месячная подписка",
+      "yearSubscription": "Годовая подписка",
+      "templateExample": "Образец шаблона",
+      "templatePrice": "Стоимость шаблона",
+      "subscriptionDuration": "Срок подписки",
+      "thanks": "Ваша заявка успешно подана и будет обработана в ближайшее время."
+    },
+    "payed": "Оплачено",
+    "plan": "Тарифный план",
+    "email": "Email",
+    "verifySuccess": "Адрес электронной почты успешно подтвержден",
+    "password": "Пароль",
+    "pending": "Оплата ожидает подтвердения",
+    "notPayed": "Не оплачено",
+    "login": "Вход",
+    "logout": "Выход",
+    "send": "Отправить",
+    "adminLogin": "Вход для администраторов",
+    "register": "Регистрация",
+    "creationDate": "Дата регистрации",
+    "username": "Имя пользователя",
+    "days": "дней",
+    "hours": "часов",
+    "year": "Год",
+    "month": "Месяц",
+    "profileStat": "Статистика учетной записи",
+    "visitorsStat": "Статистика посещений",
+    "activeTemplate": "Активный шаблон",
+    "noData": "Данные недоступны",
+    "activeBonus": "Активные бонусы",
+    "noBonus": "Бонусы отсутствуют",
+    "visitStatistic": {
+      "totalVisits": "Всего посещений",
+      "thisMonthVisits": "Посещений за текущий месяц",
+      "lastVisit": "Дата последнего посещения",
+      "todayVisits": "Посещений за сегодня"
+    },
+    "ref": "Реферальная ссылка",
+    "name": "Имя",
+    "enterValue": "Введите значение",
+    "info": {
+      "usernameAlert": "Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com"
+    },
+    "company": "Компания",
+    "phoneNumber": "Номер телефона",
+    "lastName": "Фамилия",
+    "userName": "Имя пользователя",
+    "contactInfo": "Контакты"
+  },
+  "pathToStatic": "http://smartpage.com.ua/static",
+  "refProgram": {},
+  "subscriptions": [
+    {
+      "name": "Start",
+      "val": "start",
+      "extraFields": [
+        {
+          "name": "Рефферальная ссылка",
+          "id": "ref",
+          "placeholder": "Уникальная ссылка",
+          "type": "link"
+        },
+        {
+          "name": "Ранг",
+          "id": "rank",
+          "placeholder": "Ваш ранг или должность",
+          "type": "text"
+        },
+        {
+          "name": "Инвестиции",
+          "id": "invest",
+          "placeholder": "Сумма привлеченных инвестиций",
+          "type": "text"
+        },
+        {
+          "name": "Партнеры",
+          "id": "partners",
+          "placeholder": "Число партнеров",
+          "type": "text"
+        },
+        {
+          "name": "Подробно",
+          "id": "extra",
+          "placeholder": "Несколько слов о себе. Ваши сильные стороны, биография, устремления.",
+          "type": "text-long"
+        }
+      ],
+      "example": "http://helix1.raval.biz",
+      "description": "Стандартный, но в то же время качественный и продающий дизайн с минимальной возможностью редактирования.",
+      "cost": {
+        "from": 3,
+        "price": 49,
+        "year": 36
+      }
+    },
+    {
+      "name": "Business",
+      "val": "business",
+      "extraFields": [
+        {
+          "name": "Рефферальная ссылка",
+          "id": "ref",
+          "placeholder": "Уникальная ссылка",
+          "type": "link"
+        },
+        {
+          "name": "Ранг",
+          "id": "rank",
+          "placeholder": "Ваш ранг или должность",
+          "type": "text"
+        },
+        {
+          "name": "Инвестиции",
+          "id": "invest",
+          "placeholder": "Сумма привлеченных инвестиций",
+          "type": "text"
+        },
+        {
+          "name": "Партнеры",
+          "id": "partners",
+          "placeholder": "Число партнеров",
+          "type": "text"
+        },
+        {
+          "name": "Подробно",
+          "id": "extra",
+          "placeholder": "Несколько слов о себе. Ваши сильные стороны, биография, устремления.",
+          "type": "text-long"
+        }
+      ],
+      "example": "http://helix2.raval.biz",
+      "description": "Солидный дизайн, все основные функции и самые необходимые маркетинговые технологии - разумный выбор для большинства случаев. В вашем распоряжении будет мощный инструмент продаж.",
+      "cost": {
+        "from": 4,
+        "price": 79,
+        "year": 40
+      }
+    },
+    {
+      "name": "Premium",
+      "val": "premium",
+      "extraFields": [
+        {
+          "name": "Рефферальная ссылка",
+          "id": "ref",
+          "placeholder": "Уникальная ссылка",
+          "type": "link"
+        },
+        {
+          "name": "Ранг",
+          "id": "rank",
+          "placeholder": "Ваш ранг или должность",
+          "type": "text"
+        },
+        {
+          "name": "Инвестиции",
+          "id": "invest",
+          "placeholder": "Сумма привлеченных инвестиций",
+          "type": "text"
+        },
+        {
+          "name": "Партнеры",
+          "id": "partners",
+          "placeholder": "Число партнеров",
+          "type": "text"
+        },
+        {
+          "name": "Подробно",
+          "id": "extra",
+          "placeholder": "Несколько слов о себе. Ваши сильные стороны, биография, устремления.",
+          "type": "text-long"
+        }
+      ],
+      "example": "http://helix3.raval.biz",
+      "description": "Элитный дизайн, максимальная фунциональность, дополнительные опции и все маркетинговые технологии для максимального престижа и эффективности вашего Landing Page!",
+      "cost": {
+        "from": 5,
+        "price": 99,
+        "year": 50
+      }
+    }
+  ]
+}

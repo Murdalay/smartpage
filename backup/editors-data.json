@@ -1,0 +1,64 @@
+{
+  "Endpoints": {
+    "login": {
+      "url": "/useradmin",
+      "successRedirect": "/useradmin/home",
+      "failureRedirect": "/useradmin",
+      "extra": {
+        "secondInputName": "password",
+        "firstInputName": "username"
+      }
+    },
+    "register": {
+      "url": "/useradmin-reg",
+      "successRedirect": "/useradmin/",
+      "failureRedirect": "/useradmin-reg",
+      "extra": {
+        "secondInputName": "username",
+        "firstInputName": "email"
+      }
+    },
+    "dLayers": {
+      "tech": "true"
+    }
+  },
+  "Pages": [
+    {
+      "id": "request",
+      "title": "Обработка заявок",
+      "template": "dash",
+      "fGroups": [
+        "payRequests"
+      ],
+      "bundle": "admin"
+    }
+  ],
+  "functionalGroups": {
+    "payRequests": {
+      "block": "adm-payrequests",
+      "fieldSet": [
+        {
+          "id": "users",
+          "dataLayer": "users",
+          "type": "filter",
+          "provider": "payRequest.date",
+          "customData": true
+        },
+        {
+          "id": "email",
+          "dataLayer": "self",
+          "type": "field",
+          "provider": "email",
+          "customData": false
+        }
+      ]
+    }
+  },
+  "messages": {
+    "errors": {
+      "notMail": "Что за хрень вы тут вводите вместо мейа?!",
+      "logError": "Не срослось. Сорри. Попробуй снова"
+    }
+  },
+  "theme": "dark"
+}

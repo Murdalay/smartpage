@@ -8,6 +8,10 @@ block('enter')(def()(function(){
     block : 'info-message',
     content : this.ctx.info
   } : '';
+  var _caption = this.ctx.caption ? {
+    block : 'small-caption',
+    content : this.ctx.caption
+  } : '';
 
   var _begining = '<div class="navbar-wrapper subpage"><div data-collapse="medium" data-animation="default" data-duration="400" data-contain="1" class="w-nav navbar"><div class="w-container"><a href="http://sp-helix.com/" class="w-nav-brand logo"><img src="/images/logo.png"></a><nav role="navigation" class="w-nav-menu nav-menu"><a href="/#aboutcompany" class="w-nav-link nav-link">О нас</a><a href="/#partner" class="w-nav-link nav-link">Сотрудничество</a><a href="/#tarif" class="w-nav-link nav-link">Тарифы</a><a href="/#contactus" class="w-nav-link nav-link">Контакты</a><a href="/login/" class="w-nav-link nav-link">Вход</a></nav><div class="w-nav-button menu-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-section image-section login"><div class="image-section-overlay contact"><div class="w-container container">';
   var _end = '</div></div><div class="w-section footer"><div class="footer-social-wrapper"><div class="w-container container"><div class="w-row footer-social-row"><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://vk.com/ut_smartpage" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/vk.png" class="footer-social-icon"><div class="footer-social-title">ВКонтакте</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://www.youtube.com/channel/UCAgKzvOu2wpYITduG6zRMLA" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-youtube.png" class="footer-social-icon"><div class="footer-social-title">YouTube</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-facebook.png" class="footer-social-icon"><div class="footer-social-title">Facebook</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-twitter.png" class="footer-social-icon"><div class="footer-social-title">Twitter</div></a></div></div></div></div><script type="text/javascript" src="/js/webflow.js"></script>';
@@ -41,6 +45,7 @@ block('enter')(def()(function(){
                                 placeholder : this.ctx.secondInput.placeholder
                             },
                             '<div class="w-editable block-title small small-gray"><a class="link" href="/restore">Восстановить пароль</a> |&nbsp;<a class="link" href="/login">Вход</a></div>',
+                            _caption,
                             _err,
                             _info,
                             {

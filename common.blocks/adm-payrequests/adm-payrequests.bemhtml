@@ -1,0 +1,118 @@
+block('adm-payrequests')(content()(function(){
+			var _custom = this.ctx.uData.custom;
+			var _stat = _custom.statistic;
+			var _dates = _stat.visits;
+			var _dir = this.ctx.appData;
+			var _messages = this.ctx.appData.messages;
+			var _visitTypes = _messages.visitStatistic;
+			var _visitsStat = {};
+			var _visits = [];
+			var _now = new Date;
+			var _dayBefore = _now.getTime() - 86400000;
+			var _monthBefore = _now.setMonth(_now.getMonth - 1);
+
+
+			_dates && _dates.forEach(function(date){
+				if(date > _dayBefore) {
+					_visitsStat.todayVisits || (_visitsStat.todayVisits = 0);
+					_visitsStat.todayVisits += 1;
+				}
+
+				if(date > _monthBefore) {
+					_visitsStat.thisMonthVisits || (_visitsStat.thisMonthVisits = 0);
+					_visitsStat.thisMonthVisits += 1;
+				}
+			});
+
+			_dates && (_visitsStat.totalVisits = _dates.length);
+			_dates && _dates.length > 0 && (_visitsStat.lastVisit = new Date(_dates[_dates.length - 1]).toLocaleDateString('ru-RU'));
+			
+			for(type in _visitTypes) {
+				_visits.push(
+					{
+					    elem : 'row',
+					    content : [
+						    {
+						    	elem : 'cell',
+							    content : _visitTypes[type]
+						    },
+						    {
+						    	elem : 'cell',
+							    content : _visitsStat[type] ? _visitsStat[type] : _messages.noData
+						    }
+					    ]
+					}
+				)
+			}
+
+			return [
+				{
+				    block : 'column',
+				    mods : { 'triple' : true },
+				    content : [
+						{
+						    mix: [{ block : 'margins', mods : { none : true } }],
+
+						    block : 'group-title',
+						    content : _messages.profileStat
+						}
+				    ]
+				},
+				{
+				    block : 'column',
+				    mods : { 'double' : true },
+				    content : [
+						{
+						    block : 'info-table',
+
+						    content : [
+								{
+								    elem : 'row',
+								    content : [
+									    {
+									    	elem : 'cell',
+										    content : _messages.creationDate
+									    },
+									    {
+									    	elem : 'cell',
+										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
+									    }
+								    ]
+								},
+								{
+								    elem : 'row',
+								    content : [
+									    {
+									    	elem : 'cell',
+										    content : _messages.activeBonus
+									    },
+									    {
+									    	elem : 'cell',
+										    content : _custom.bonus ? _dir.bonus[_custom.bonus].description : _messages.noBonus
+									    }
+								    ]
+								}
+						    ]
+						}
+				    ]
+				},
+
+				{
+				    block : 'column',
+				    mods : { 'triple' : true },
+				    content : [
+						{
+						    block : 'group-title',
+						    content : _messages.visitorsStat
+						},
+						{
+						    block : 'info-table',
+						    content : _visits
+						}
+				    ]
+				}
+			]
+		}
+	),
+	js()(true)
+)

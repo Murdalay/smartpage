@@ -2,6 +2,8 @@ block('user-data')(content()(function(){
 			var _user = this.ctx.user;
 			var _username = _user.username + '';
 			var _social = this.ctx.custom.social;
+			var _reflink = this.ctx.custom.reflink;
+			var _messages = this.ctx.messages;
 
 			console.log('\n\n\n\nAnd username is\n\n' + _username)
 
@@ -28,13 +30,13 @@ block('user-data')(content()(function(){
 						    content : [
 								{
 								    block : 'field-title',
-								    content : 'Имя'
+								    content : _messages ? _messages.name : ''
 								},
 								{
 								    block : 'input',
 								    mods : { width : 'available', theme : 'islands', size: 'xl' },
 								    name : 'name',
-								    placeholder : 'Введите значение',
+								    placeholder : _messages ? _messages.enterValue : '',
 								    val : _user.givenName !== 'null' ? _user.givenName : ''
 								}
 						    ]
@@ -44,13 +46,13 @@ block('user-data')(content()(function(){
 						    content : [
 								{
 								    block : 'field-title',
-								    content : 'Фамилия'
+								    content : _messages ? _messages.lastName : ''
 								},
 								{
 								    block : 'input',
 								    mods : { width : 'available', theme : 'islands', size: 'xl' },
 								    name : 'surname',
-								    placeholder : 'Введите значение',
+								    placeholder : _messages ? _messages.enterValue : '',
 								    val : _user.surname !== 'null' ? _user.surname : ''
 								}
 						    ]
@@ -64,22 +66,30 @@ block('user-data')(content()(function(){
 
 						{
 						    block : 'field-title',
-						    content : 'Имя пользователя'
+						    content : _messages ? _messages.userName : ''
 						},
 						{
 						    block : 'input',
 						    mods : { width : 'available', theme : 'islands', size: 'xl' },
 						    name : 'username',
-						    placeholder : 'Введите значение',
+						    placeholder : _messages ? _messages.enterValue : '',
 						    val : _username.indexOf('smartuser') === -1 ? _user.username : ''
 						},
 						{
 						    block : 'small-caption',
-						    content : 'Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com'
+						    content : _messages ? _messages.info.usernameAlert : ''
 						},
 						{
 						    block : 'field-title',
-						    content : 'Компания'
+						    content : _messages ? _messages.ref : ''
+						},
+						{
+						    block : 'basic-text',
+						    content : _reflink
+						},
+						{
+						    block : 'field-title',
+						    content : _messages ? _messages.company : ''
 						},
 						{
 						    block : 'select',
@@ -98,7 +108,7 @@ block('user-data')(content()(function(){
 				    content : [
 						{
 						    block : 'group-title',
-						    content : 'Контакты'
+						    content : _messages ? _messages.contactInfo : ''
 						},
 					    {
 						    block : 'column',
@@ -120,7 +130,7 @@ block('user-data')(content()(function(){
 						    content : [
 								{
 								    block : 'field-title',
-								    content : 'Номер телефона'
+								    content : _messages ? _messages.phoneNumber : ''
 								},
 								{
 								    block : 'input',
@@ -174,7 +184,7 @@ block('user-data')(content()(function(){
 								{
 								    block : 'button',
 								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-								    text : 'Отправить'
+								    text : _messages.send
 								}
 							]
 						}

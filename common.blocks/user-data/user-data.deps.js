@@ -9,6 +9,7 @@
         { block : 'attach', mods : { theme : 'simple' } },
         { block : 'icon', mods : { action : 'download' } },
         { block : 'field-title' },
+        { block : 'basic-text' },
         { block : 'padding' },
         { block : 'group-title' },
         { block : 'user-photo' },

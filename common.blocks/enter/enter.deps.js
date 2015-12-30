@@ -11,6 +11,7 @@
         { block : 'user-data' },
         { block : 'padding' },
         { block : 'info-message' },
+        { block : 'small-caption' },
         { block : 'margins' },
         { block : 'error' },
         { block : 'form' },

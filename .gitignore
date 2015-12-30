@@ -10,6 +10,8 @@ npm-debug.log
 .bem/cache/
 .enb/tmp/
 photos/
+public/
+public/index.html
 *bundles*/*/*.*
 !*bundles*/*/*.bemdecl.js
 *bundles*/*/*.*.bemdecl.js

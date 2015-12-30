@@ -8,6 +8,7 @@ block('profile')(content()(function(){
 	              block : 'user-data',
 	              isfiled : this.ctx.uData.isfiled,
 	              user : this.ctx.uData.user,
+	              messages : this.ctx.messages,
 	              custom : this.ctx.uData.custom
 	            }
 			]
