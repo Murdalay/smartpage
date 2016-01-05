@@ -745,14 +745,6 @@ function initDataLayers() {
 
 		DL('get', 'dir')(function() { 
 			console.log(this.getEndpoints());
-			this.getAccounts(function(err, accounts) {  
-				function isAppContainsTest (application, cb) {
-				  cb(crypto.createHash('sha1').update(application.email).digest("hex") === crypto.createHash('sha1').update('murdalay@gmail.com').digest("hex"));
-				}
-				// console.log(accounts.detect(isAppContainsTest, function(result){
-				// 	console.log(result);
-				// }))
-			});
 
 			registerEndPoints(this.getEndpoints(), this.getMessages())
 			this.updateAccounts(function(err) {  });
@@ -787,9 +779,9 @@ function initDataLayers() {
 												},
 												function(err) {
 													if (err) {
-														req.flash('error', 'Печалька, но вы не админ (');
-														return res.redirect('/useradmin');
+														req.flash(err);
 													}
+													req.flash('error', 'Печалька, но вы не админ (');
 												}
 											);
 										} 
