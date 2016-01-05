@@ -22,6 +22,9 @@
       "tech": "true"
     }
   },
+  "PATHS": {
+    "basePath": "/dashboard"
+  },
   "bonus": {
     "monthForFree": {
       "type": "time",
@@ -82,7 +85,10 @@
       "templateExample": "Образец шаблона",
       "templatePrice": "Стоимость шаблона",
       "subscriptionDuration": "Срок подписки",
-      "thanks": "Ваша заявка успешно подана и будет обработана в ближайшее время."
+      "thanks": "Ваша заявка успешно подана и будет обработана в ближайшее время.",
+      "subscription": "Подписка",
+      "durration": "Продолжительность",
+      "subscription-type": "Тип подписки"
     },
     "payed": "Оплачено",
     "plan": "Тарифный план",
@@ -118,13 +124,15 @@
     "name": "Имя",
     "enterValue": "Введите значение",
     "info": {
-      "usernameAlert": "Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com"
+      "usernameAlert": "Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com",
+      "passwordAlert": "Пароль не должен быть короче 8 символов. В нем должны присутствовать минимум 1 цифра, 1 буква в верхнем регистре и 1 буква в нижнем"
     },
     "company": "Компания",
     "phoneNumber": "Номер телефона",
     "lastName": "Фамилия",
     "userName": "Имя пользователя",
-    "contactInfo": "Контакты"
+    "contactInfo": "Контакты",
+    "fullName": "Полное имя"
   },
   "pathToStatic": "http://smartpage.com.ua/static",
   "refProgram": {},

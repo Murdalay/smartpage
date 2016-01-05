@@ -8,13 +8,44 @@ block('pay')(content()(function(){
 			var _defSubscription = this.ctx.appData.defaultSubcription;
 			var _domain = this.ctx.appData.domain;
 			var _messages = this.ctx.appData.messages;
+			var _bonus = '';
 
 			var isPayed = function() {
-				return !!_payed;
+				return _payed === 'active'
 			};
 
+			// bonus display
+			if (this.ctx.uData && this.ctx.uData.bonus && this.ctx.uData.bonus.type === 'discount') {
+				_bonus = [
+					{
+						block : 'margins',
+						mods : { top : true, 'double' : true },
+						content : [
+							{
+							    block : 'basic-text',
+							    content : _messages && _messages.bonus ? _messages.bonus : ''
+							},
+							{
+							    block : 'basic-text',
+							    mods : { bold : true  },
+							    mix: { block : 'margins', mods : { bottom : true, left : true } },
+							    content : this.ctx.uData.bonus.description
+							},
+							{
+							    block : 'input',
+							    mods : { bonus : true, theme : 'islands', size: 'xl', hidden : true },
+							    name : 'bonus',
+							    val : this.ctx.uData.bonus.description
+							}
+						]						
+					}
+				];
+			}
+
 			var getActiveSubcription = function(social) {
-				if(_subscription) {
+				if(isPayed()) {
+					return _custom.template
+				} else if(_subscription) {
 					return _subscription
 				} if(_defSubscription) {
 					return _defSubscription
@@ -29,12 +60,12 @@ block('pay')(content()(function(){
 
 						{
 						    block : 'field-title',
-						    content : 'Адрес страницы'
+						    content : _messages && _messages.pageAdress ? _messages.pageAdress : ''
 						},
 						{
 						    block : 'input',
 						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : true },
-						    val : _username && _username.indexOf('smartuser') === -1 ? _username + _domain : ''
+						    val : _username && _username.indexOf('smartuser') === -1 ? _username + '.' +_domain : ''
 						}
 				    ]
 				},
@@ -43,10 +74,10 @@ block('pay')(content()(function(){
 				    mods : { 'right' : true },
 				    content : [
 						{
-							    block : 'subscription-status',
-								payed : _payed, 
-							    dates : this.ctx.uData.custom.payDates,
-							    messages : _messages
+						    block : 'subscription-status',
+							payed : _payed, 
+						    dates : _custom.dates,
+						    messages : _messages
 						}
 				    ]
 				},
@@ -59,11 +90,12 @@ block('pay')(content()(function(){
 						    content : _messages.plan
 						},
 						{
-							    block : 'tarif',
-							    name : 'subscription',
-							    messages : _messages,
-								val : getActiveSubcription(),
-								subscript : _subscriptions
+						    block : 'tarif',
+						    mods : { disabled : isPayed() },
+						    name : 'subscription',
+						    messages : _messages,
+							val : getActiveSubcription(),
+							subscript : _subscriptions
 						}
 				    ]
 				},
@@ -71,28 +103,68 @@ block('pay')(content()(function(){
 				    block : 'column',
 				    mods : { 'right' : true },
 				    content : [
+						isPayed() ? '' : {
+						    block : 'margins',
+						    mods : { top : true, 'double' : true },
+						    content : [
+							    {
+								    block : 'basic-text',
+								    content : _messages && _messages.pay ? _messages.pay.activeUntil : ''
+								},
+							    {
+								    block : 'basic-text',
+								    mods : { endDate : true, bold : true },
+								    mix: { block : 'margins', mods : { left : true } },
+								    content : ''
+								}
+						    ]						
+						},
+						isPayed() ? '' : [
+							{
+							    block : 'field-title',
+							    content : _messages && _messages.pay ? _messages.pay.tarifInclude : ''
+							},
+							{
+							    block : 'input',
+							    mods : { disabled : true, freeMonths : true, width : 'available', theme : 'islands', size: 'xl' },
+							    name : 'freeMonths',
+							    val : 1
+							},
+							{
+							    block : 'margins',
+							    mods : { top : true, half : true },
+							    content : [
+								    {
+									    block : 'basic-text',
+									    mods : { small : true },
+									    content : _messages && _messages.pay ? _messages.pay.freeMonth : ''
+									}
+							    ]						
+							}
+						],
 						{
 						    block : 'field-title',
-						    content : _messages && _messages.pay ? _messages.pay.subscriptionDuration : ''
+						    content : _messages && _messages.pay ? _messages.pay.additionalSubscript : ''
 						},
 						{
 						    block : 'input',
-						    mods : { number : true, width : 'available', theme : 'islands', size: 'xl' },
+						    mods : { number : true, width : 'available', theme : 'islands', size: 'xl', disabled : isPayed() },
 						    name : 'durration',
 						    maxLength : 2,
-						    val : 1
+						    val : _custom.statistic && _custom.statistic.lastPayment ? _custom.statistic.lastPayment.durration : 0
 						},
 						{
 						    block : 'radio-group',
-						    mods : { theme : 'islands', size : 'xl', type : 'button' },
+						    mods : { theme : 'islands', size : 'xl', type : 'button', disabled : isPayed() },
 						    name : 'subscription-type',
-						    val : 'year',
+						    val : _custom.statistic && _custom.statistic.lastPayment ? _custom.statistic.lastPayment['subscription-type'] : 'year',
 						    mix: [{ block : 'margins', mods : { top : true } }],
 						    options : [
 						        { val : 'year', text : _messages.year },
 						        { val : 'month', text : _messages.month }
-						    ],
+						    ]
 						},
+						_bonus,
 						{
 						    block : 'field-title',
 						    content : _messages && _messages.pay ? _messages.pay.sum : ''
@@ -101,27 +173,57 @@ block('pay')(content()(function(){
 						    block : 'input',
 						    mods : { summ : true, width : 'available', theme : 'islands', size: 'xl', disabled : true },
 						    name : 'summ',
-						    mix: { block : 'margins', mods : { bottom : true, 'double' : true } },
-						    val : 0
+						    val :  _custom.statistic && _custom.statistic.lastPayment ? _custom.statistic.lastPayment.sum : 0
 						},
-						{
-						    block : 'checkbox',
-						    mods : { theme : 'islands', checked : true, size : 'l' },
-						    name: 'autoRenew',
-						    val: true,
-						    text : _messages && _messages.pay ? _messages.pay.autoRenew : ''
-						},
-						{
-						    block : 'small-caption',
-						    content :  _messages && _messages.pay ? _messages.pay.weWillFindYou : ''
-						},
+						isPayed() ? '' : [
+							{
+							    block : 'field-title',
+							    content : _messages && _messages.pay ? _messages.pay.save : ''
+							},
+							{
+							    block : 'input',
+							    mods : { save : true, width : 'available', theme : 'islands', size: 'xl', disabled : true },
+							    name : 'save',
+							    mix: { block : 'margins', mods : { bottom : true } },
+							    val : 0
+							},
+							{
+							    block : 'input',
+							    mods : { sum : true, theme : 'islands', size: 'xl', hidden : true },
+							    name : 'sum',
+							    val : 0
+							},
+							{
+							    block : 'input',
+							    mods : { endDate : true, theme : 'islands', size: 'xl', hidden : true },
+							    name : 'endDate',
+							    val : 0
+							},
+						],
+					    { 
+					    	block : 'margins', 
+					    	mods : { top : true },
+							content : [
+								{
+								    block : 'checkbox',
+								    mods : { theme : 'islands', checked : true, size : 'l', disabled : isPayed() },
+								    name: 'autoRenew',
+								    val: true,
+								    text : _messages && _messages.pay ? _messages.pay.autoRenew : ''
+								},
+								isPayed() ? '' : {
+								    block : 'small-caption',
+								    content :  _messages && _messages.pay ? _messages.pay.weWillFindYou : ''
+								}
+							]
+					    },
 						{ 
 							block : 'align', 
 							mods : { right : true },
 							content : [
 								{
 								    block : 'button',
-								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+								    mods : { theme : 'islands', size : 'xl', type : 'submit', disabled : isPayed() },
 								    mix: [{ block : 'margins', mods : { top : true } }],
 								    text : _messages && _messages.pay ? _messages.pay.makeRequest : ''
 								}

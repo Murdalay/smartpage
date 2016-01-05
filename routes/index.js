@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var stormpath = require('stormpath');
 var request = require('request');
+var Vow = require('../libs/bem-core/common.blocks/vow/vow.vanilla');
 var multer  = require('multer');
 var crypto = require('crypto');
 var fs = require('fs');
@@ -10,6 +11,8 @@ var undef;
 var dir;
 var GRP;
 var DL;
+
+console.log(Vow);
 var uploader = multer({ 
 	dest : './photos/',
 
@@ -159,6 +162,8 @@ function isProfileFiled (user) {
 	return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
 }
 
+
+
 var setingsStorage = { common : false };
 var endpointCallbacks = {
 	login : function(endpoint, messages, extra) {
@@ -233,8 +238,58 @@ function registerEndPoints (endpoints, msg) {
 	}
 }
 
+var funcGroupTypesCb = {
+	filter : function(fGroup, params, cb) {
+		console.log(fGroup);
+		console.log(params.criteria);
+
+		if(!params.criteria) {
+			return console.error('filter criteria must be provided');
+		}
+
+		if(fGroup.dataLayer === 'users') {
+			if(params.level === 'dir') {
+				if(!!params.customData) {
+					this.dirAccounts({ expand:'customData' }, function(err, accounts) {
+						accounts.filter(function(application, callback) {
+							if(typeof params.criteria.shouldBe === 'boolean') {
+								if(params.criteria.shouldBe) {
+									application.getCustomData(function(err, customData) {
+										//filter
+										callback(!!customData[params.criteria.field]);
+									});
+								} else {
+									application.getCustomData(function(err, customData) {
+										//filter
+										callback(!customData[params.criteria.field]);
+									});									
+								}
+							}
+						}, function(results) {
+							console.log(results);
+							cb && cb(results);
+						});
+					});
+				} else {
+					this.dirAccounts(function(err, accounts) {
+						accounts.filter(function(application, callback) {
+							callback(!!application[params.criteria.field]);
+						}, function(results) {
+							console.log(results);
+							cb && cb(results);
+						});
+					});
+				}
+
+			}
+		} else {
+			console.log('dataLayer is unsupported by filter');
+		}
+
+	}
+};
+
 var dataProviders = {
-	
 	accountByUrl : function(url, callback) {
 		spClient.getAccount(url, { expand: 'customData' }, callback);
 	},
@@ -267,7 +322,7 @@ var dataProviders = {
 	},
 
 	dir : function(callback) {
-		spClient.getDirectory(dirUrl, { expand: 'customData' }, callback)
+		spClient.getDirectory(dirUrl, { expand: 'customData' }, callback);
 	},
 
 	getDirCustomData : function(callback) {
@@ -289,6 +344,7 @@ var dataProviders = {
 			}
 		})
 	},
+
 	eachAccount : function(callback, endCb, searchObj) {
 		dataProviders.dirAccounts(searchObj ? searchObj : { expand: 'customData' }, function(err, accounts) {
 			if (err) callback(new Error(err));
@@ -364,11 +420,17 @@ DL = function() {
 	var providers = {};
 	var components = {};
 	var groups = {};
+	var fGroupTypesCb = {};
 	var layers = {};
 
 	function _getActiveDataProviders(res, key) {
 		providers[key] = res;
 		console.log('registring data provide ' + key)
+	}
+
+	function _getFuncGroupTypesCb(res, key) {
+		fGroupTypesCb[key] = res;
+		console.log('registring callbacks for functional Group type ' + key)
 	}
 
 	function getAccounts (query, cb) {
@@ -381,8 +443,6 @@ DL = function() {
 	}
 
 	function updateAccounts(endCb) {
-
-
 		providers.eachAccount(updateAccount, endCb.bind(this));
 	}
 
@@ -402,29 +462,87 @@ updateAccounts.bind(this);
 
 	function initPages(cb) {
 		var _pages = this.getPages();
-		var _initPage = function(item) {
-			_ext = { 
+		var _paths = this.getPaths(); 
+		var _components = this.getFuncComponents(); 
+		var _fGroups = this.getFuncGroups(); 
+		var _header = { basePath : _paths.basePath, items : [] };
+
+		function _initPage(item) {
+			var fGroups = [];
+
+			for (key in item.fGroups) {
+				fGroups.push({ fGroup : _fGroups[key], params : item.fGroups[key] });
+			}
+
+			_header.items.push({ value : item.id, title : item.title });
+
+			var _ext = { 
 				name : item.id,
 				title : item.title,
+				bundle : item.bundle,
 				template : item.template,
+				fGroups : fGroups,
+				header : _header,
 				page : item,
 
+				getName : function() { return this.name },
 				getPage : function() { return this.page },
+				getFuncGroups : function() { return this.fGroups },
+				initFuncGroups : function(cb) {
+					var _grp = this.getFuncGroups();
+					var _grpPromises = [];
+
+					_grp.length && _grp.forEach(function(item){
+						var _cb = fGroupTypesCb[item.fGroup.type];
+						var _promise = new Vow.Promise(function(resolve, reject, notify) {
+							function getDataForfGroup(result) {
+								if(!!groupBemjson) {
+									var _bJson = groupBemjson; 
+									_bJson.data = result;
+									resolve(_bJson);
+
+								} else {
+									resolve(result);
+								}
+							}
+
+							if(!!item.fGroup.block) {
+								var groupBemjson = { block : item.fGroup.block }
+								if(!!_cb) {
+									groupBemjson.data = _cb.apply(this, [item.fGroup, item.params, getDataForfGroup]);
+								} else {
+									resolve(groupBemjson);
+								}
+							} else {
+								var groupBemjson = false;
+								_cb && _cb.apply(this, [item.fGroup, item.params, getDataForfGroup]);
+							}
+					    });
+
+						_grpPromises.push(_promise);
+
+					});
+
+					Vow.all(_grpPromises)
+					    .then(cb.bind(this));
+				},
+
+				getBundle : function() { return this.bundle },
 				getTemplate : function() { return this.template },
-				getTitle : function() { return this.title }
-
+				getTitle : function() { return this.title },
+				getHeader : function() { return this.header }
 			}; 
-
+			
 			cb.bind(extend({}, this, _ext))()
-
 		}
+
 		_initPage.bind(this)
 		_pages.forEach(_initPage);
-
 	}
 
 
 	passFieldToCb(dataProviders, _getActiveDataProviders);
+	passFieldToCb(funcGroupTypesCb, _getFuncGroupTypesCb);
 	console.log('DL is created');
 
 
@@ -448,14 +566,25 @@ updateAccounts.bind(this);
 			this.getUrl = function() {
 				return groups[name].customData.url;
 			}
+			this.getFuncComponents = function() {
+				return this.fComponents;
+			}
+			this.getFuncGroups = function() {
+				return this.fGroups;
+			}
 			this.getProviders = function() {
 				return providers;
 			}
 			this.initPages = initPages.bind(this);
+			this.dirAccounts = providers.dirAccounts.bind(this);
 
 			this.getCustomData = function() {
 				return groups[name].customData;
-			}			
+			}
+			this.getPaths = function() {
+				var _cd = getCustomData();
+				return _cd.PATHS;
+			};	
 
 			this.name = groups[name].name;
 			this.messages = groups[name].customData.messages;
@@ -463,6 +592,8 @@ updateAccounts.bind(this);
 			this.url = groups[name].url;
 			this.data = groups[name].customData;
 			this.Endpoints = groups[name].customData.Endpoints;
+			this.fComponents = groups[name].customData.functionalComponents;
+			this.fGroups = groups[name].customData.functionalGroups;
 			this.Pages = groups[name].customData.Pages;
 
 			return cb.bind(this)();
@@ -497,11 +628,17 @@ updateAccounts.bind(this);
 			this.getMessages = function() {
 				return data.dir.customData.messages;
 			};
+			this.getPaths = function() {
+				return data.dir.customData.PATHS;
+			};
 			this.getCustomData = function() {
 				return data.dir.customData;
 			};
 			this.getAccounts = function(query, cb) {
 				return providers.dirAccounts(query, cb);
+			};
+			this.accessDirCustomData = function(callback) {
+				return providers.dir(callback);
 			};
 			this.eachAccount = function(cb, endCb, query) {
 				return providers.eachAccount(cb, endCb, query);
@@ -547,7 +684,7 @@ function literalMethodsLauncher(methods, launchlist, iterator, cb) {
 	var _initOver = 0;
 
 	var initCallback = function(err, name, data, layer) {
-		if (err) cb(err)
+		if (err) { cb(err) }
 
 		lData[layer] = data;
 		_initOver += 1;
@@ -556,7 +693,6 @@ function literalMethodsLauncher(methods, launchlist, iterator, cb) {
 		if(_listIsProccesed) {
 			_counter > _initOver || cb(null, lData);
 		}
-
 	};
 
 	if (typeof launchlist === 'object') {
@@ -623,14 +759,116 @@ function initDataLayers() {
 		});
 
 		DL('get', 'dir', 'editors')(function() {
+					
 			var grpoups = this.getGroups();
 			
 			for (name in grpoups) {
 				DL('get', 'group', name)(function() { 
-					// console.log(this.getEndpoints());
-					this.initPages(function() { console.log(this.getTemplate()) })
-					console.log(this.getPages());
-					registerEndPoints(this.getEndpoints(), this.getMessages())
+					function verifyGroupAccess(req, res, next) {
+						if (!req.user || req.user.status !== 'ENABLED') {
+							req.flash('error', 'Какая-то бодяга с авторизацией (');
+							return res.redirect('/useradmin');
+						}
+
+						if (!req.user.groups || !req.user.groups[this.getName()]) {
+							spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+									account.getGroups({ name: this.getName() }, 
+										function(err, groups) {
+											groups.each(function(group, cb) {
+												if (group) {
+													var _name = group.name;
+
+													req.user.groups || (req.user.groups = {});
+													req.user.groups = extend(req.user.groups, { _name : true });
+													return next()
+												}
+
+												cb();
+												},
+												function(err) {
+													if (err) {
+														req.flash('error', 'Печалька, но вы не админ (');
+														return res.redirect('/useradmin');
+													}
+												}
+											);
+										} 
+									);
+								}
+							)
+						} else {
+							return next()
+						}
+					}
+					//TODO : remove active
+					function displayPage(req, res, next) {
+						this.initFuncGroups(function(data) {
+							res.render(this.getBundle(), {
+								block : this.getTemplate(),
+								error : req.flash('error'),
+								info : req.flash('info'),
+								appData : dir,
+								menu : this.getHeader(),
+								title : this.getTitle(),
+								helpers : { makeHashForString : makeHashForEmail },
+								messages : this.getMessages(),
+								active : [ true, true, false, false ],
+								bundle : this.getBundle(),
+								inside: data
+							});
+						});
+					}
+
+					registerEndPoints(this.getEndpoints(), this.getMessages());
+
+					this.initPages(function() { 
+						// this.initFuncGroups();
+						// console.log(this.getFuncGroups()) 
+						// console.log(this.getName()) 
+						// console.log(this.getPage()) 
+						// console.log(this.getTemplate()) 
+						// console.log(this.getTitle()) 
+						// console.log(this.getHeader()) 
+						// console.log(this.getPaths().basePath) 
+
+						router.get(this.getPaths().basePath + '/' + this.getName(), verifyGroupAccess, displayPage.bind(this));
+
+
+					});
+
+
+
+					// admin dashboard
+					// router.get('/useradmin/home', verifyGroupAccess, function(req, res, next) {
+					// 	this.dirAccounts({ expand:'customData' }, function(err, accounts) {
+					// 		accounts.filter(function(application, callback) {
+					// 			application.getCustomData(function(err, customData) {
+					// 				//filter
+					// 				callback(!!customData.payRequest);
+					// 			});
+
+					// 		}, function(results) {
+					// 			console.log(results);
+
+					// 			res.render('admin', {
+					// 				block : 'container',
+					// 				error : req.flash('error'),
+					// 				info : req.flash('info'),
+					// 				menu : dir.menuUserAdmin,
+					// 				messages : this.getMessages(),
+					// 				active : [ true, true, false, false ],
+					// 				bundle : 'admin',
+					// 				inside: [
+					// 					{
+					// 						block : 'adm-payrequests',
+					// 						appData : dir,
+					// 						accounts : results
+					// 					}
+					// 				]
+					// 			});
+					// 		});
+					// 	});
+					// });
 				});
 			}
 		});
@@ -780,12 +1018,12 @@ router.post('/register', function(req, res) {
 					_referrer && this.getAccountByUrl(_referrer.href, function(err, account) {
 						account && account.getCustomData(function(err, customData) {
 							console.log('updating referrer data');
-						  customData.refferedAccounts || (customData.refferedAccounts = {});
-						  customData.refferedAccounts[makeHashForEmail(_email)] = _email;
+							customData.referredAccounts || (customData.referredAccounts = {});
+							customData.referredAccounts[makeHashForEmail(_email)] = _email;
 
-						  customData.save(function(err) {
-						    if (err) next(err);
-						  });
+							customData.save(function(err) {
+							    if (err) next(err);
+							});
 						});
 					})
 				});
@@ -815,77 +1053,306 @@ router.get('/verify/', function(req, res, next) {
 	});
 });
 
+// pay confirmation request
+
+DL('get', 'dir')(function() { 
+	function confirmPayRequest(href, payId) {
+		return new Vow.Promise(function(resolve, reject, notify) {
+			console.log('updating payment data');
+
+			this.getAccountByUrl(href, function(err, account) {
+				account || reject('Unable to get payer account');
+
+				var _payerMail = account.email;
+				
+				account.getCustomData(function(err, customData) {
+				    if (err) reject(err);
+
+					if (customData && customData.payRequest && customData.payRequest.date) {
+						if (makeHashForEmail(customData.payRequest.date + '') === payId) {
+							if (customData.payRequest.endDate && customData.payRequest.sum) {
+								var _payReq = customData.payRequest;
+								var _payerHash = customData.hash;
+								var _dir = this.getCustomData();
+								var _que = [];
+
+
+								function updatePaymentStatistic() {
+									var _payerMail = _payerMail;
+									return new Vow.Promise(function(resolve, reject, notify) {
+										this.accessDirCustomData(function(err, dirr) {
+											if (err) { reject(err) }
+
+											if (dirr) {
+												dirr.getCustomData(function(err, customData) {
+													if (err) { reject(err) }
+													  console.log(customData);
+
+													customData.payments || (customData.payments = {});
+													customData.payments.byUser || (customData.payments.byUser = {});
+													customData.payments.byUser[_payerHash] || (customData.payments.byUser[_payerHash] = []);
+													
+													customData.payments.byUser[_payerHash].push({ 
+														email : _payerMail, 
+														amount : _payReq.sum, 
+														payDate : Date.now(), 
+														transactionId : payId, 
+														status : 'payed' 
+													});
+																		
+													customData.payments.incoming || (customData.payments.incoming = []);
+													customData.payments.incoming.push({ 
+														amount : _payReq.sum, 
+														transactionId : payId, 
+														status : 'payed' 
+													});
+
+													customData.statistics || (customData.statistics = {});
+													customData.statistics.transactions || (customData.statistics.transactions = {});
+													customData.statistics.transactions[payId] = { transaction : _payReq, payerHash : _payerHash };
+
+													customData.save(function(err) {
+													    if (err) reject(err);
+													    resolve('transaction data stored in dir');
+													});
+												});
+											} else {
+												reject('Unable to get dir customData');
+											}
+										});
+									});
+								}
+
+								_que.push(updatePaymentStatistic().then(function() {}, function(err) {
+										reject(err);
+									})
+								);
+
+								if (customData.referrer && _dir.refProgram && _dir.refProgram.firstRef) {
+									console.log('URURURUURURURURR\n\n\n\n\n\n')
+									function updateReferrerPayouts(url) {
+										return new Vow.Promise(function(resolve, reject, notify) {
+											this.getAccountByUrl(url, function(err, account) {
+												if (err) { reject(err) }
+
+												if (account) {
+													account.getCustomData(function(err, customData) {
+														console.log('updating referrer data');
+
+														customData.refPayment || (customData.refPayment = {});
+														customData.refPayment[_payerHash] || (customData.refPayment[_payerHash] = []);
+														
+														customData.refPayment[_payerHash].push({ 
+															amount : ((_dir.refProgram.firstRef * _payReq.sum) / 100), 
+															payDate : Date.now(), 
+															transactionId : payId, 
+															status : 'not-payed' 
+														});
+
+														customData.save(function(err) {
+														    if (err) reject(err);
+														    resolve('referrer payouts updated');
+														});
+													});
+												} else {
+													reject('Unable to get referrer account');
+												}
+											});
+										});
+									}
+
+									var _ref = this.getAccountByHash(customData.referrer);
+
+									_ref && _que.push(updateReferrerPayouts(_ref.href).then(function() {}, function(err) {
+										reject(err);
+									}));
+								}
+
+								customData.template = customData.payRequest.subscription;
+								customData.payed = 'active';
+								
+								customData.dates || (customData.dates = {});
+								customData.dates.payedFrom = Date.now();
+								customData.dates.payedUntil = Number(_payReq.endDate) + (Date.now() - Number(_payReq.date));
+								
+								customData.statistic || (customData.statistic = {});
+								customData.statistic.lastPayment = _payReq;
+								
+								// the end
+								customData.remove('payRequest');
+
+								function storePayerData() {
+									return new Vow.Promise(function(resolve, reject, notify) {
+										customData.save(function(err) {
+											if (err) reject(err);
+											resolve('done');
+										});
+									})
+								}
+
+								_que.push(storePayerData().then(function(){}, function(err) {
+										reject(err);
+									})
+								);
+
+								Vow.all(_que)
+								    .then(function(result) {
+										resolve('All done');
+									}, function(err) {
+										reject(err);
+									});
+
+							} else {
+								reject('Corrupted pay request data. Please, make a new request');
+							}
+						} else {
+							reject('Unable to verify transaction data');
+						}
+					} else {
+						reject('Unable to get user data fot transaction');
+					}
+				}.bind(this));
+			});
+		});
+	}
+
+	function checkPayRequest(req, res, next) {
+		console.log(req.params.payId);
+		console.log(req.body);
+
+		for (key in req.body) {
+			if(req.body.hasOwnProperty(key)) {
+				var _accToConfirm = this.getAccountByHash(key);
+
+				_accToConfirm && confirmPayRequest(_accToConfirm.href, req.params.payId).then(function(data) {
+					req.flash('info', 'Payment confirmed. With status: «' + data + '»');
+					next();
+				},
+				function(data) {
+					req.flash('error', 'Payment rejected. With status: «' + data + '»');
+					next();
+				});
+
+				break
+			}
+		}
+
+		if (!_accToConfirm) {
+			req.flash('error', 'Unable to complete payment');
+			next();
+		}
+	}
+
+	function goBack(req, res, next) {
+		res.redirect('back');
+	}
+	
+	router.post('/api/pay/:payId', checkPayRequest, goBack);
+});
+
+
+
 router.get('/restore/', function(req, res, next) {
 	res.redirect('/404.html')
 });
 
-// admin dashboard
-router.get('/useradmin/home', function(req, res, next) {
 
-	if (!req.user || req.user.status !== 'ENABLED') {
-		req.flash('error', 'Какая-то бодяга с авторизацией (');
-		return res.redirect('/admin');
-	}
+// function verifyGroupAccess(req, res, next) {
 
-	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-			account.getGroups({ name: 'editors' }, function(err, groups) {
-				groups.each(function(group, cb) {
-					group && group.getDirectory({ expand:'accounts' }, function(err, directory) {
+// 	if (!req.user || req.user.status !== 'ENABLED') {
+// 		req.flash('error', 'Какая-то бодяга с авторизацией (');
+// 		return res.redirect('/useradmin');
+// 	}
 
-						directory.getAccounts({ expand:'customData' }, function(err, accounts) {
-							var _selection = [];
+// 	if (!req.user.groups || req.user.groups !== 'editors') {
+// 		spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+// 			account.getGroups({ name: 'editors' }, 
+// 				function(err, groups) {
+// 					groups.each(function(group, cb) {
+// 						if (group) {
+// 							console.log(group);
+
+// 							var _name = group.name;
+
+// 							req.user.groups || (req.user.groups = {});
+// 							req.user.groups = extend(req.user.groups, { _name : true });
+// 							next()
+// 						}
+// 					});
+// 				}, 
+
+// 				function(err) {
+// 					req.flash('error', 'Печалька, но вы не админ (');
+// 					return res.redirect('/admin');
+// 				});
+// 			}
+// 		)
+
+// 	next()
+// }
+
+// // admin dashboard
+// router.get('/useradmin/home', verifyGroupAccess, function(req, res, next) {
+// 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+// 			account.getGroups({ name: 'editors' }, function(err, groups) {
+// 				groups.each(function(group, cb) {
+// 					group && user.group = { group.name : true };
+// 					group && group.getDirectory({ expand:'accounts' }, function(err, directory) {
+
+// 						directory.getAccounts({ expand:'customData' }, function(err, accounts) {
+// 							var _selection = [];
 
 
-							accounts.sortBy(function(application, callback) {
-								application.getCustomData(function(err, customData) {
-									//filter
-									callback(null, customData.payRequest && customData.payRequest.date ? customData.payRequest.date : !customData.payed );
-								});
+// 							accounts.filter(function(application, callback) {
+// 								application.getCustomData(function(err, customData) {
+// 									//filter
+// 									callback(!!customData.payRequest);
+// 								});
 
-							}, function(err, results) {
-								if(err) { req.flash('error', err) }
+// 							}, function(err, results) {
+// 								// if(err) { req.flash('error', err) }
 
-								console.log(req.user);
-								console.log(results);
+// 								console.log(err);
+// 								console.log(results);
 
-								res.render('admin', {
-									block : 'container',
-									error : req.flash('error'),
-									info : req.flash('info'),
-									menu : dir.menuUserAdmin,
-									messages : dir.messages,
-									bundle : 'admin',
-									active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
-									inside: [
-										{
-											block : 'adm-payrequests',
-											appData : dir,
-											js : {
-												subscriptions : dir.subscriptions,
-												bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
-											},
-											uData : {
-													user : req.user,
-													custom : account.customData,
-													payed : account.customData.payed
-											}
-										}
-									]
-								});
-							});
-						});
-					});
+// 								res.render('admin', {
+// 									block : 'container',
+// 									error : req.flash('error'),
+// 									info : req.flash('info'),
+// 									menu : dir.menuUserAdmin,
+// 									messages : dir.messages,
+// 									bundle : 'admin',
+// 									active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
+// 									inside: [
+// 										{
+// 											block : 'adm-payrequests',
+// 											appData : dir,
+// 											js : {
+// 												subscriptions : dir.subscriptions,
+// 												bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
+// 											},
+// 											uData : {
+// 													user : req.user,
+// 													custom : account.customData,
+// 													payed : account.customData.payed
+// 											}
+// 										}
+// 									]
+// 								});
+// 							});
+// 						});
+// 					});
 
-				}, 
+// 				}, 
 
-				function(err) {
-					console.log('Finished iterating over groups.');
-					req.flash('error', 'Печалька, но вы не админ (');
-					return res.redirect('/admin');
-				});
-		});
-	});
-});
+// 				function(err) {
+// 					console.log('Finished iterating over groups.');
+// 					req.flash('error', 'Печалька, но вы не админ (');
+// 					return res.redirect('/admin');
+// 				});
+// 		});
+// 	});
+// });
 
 
 // Logout the user, then redirect to the home page.
@@ -967,9 +1434,10 @@ router.get('/dashboard/payment', function (req, res) {
 						bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
 					},
 					uData : {
-							user : req.user,
-							custom : account.customData,
-							payed : account.customData.payed
+						user : req.user,
+						custom : account.customData,
+						bonus : dir.bonus[account.customData.bonus],
+						payed : account.customData.payed
 					}
 				}
 			]
@@ -997,9 +1465,9 @@ router.get('/dashboard/edit', function (req, res) {
 					block : 'edit',
 					appData : dir,
 					uData : {
-							user : req.user,
-							custom : account.customData,
-							payed : account.customData.payed
+						user : req.user,
+						custom : account.customData,
+						payed : account.customData.payed
 					}
 				}
 			]
@@ -1146,8 +1614,8 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 	}
 
 	if (!req.body.username) {
-				req.flash('error', dir.messages.errors.mustFillUsername);
-				return res.redirect('/dashboard/profile');
+		req.flash('error', dir.messages.errors.mustFillUsername);
+		return res.redirect('/dashboard/profile');
 	}
 
 	if(req.user.username !== req.body.username){

@@ -6,7 +6,8 @@ block('container')(def()(function(){
 		content : this.ctx.error
 	} : '';
 
-	var _info = this.ctx.info && this.ctx.info.length ? {
+	var _ctx = this.ctx;
+	var _info = _ctx.info && this.ctx.info.length ? {
 		block : 'info-message',
 		content : this.ctx.info
 		} : '';
@@ -18,58 +19,78 @@ block('container')(def()(function(){
 	menuTitles && menuTitles.forEach(function(title, index) {
 		if (title.value === _bundle) {
 			_title = title.title
+		} else if (title.title === _ctx.title) {
+			_title = _ctx.title
 		}
 	});
 
+	// passing messages and appData to blocks
+	var _inside = [];
+	this.ctx.inside && this.ctx.inside.length && this.ctx.inside.forEach(function(block) {
+		block.helpers = _ctx.helpers;
+		block.messages = _ctx.messages;
+		block.appDatas = _ctx.appData;
+		_inside.push(block);
+	})
+
 	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
 
-			return applyCtx([
-				{
-				    block : 'page',
-				    head: [
-				        { elem : 'js', url : '/js/jquery-1.8.3.min.js' },
-				        { elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
-				        { elem : 'js', url : '/js/jquery.mCustomScrollbar.min.js' },
-				        { elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
-				        { elem : 'js', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.js' : '_main.js' }
-				    ],
-				    styles : { elem : 'css', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.css' : '_main.css' },
-				    title: this.ctx.title ? this.ctx.title : _title ? _title : 'Dashboard',
-				    content : [
-					    { 
-					    	block : 'header',
-					    	page : _title,
-					    	menu : this.ctx.menu,
-					    	logout : this.ctx.messages ? this.ctx.messages.logout : '',
-					    	active : this.ctx.active,
-					    	hideMenu : !_activeMenuItems
+	function getMods(){
+		var _mods = {};
+		_bundle ? (_mods[_bundle] = true) : _mods = '';
+		return _mods
+	}
 
-					    },
-					    { 
-					    	block:'content-wrapper', content: [
-							    { 
-							    	block: 'inner-wrapper',
-							    	content: [
-								    	{ 
-								    		block : 'section-title',
-								    		content : _title
-								    	},
-								    	{ 
-								    		block : 'scroller',
-								    		content : [_err, _info, this.ctx.inside]
-								    	}
-							    	]
-							    },
-							    { 
-							    	block : 'container',
-							    	elem : 'back',
-							    	mods : { error : this.ctx.error }
-							    }
-					    	]
-					    }
-				    ]
-				}
-			])
-		}
-	)
+		return applyCtx([
+			{
+			    block : 'page',
+			    head: [
+			        { elem : 'js', url : '/js/jquery-1.8.3.min.js' },
+			        { elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
+			        { elem : 'js', url : '/js/jquery.mCustomScrollbar.min.js' },
+			        { elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
+			        { elem : 'js', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.js' : '_main.js' }
+			    ],
+			    styles : { elem : 'css', url : _bundle ? '/' + _bundle + '/_' + _bundle + '.css' : '_main.css' },
+			    title: this.ctx.title ? this.ctx.title : _title ? _title : 'Dashboard',
+			    content : [
+				    { 
+				    	block : 'header',
+				    	mods: getMods(),
+				    	page : _title,
+				    	menu : this.ctx.menu,
+				    	logout : this.ctx.messages ? this.ctx.messages.logout : '',
+				    	active : this.ctx.active,
+				    	hideMenu : !_activeMenuItems
+
+				    },
+				    { 
+				    	block:'content-wrapper', 
+				    	mods: getMods(),
+				    	content: [
+						    { 
+						    	block: 'inner-wrapper',
+						    	mods: getMods(),
+						    	content: [
+							    	{ 
+							    		block : 'section-title',
+							    		content : _title
+							    	},
+							    	{ 
+							    		block : 'scroller',
+							    		content : [_err, _info, _inside]
+							    	}
+						    	]
+						    },
+						    { 
+						    	block : 'container',
+						    	elem : 'back',
+						    	mods : { error : this.ctx.error }
+						    }
+				    	]
+				    }
+			    ]
+			}
+		])
+	})
 )

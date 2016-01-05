@@ -1,118 +1,166 @@
 block('adm-payrequests')(content()(function(){
-			var _custom = this.ctx.uData.custom;
-			var _stat = _custom.statistic;
-			var _dates = _stat.visits;
-			var _dir = this.ctx.appData;
-			var _messages = this.ctx.appData.messages;
-			var _visitTypes = _messages.visitStatistic;
-			var _visitsStat = {};
-			var _visits = [];
-			var _now = new Date;
-			var _dayBefore = _now.getTime() - 86400000;
-			var _monthBefore = _now.setMonth(_now.getMonth - 1);
+		var _dir = this.ctx.appData;
+		var _messages = this.ctx.messages;
+		var _accounts = this.ctx.data;
+		var _visitTypes = _messages.visitStatistic;
+		var _visitsStat = {};
+		var _helpers = this.ctx.helpers;
+		var _table = [];
+		var _tableHeader = false;
+		var _now = new Date;
+		var _dayBefore = _now.getTime() - 86400000;
+		var _monthBefore = _now.setMonth(_now.getMonth - 1);
 
 
-			_dates && _dates.forEach(function(date){
-				if(date > _dayBefore) {
-					_visitsStat.todayVisits || (_visitsStat.todayVisits = 0);
-					_visitsStat.todayVisits += 1;
+		var _payRequest = {
+	      dataLayer: 'user',
+	      type: 'user-subscription',
+	      provider: 'payRequest',
+	      messages: 'pay',
+	      customData: true,
+	      fileds: {
+	        subscription: {
+	          type: 'selector-list'
+	        },
+	        endDate: {
+	          type: 'date-in-ms'
+	        },
+	        'subscription-type': {
+	          type: 'selector-kind'
+	        },
+	        autoRenew: {
+	          type: 'input-logic'
+	        },
+	        sum: {
+	          type: 'cost'
+	        },
+	        bonus: {
+	          type: 'cost'
+	        },
+	        date: {
+	          type: 'date-in-ms'
+	        }
+	      }
+	    };
+
+	    var _userInfoBasic = {
+	    	fileds: {
+		        email: {
+		          type: 'field',
+		          mutable: false
+		        },
+		        username: {
+		          type: 'field'
+		        },
+		        fullName: {
+		          type: 'field'
+		        }
+	    	}
+		};
+
+
+
+		_accounts && _accounts.forEach(function(account) {
+			var _cells = [];
+			var _head = [];
+	
+			function buildHeaderCells(obj, messages) {
+				for(type in obj) {
+					_head.push(
+					    {
+					    	elem : 'cell',
+					    	mods : { header : true },
+						    content : messages[type] ? messages[type] : type
+					    }
+					);
 				}
-
-				if(date > _monthBefore) {
-					_visitsStat.thisMonthVisits || (_visitsStat.thisMonthVisits = 0);
-					_visitsStat.thisMonthVisits += 1;
-				}
-			});
-
-			_dates && (_visitsStat.totalVisits = _dates.length);
-			_dates && _dates.length > 0 && (_visitsStat.lastVisit = new Date(_dates[_dates.length - 1]).toLocaleDateString('ru-RU'));
-			
-			for(type in _visitTypes) {
-				_visits.push(
-					{
-					    elem : 'row',
-					    content : [
-						    {
-						    	elem : 'cell',
-							    content : _visitTypes[type]
-						    },
-						    {
-						    	elem : 'cell',
-							    content : _visitsStat[type] ? _visitsStat[type] : _messages.noData
-						    }
-					    ]
-					}
-				)
 			}
 
-			return [
-				{
-				    block : 'column',
-				    mods : { 'triple' : true },
-				    content : [
-						{
-						    mix: [{ block : 'margins', mods : { none : true } }],
+			function buildBodyCells(obj, source) {
+				for(type in obj) {
+					_cells.push(
+					    {
+					    	elem : 'cell',
+						    content : source[type] ? source[type] : _messages.noData
+					    }
+					);
+				}
+			}
 
-						    block : 'group-title',
-						    content : _messages.profileStat
-						}
-				    ]
-				},
-				{
-				    block : 'column',
-				    mods : { 'double' : true },
-				    content : [
-						{
-						    block : 'info-table',
+			function wrapInRow(cells) {
+				return {
+				    elem : 'row',
+				    content : cells
+				}
+			}
 
+			if (account.customData && account.customData.payRequest) {
+				if (!_tableHeader) {
+					buildHeaderCells(_userInfoBasic.fileds, _messages);
+					buildHeaderCells(_payRequest.fileds, _messages.pay);
+
+					// button header
+					_head.push(
+					    {
+					    	elem : 'cell',
+					    	mods : { header : true },
+						    content : _messages.pay.confirmRequest
+					    }
+					);
+					_table.push(wrapInRow(_head));
+					_tableHeader = true;
+				}
+
+				buildBodyCells(_userInfoBasic.fileds, account);
+				buildBodyCells(_payRequest.fileds, account.customData.payRequest);
+
+
+				if(account.customData.payRequest.date) {
+					_cells.push(
+					    {
+					    	elem : 'cell',
+						    content : [{
+						    	block : 'form',
+						    	url : '/api/pay/' + _helpers.makeHashForString(account.customData.payRequest.date + ''),
+								content : [
+							        { 
+							        	block : 'input', 
+								        mods : { theme : 'islands', size : 'xl', hidden : true },
+										name : _helpers.makeHashForString(account.email + ''),
+									    val : 'lalala' 
+								    },
+									{
+									    block : 'button',
+									    mods : { theme : 'islands', size : 'xl', type : 'submit' },
+									    text : _messages.send
+									}
+								]
+						    }]
+					    }
+					);
+				} else {
+					_cells.push(
+					    {
+					    	elem : 'cell',
 						    content : [
 								{
-								    elem : 'row',
-								    content : [
-									    {
-									    	elem : 'cell',
-										    content : _messages.creationDate
-									    },
-									    {
-									    	elem : 'cell',
-										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
-									    }
-								    ]
-								},
-								{
-								    elem : 'row',
-								    content : [
-									    {
-									    	elem : 'cell',
-										    content : _messages.activeBonus
-									    },
-									    {
-									    	elem : 'cell',
-										    content : _custom.bonus ? _dir.bonus[_custom.bonus].description : _messages.noBonus
-									    }
-								    ]
+								    block : 'button',
+								    mods : { theme : 'islands', size : 'xl', disabled : true },
+								    text : _messages.send
 								}
 						    ]
-						}
-				    ]
-				},
-
-				{
-				    block : 'column',
-				    mods : { 'triple' : true },
-				    content : [
-						{
-						    block : 'group-title',
-						    content : _messages.visitorsStat
-						},
-						{
-						    block : 'info-table',
-						    content : _visits
-						}
-				    ]
+					    }
+					);
 				}
-			]
+			}
+
+			_table.push(wrapInRow(_cells));
+		});
+
+		return {
+			block : 'info-table',
+		    content : _table
 		}
-	),
+	}),
 	js()(true)
 )

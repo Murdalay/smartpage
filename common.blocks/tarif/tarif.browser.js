@@ -9,7 +9,12 @@ provide(BEMDOM.decl(this.name, {
             'inited' : function() {
         		this._select = this.findBlockInside('select');
 
-				this._select.on('change', this._onSelectChange, this);
+                if(this.hasMod('disabled', true)) {
+                    this._select.setMod('disabled');
+                } else {
+    				this._select.on('change', this._onSelectChange, this);
+                }
+
             },
             '' : function() {
 				this._select.un('change', this._onSelectChange, this);

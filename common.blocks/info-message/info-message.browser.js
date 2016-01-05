@@ -7,7 +7,7 @@ provide(BEMDOM.decl(this.name, {
             'inited' : function() {
 				this.bindTo('click', this._onClick);
 
-                setTimeout(this._onClick.bind(this), 6000);
+                setTimeout(this._onClick.bind(this), 30000);
             },
             '' : function() {
 				this.unbindFrom('click', this._onClick);
