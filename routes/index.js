@@ -782,6 +782,7 @@ function initDataLayers() {
 														req.flash(err);
 													}
 													req.flash('error', 'Печалька, но вы не админ (');
+													return res.redirect('back');
 												}
 											);
 										} 
