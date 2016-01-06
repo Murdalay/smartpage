@@ -760,6 +760,7 @@ function initDataLayers() {
 						if (!req.user || req.user.status !== 'ENABLED') {
 							req.flash('error', 'Какая-то бодяга с авторизацией (');
 							return res.redirect('/useradmin');
+							// todo this.getEndpoints().
 						}
 
 						if (!req.user.groups || !req.user.groups[this.getName()]) {
@@ -780,9 +781,11 @@ function initDataLayers() {
 												function(err) {
 													if (err) {
 														req.flash(err);
+														return res.redirect('/useradmin');
 													}
+													
 													req.flash('error', 'Печалька, но вы не админ (');
-													return res.redirect('back');
+													return res.redirect('/useradmin');
 												}
 											);
 										} 
