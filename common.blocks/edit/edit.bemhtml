@@ -80,8 +80,6 @@ block('edit')(content()(function(){
 						}
 				    ]
 				},
-				
-
 				{
 				    block : 'column',
 				    content : _fields

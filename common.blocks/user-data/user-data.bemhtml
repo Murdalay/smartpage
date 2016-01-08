@@ -1,23 +1,11 @@
 block('user-data')(content()(function(){
 			var _user = this.ctx.user;
 			var _username = _user.username + '';
-			var _social = this.ctx.custom.social;
 			var _reflink = this.ctx.custom.reflink;
 			var _messages = this.ctx.messages;
 
 			console.log('\n\n\n\nAnd username is\n\n' + _username)
 
-			var isSocialFiled = function() {
-				return typeof _social == 'object' && _social.type === 'facebook' || _social.type === 'vk' || _social.type === 'tweet'
-			};
-
-			var currentSocialVal = function(social) {
-				if(typeof _social == 'object' && _social.type === social) {
-					return _social.profile
-				} else {
-					return ''
-				}
-			};
 
 			return [
 				{
@@ -142,52 +130,6 @@ block('user-data')(content()(function(){
 								}
 							]
 					    }
-				    ]
-				},
-				{
-				    block : 'column',
-				    mods : { right : true, 'double' : true },
-				    content : [
-						{
-						    block : 'field-title',
-						    content : 'Социальные сети'
-						},
-						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('vk') },
-						    name : 'vk',
-						    placeholder : 'VKontakte',
-						    val : currentSocialVal('vk')
-						},
-						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('facebook') },
-						    name : 'facebook',
-						    placeholder : 'Facebook',
-						    val : currentSocialVal('facebook')
-						},
-						{
-						    block : 'input',
-						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : isSocialFiled() && !currentSocialVal('tweet') },
-						    name : 'tweet',
-						    placeholder : 'Twitter',
-						    val : currentSocialVal('tweet')
-						},
-						{
-						    block : 'small-caption',
-						    content : 'Выберите одну из социальных сетей и введите ссылку на профиль'
-						},
-						{
-						    block : 'column',
-						    mods : { 'right' : true, align : 'right' },
-						    content : [
-								{
-								    block : 'button',
-								    mods : { theme : 'islands', size : 'xl', type : 'submit' },
-								    text : _messages.send
-								}
-							]
-						}
 				    ]
 				}
 			]
