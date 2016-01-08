@@ -135,6 +135,7 @@ block('user-data')(content()(function(){
 				{
 				    block : 'column',
 				    mods : { right : true, 'double' : true },
+				    mix: [{ block : 'margins', mods : { top : true } }],
 				    content : [
 						{
 						    block : 'column',
