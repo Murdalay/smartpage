@@ -1,60 +1,61 @@
 block('container')(def()(function(){
-	var _ctx = this.ctx;
-	var _activeMenuItems = _ctx.active;
-	var _bundle = this.ctx.bundle;
-	var _err = _ctx.error && _ctx.error.length ? {
-		block : 'error',
-		content : _ctx.error
-	} : '';
-
-	var _info = _ctx.info && _ctx.info.length ? {
-		block : 'info-message',
-		content : this.ctx.info
+		var _ctx = this.ctx;
+		var _activeMenuItems = _ctx.active;
+		var _bundle = this.ctx.bundle;
+		var _err = _ctx.error && _ctx.error.length ? {
+			block : 'error',
+			content : _ctx.error
 		} : '';
 
-	var _menu = this.ctx.menu,
-		menuTitles = _menu ? _menu.items : '',
-		_title = '';
+		var _info = _ctx.info && _ctx.info.length ? {
+			block : 'info-message',
+			content : this.ctx.info
+			} : '';
 
-	var _secondary = _menu && _menu.secondary ? _menu.secondary : null;
+		var _menu = this.ctx.menu,
+			menuTitles = _menu ? _menu.items : '',
+			_title = '';
 
-	menuTitles && menuTitles.forEach(function(title, index) {
-		if (title.value === _bundle) {
-			_title = title.title
-		} else if (title.title === _ctx.title) {
-			_title = _ctx.title
-		}
-	});
+		var _secondary = _menu && _menu.secondary ? _menu.secondary : null;
 
-	// passing messages and appData to blocks
-	var _inside = [];
-	this.ctx.inside && this.ctx.inside.length && this.ctx.inside.forEach(function(block) {
-		block.helpers = _ctx.helpers;
-		block.messages = _ctx.messages;
-		block.appDatas = _ctx.appData;
-		_inside.push(block);
-	})
-
-	// adding balance to secondary header
-	if (_secondary && typeof _secondary === 'object' && !!_secondary.length && _ctx.custom) {
-		_secondary.forEach(function(item, index) {
-			if(item === 'balance') {
-				_secondary[index] = {
-				    block : 'balance',
-				    balance : _ctx.custom.balance ? _ctx.custom.balance : 0,
-				    message : _ctx.messages.balance ? _ctx.messages.balance  : ''
-				}
+		menuTitles && menuTitles.forEach(function(title, index) {
+			if (title.value === _bundle) {
+				_title = title.title
+			} else if (title.title === _ctx.title) {
+				_title = _ctx.title
 			}
+		});
+
+		// passing messages and appData to blocks
+		var _inside = [];
+		this.ctx.inside && this.ctx.inside.length && this.ctx.inside.forEach(function(block) {
+			block.helpers = _ctx.helpers;
+			block.messages = _ctx.messages;
+			block.appDatas = _ctx.appData;
+			_inside.push(block);
 		})
-	}
 
-	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
+		// adding balance to secondary header
+		if (_secondary && typeof _secondary === 'object' && !!_secondary.length && _ctx.custom) {
+			_secondary.forEach(function(item, index) {
+				if(item === 'balance') {
+					_secondary[index] = {
+					    block : 'balance',
+					    balance : _ctx.custom.balance ? _ctx.custom.balance : 0,
+					    message : _ctx.messages.balance ? _ctx.messages.balance  : ''
+					}
+				}
+			})
+		}
 
-	function getMods(){
-		var _mods = {};
-		_bundle ? (_mods[_bundle] = true) : _mods = '';
-		return _mods
-	}
+		_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
+
+		function getMods(){
+			var _mods = {};
+			_bundle ? (_mods[_bundle] = true) : _mods = '';
+			return _mods
+		}
+
 
 		return applyCtx([
 			{

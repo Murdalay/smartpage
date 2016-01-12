@@ -408,12 +408,12 @@ var dataProviders = {
 		});
 	},
 
-	dir : function(callback) {
-		spClient.getDirectory(dirUrl, { expand: 'customData' }, callback);
+	dir : function(callback, url) {
+		spClient.getDirectory(url ? url : dirUrl, { expand: 'customData' }, callback);
 	},
 
-	getDirCustomData : function(callback) {
-		spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
+	getDirCustomData : function(callback, url) {
+		spClient.getDirectory(url ? url : dirUrl, { expand: 'customData' }, function(err, dirr) {
 			if (err) callback(new Error(err));
 
 			callback(null, dirr.customData);
@@ -502,13 +502,20 @@ function passFieldToCb(launchlist, cb) {
 	}
 }
 
-DL = function() {
+var _layers = {
+	finance : 'https://api.stormpath.com/v1/directories/6mggHKx7G6qLxfnnr6vVsP'
+}
+
+DL = DataLayer(_layers);
+
+function DataLayer(layersObj) {
 	var data = { accounts : {}, dir : {}, groups : {} };
 	var providers = {};
 	var components = {};
 	var groups = {};
 	var fGroupTypesCb = {};
 	var layers = {};
+	var registredLayers = layersObj ? layersObj : {};
 
 	function _getActiveDataProviders(res, key) {
 		providers[key] = res;
@@ -696,6 +703,38 @@ updateAccounts.bind(this);
 		this.name = data.dir.name;
 	}
 
+	function Layer(name, url) {
+		this.getName = function() {
+			return this.name;
+		};
+		this.getPages = function() {
+			return this.customData.Pages;
+		};
+		this.getEndpoints = function() {
+			return this.customData.Endpoints;
+		};				
+		this.getUrl = function() {
+			return this.url;
+		};
+		this.getMessages = function() {
+			return this.messages;
+		};
+		this.getPaths = function() {
+			return this.customData.PATHS;
+		};
+		this.getCustomData = function() {
+			return this.customData;
+		};
+
+		this.accessDirCustomData = function(callback) {
+			return providers.dir(callback, url);
+		};
+		
+		this.customData = layers[name] && layers[name].customData ? layers[name].customData : data.dir.customData;
+		this.name = name;
+		this.url = url;
+	}
+
 	function Grp(name) {
 
 		this.name = groups[name].name;
@@ -761,6 +800,13 @@ updateAccounts.bind(this);
 
 			return cb.apply(_newCtx);
 		}
+
+		function getLayer(cb) {
+			var _dir = new Dir();
+			var _newCtx = new Layer(name, registredLayers[name]);
+
+			return cb.apply(extend(_dir, _newCtx));
+		}
 		
 
 		if (action === 'set') {
@@ -776,10 +822,16 @@ updateAccounts.bind(this);
 				return getGroup
 			} else if (layer === 'dir') {
 				return getDir
+			} else if (layer === 'layer') {
+				if (registredLayers[name]) {
+					return getLayer
+				} else {
+					return null
+				}
 			}
 		}
 	}
-}();
+};
 
 
 
@@ -1329,7 +1381,7 @@ function confirmPayRequest(href, payId) {
 								function updatePaymentStatistic() {
 									var _payerMail = _payerMail;
 									return new Vow.Promise(function(resolve, reject, notify) {
-										DL('get', 'dir')(function() { 
+										DL('get', 'layer', 'finance')(function() { 
 											this.accessDirCustomData(function(err, dirr) {
 												if (err) { reject(err) }
 
