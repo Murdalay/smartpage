@@ -16,7 +16,7 @@ block('container')(def()(function(){
 		menuTitles = _menu ? _menu.items : '',
 		_title = '';
 
-	var _secondary = _menu.secondary;
+	var _secondary = _menu && _menu.secondary ? _menu.secondary : null;
 
 	menuTitles && menuTitles.forEach(function(title, index) {
 		if (title.value === _bundle) {

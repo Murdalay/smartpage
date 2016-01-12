@@ -4,7 +4,7 @@ block('header')(content()(function(){
 		_ctx = this.ctx,
 		_page = this.ctx.page,
 		_menu = this.ctx.menu,
-		_secondary = _menu.secondary,
+		_secondary = _menu ? _menu.secondary : null,
 		menuTitles = _menu ? _menu.items : '',
 		_active;
 
@@ -47,7 +47,7 @@ block('header')(content()(function(){
 	    url : '/logout',
 	    content : this.ctx.logout
 	});
-	
+
 	_secondary && _secondary.forEach(function(item, index) {
 		addSecondary(item);
 	});
