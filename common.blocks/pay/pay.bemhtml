@@ -155,7 +155,7 @@ block('pay')(content()(function(){
 						},
 						{
 						    block : 'radio-group',
-						    mods : { theme : 'islands', size : 'xl', type : 'button', disabled : isPayed() },
+						    mods : { tarif : true, theme : 'islands', size : 'xl', type : 'button', disabled : isPayed() },
 						    name : 'subscription-type',
 						    val : _custom.statistic && _custom.statistic.lastPayment ? _custom.statistic.lastPayment['subscription-type'] : 'year',
 						    mix: [{ block : 'margins', mods : { top : true } }],
@@ -200,6 +200,21 @@ block('pay')(content()(function(){
 							    val : 0
 							},
 						],
+						{
+						    block : 'field-title',
+						    content : _messages && _messages.pay && _messages.pay.payMethod ? _messages.pay.payMethod : ''
+						},
+						{
+						    block : 'radio-group',
+						    mods : { payMethod : true, theme : 'islands', size : 'xl', type : 'button', disabled : isPayed() },
+						    name : 'payMethod',
+						    val : _custom.statistic && _custom.statistic.lastPayment && _custom.statistic.lastPayment['payMethod'] ? _custom.statistic.lastPayment['payMethod'] : 'cash',
+						    mix: [{ block : 'margins', mods : { top : true } }],
+						    options : [
+						        { val : 'cash', text : _messages && _messages.pay && _messages.pay.cash ? _messages.pay.cash  : '' },
+						        { val : 'fromBalance', text : _messages && _messages.pay && _messages.pay.fromBalance ? _messages.pay.fromBalance : '' }
+						    ]
+						},
 					    { 
 					    	block : 'margins', 
 					    	mods : { top : true },

@@ -3,6 +3,7 @@ block('user-data')(content()(function(){
 			var _username = _user.username + '';
 			var _social = this.ctx.custom.social;
 			var _reflink = this.ctx.custom.reflink;
+			var _referrer = this.ctx.custom.referrer;
 			var _messages = this.ctx.messages;
 
 			console.log('\n\n\n\nAnd username is\n\n' + _username)
@@ -67,6 +68,14 @@ block('user-data')(content()(function(){
 						    block : 'small-caption',
 						    content : _messages ? _messages.info.usernameAlert : ''
 						},
+						!_referrer ? '' : [{
+						    block : 'field-title',
+						    content : _messages ? _messages.referrer : ''
+						},
+						{
+						    block : 'basic-text',
+						    content : _referrer
+						}],
 						{
 						    block : 'field-title',
 						    content : _messages ? _messages.ref : ''

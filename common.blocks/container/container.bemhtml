@@ -1,13 +1,13 @@
 block('container')(def()(function(){
-	var _activeMenuItems = this.ctx.active;
+	var _ctx = this.ctx;
+	var _activeMenuItems = _ctx.active;
 	var _bundle = this.ctx.bundle;
-	var _err = this.ctx.error && this.ctx.error.length ? {
+	var _err = _ctx.error && _ctx.error.length ? {
 		block : 'error',
-		content : this.ctx.error
+		content : _ctx.error
 	} : '';
 
-	var _ctx = this.ctx;
-	var _info = _ctx.info && this.ctx.info.length ? {
+	var _info = _ctx.info && _ctx.info.length ? {
 		block : 'info-message',
 		content : this.ctx.info
 		} : '';
@@ -15,6 +15,8 @@ block('container')(def()(function(){
 	var _menu = this.ctx.menu,
 		menuTitles = _menu ? _menu.items : '',
 		_title = '';
+
+	var _secondary = _menu.secondary;
 
 	menuTitles && menuTitles.forEach(function(title, index) {
 		if (title.value === _bundle) {
@@ -32,6 +34,19 @@ block('container')(def()(function(){
 		block.appDatas = _ctx.appData;
 		_inside.push(block);
 	})
+
+	// adding balance to secondary header
+	if (_secondary && typeof _secondary === 'object' && !!_secondary.length && _ctx.custom) {
+		_secondary.forEach(function(item, index) {
+			if(item === 'balance') {
+				_secondary[index] = {
+				    block : 'balance',
+				    balance : _ctx.custom.balance ? _ctx.custom.balance : 0,
+				    message : _ctx.messages.balance ? _ctx.messages.balance  : ''
+				}
+			}
+		})
+	}
 
 	_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);
 
@@ -58,7 +73,7 @@ block('container')(def()(function(){
 				    	block : 'header',
 				    	mods: getMods(),
 				    	page : _title,
-				    	menu : this.ctx.menu,
+				    	menu : _menu,
 				    	logout : this.ctx.messages ? this.ctx.messages.logout : '',
 				    	active : this.ctx.active,
 				    	hideMenu : !_activeMenuItems

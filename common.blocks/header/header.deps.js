@@ -8,6 +8,7 @@
         { block : 'menu-item', mods : { top : true, type : 'link' } },
         { block : 'button', mods : { theme : 'islands', size : 'm', type : 'link' } },
         { block : 'logo' },
+        { elems : ['primary', 'secondary', 'secondary-wrapper'] },
         { block : 'align' },
         { block : 'link', mods : { theme : 'islands', logout : true } }
     ]

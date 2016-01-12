@@ -37,6 +37,9 @@ block('adm-payrequests')(content()(function(){
 	        bonus: {
 	          type: 'cost'
 	        },
+	        payMethod: {
+	          type: 'selector-list'
+	        },
 	        date: {
 	          type: 'date-in-ms'
 	        }

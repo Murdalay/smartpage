@@ -1,91 +1,108 @@
 block('enter')(def()(function(){
-  var _activeMenuItems = this.ctx.active;
-  var _err = this.ctx.error && this.ctx.error.length ? {
-    block : 'error',
-    content : this.ctx.error
-  } : '';
-  var _info = this.ctx.info && this.ctx.info.length ? {
-    block : 'info-message',
-    content : this.ctx.info
-  } : '';
-  var _caption = this.ctx.caption ? {
-    block : 'small-caption',
-    content : this.ctx.caption
-  } : '';
+	var _activeMenuItems = this.ctx.active;
+	var _err = this.ctx.error && this.ctx.error.length ? {
+		block : 'error',
+		content : this.ctx.error
+	} : '';
+	var _info = this.ctx.info && this.ctx.info.length ? {
+		block : 'info-message',
+		content : this.ctx.info
+	} : '';
+	var _caption = this.ctx.caption ? {
+		block : 'small-caption',
+		content : this.ctx.caption
+	} : '';
 
-  var _begining = '<div class="navbar-wrapper subpage"><div data-collapse="medium" data-animation="default" data-duration="400" data-contain="1" class="w-nav navbar"><div class="w-container"><a href="http://sp-helix.com/" class="w-nav-brand logo"><img src="/images/logo.png"></a><nav role="navigation" class="w-nav-menu nav-menu"><a href="/#aboutcompany" class="w-nav-link nav-link">О нас</a><a href="/#partner" class="w-nav-link nav-link">Сотрудничество</a><a href="/#tarif" class="w-nav-link nav-link">Тарифы</a><a href="/#contactus" class="w-nav-link nav-link">Контакты</a><a href="/login/" class="w-nav-link nav-link">Вход</a></nav><div class="w-nav-button menu-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-section image-section login"><div class="image-section-overlay contact"><div class="w-container container">';
-  var _end = '</div></div><div class="w-section footer"><div class="footer-social-wrapper"><div class="w-container container"><div class="w-row footer-social-row"><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://vk.com/ut_smartpage" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/vk.png" class="footer-social-icon"><div class="footer-social-title">ВКонтакте</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://www.youtube.com/channel/UCAgKzvOu2wpYITduG6zRMLA" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-youtube.png" class="footer-social-icon"><div class="footer-social-title">YouTube</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-facebook.png" class="footer-social-icon"><div class="footer-social-title">Facebook</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-twitter.png" class="footer-social-icon"><div class="footer-social-title">Twitter</div></a></div></div></div></div><script type="text/javascript" src="/js/webflow.js"></script>';
-  var _inside = function(){
-    return [ 
-              { 
-                block : 'column-title _2 large',
-                attrs : { 'data-ix' : 'fade-in-on-load-2' },
-                content : this.ctx.title
-              },
-              { 
-                block:'w-row contact-us-row', 
-                content: [
-                    { 
-                      block : 'w-col w-col-5 contact-col-left',
-                      content : [
-                        {
-                          block : 'form',
-                          content : [
-                            {
-                                block : 'input',
-                                mods : { width : 'available', theme : 'islands', size: 'xl', type : 'email' },
-                                name : this.ctx.firstInput.name,
-                                placeholder : this.ctx.firstInput.placeholder
-                            },
-                            {
-                                block : 'input',
-                                mix: [{ block : 'margins', mods : { top : true } }],
-                                mods : { width : 'available', theme : 'islands', size: 'xl', type : 'password' },
-                                name : this.ctx.secondInput.name,
-                                placeholder : this.ctx.secondInput.placeholder
-                            },
-                            '<div class="w-editable block-title small small-gray"><a class="link" href="/restore">Восстановить пароль</a> |&nbsp;<a class="link" href="/login">Вход</a></div>',
-                            _caption,
-                            _err,
-                            _info,
-                            {
-                              block : 'button',
-                              mods : { type : 'submit' },
-                              text : 'Отправить'
-                            },
-                            this.ctx.inside
-                          ]
-                        }
-                      ]
-                    },
-                    { 
-                      block : 'w-col w-col-7 contact-us-col-right',
-                      content : ''
-                    }
-                  ]
-              }
-            ]
-  }.bind(this)();
 
-      return applyCtx([
-        {
-            block : 'page',
-            head: [
-                { elem : 'js', url : '/js/jquery-1.8.3.min.js' },
-                { elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
-                { elem : 'js', url : '/js/modernizr.js' },
-                { elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
-                { elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.js' : '_main.js' }
-            ],
-            styles : [
-              { elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.css' : '_enter.css' },
-              { elem : 'css', url : '/css/webflow.css' },
-              { elem : 'css', url : '/css/smartpage.webflow.css' }
-            ],
-            title: this.ctx.title ? this.ctx.title : 'login',
-            content : [_begining, _inside, _end]
-        }
-      ])
-    }
-  )
+	var _hidden = '';
+
+	if (this.ctx.hiddenInputs) {
+		_hidden = [];
+		this.ctx.hiddenInputs.forEach(function(input){
+			_hidden.push({
+				block : 'input',
+				mods : { hidden : true, theme : 'islands', size: 'xl' },
+				name : input.name,
+				val : input.val ? input.val : ''
+			});
+		})
+	}
+
+	var _begining = '<div class="navbar-wrapper subpage"><div data-collapse="medium" data-animation="default" data-duration="400" data-contain="1" class="w-nav navbar"><div class="w-container"><a href="http://sp-helix.com/" class="w-nav-brand logo"><img src="/images/logo.png"></a><nav role="navigation" class="w-nav-menu nav-menu"><a href="/#aboutcompany" class="w-nav-link nav-link">О нас</a><a href="/#partner" class="w-nav-link nav-link">Сотрудничество</a><a href="/#tarif" class="w-nav-link nav-link">Тарифы</a><a href="/#contactus" class="w-nav-link nav-link">Контакты</a><a href="/login/" class="w-nav-link nav-link">Вход</a></nav><div class="w-nav-button menu-button"><div class="w-icon-nav-menu"></div></div></div></div></div><div class="w-section image-section login"><div class="image-section-overlay contact"><div class="w-container container">';
+	var _end = '</div></div><div class="w-section footer"><div class="footer-social-wrapper"><div class="w-container container"><div class="w-row footer-social-row"><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://vk.com/ut_smartpage" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/vk.png" class="footer-social-icon"><div class="footer-social-title">ВКонтакте</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="https://www.youtube.com/channel/UCAgKzvOu2wpYITduG6zRMLA" target="_blank" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-youtube.png" class="footer-social-icon"><div class="footer-social-title">YouTube</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-facebook.png" class="footer-social-icon"><div class="footer-social-title">Facebook</div></a></div><div class="w-col w-col-3 w-col-small-6 w-col-tiny-6 footer-social-column"><a href="#" class="w-clearfix w-inline-block footer-social-block"><img src="/images/Icon-twitter.png" class="footer-social-icon"><div class="footer-social-title">Twitter</div></a></div></div></div></div><script type="text/javascript" src="/js/webflow.js"></script>';
+	var _inside = function(){
+		return [ 
+			{ 
+				block : 'column-title _2 large',
+				attrs : { 'data-ix' : 'fade-in-on-load-2' },
+				content : this.ctx.title
+			},
+			{ 
+				block:'w-row contact-us-row', 
+				content: [
+					{ 
+						block : 'w-col w-col-5 contact-col-left',
+						content : [
+							{
+								block : 'form',
+								url : this.ctx.formUrl ? this.ctx.formUrl : '',
+								content : [
+									{
+										block : 'input',
+										mods : { width : 'available', theme : 'islands', size: 'xl', type : this.ctx.firstInput.type ? this.ctx.firstInput.type : 'email' },
+										name : this.ctx.firstInput.name,
+										placeholder : this.ctx.firstInput.placeholder
+									},
+									!this.ctx.secondInput ? '' : {
+										block : 'input',
+										mix: [{ block : 'margins', mods : { top : true } }],
+										mods : { width : 'available', theme : 'islands', size: 'xl', type : this.ctx.secondInput.type ? this.ctx.secondInput.type : 'password' },
+										name : this.ctx.secondInput.name,
+										placeholder : this.ctx.secondInput.placeholder
+									},
+									'<div class="w-editable block-title small small-gray"><a class="link" href="/restore">Восстановить пароль</a> |&nbsp;<a class="link" href="/login">Вход</a></div>',
+									_caption,
+									_err,
+									_info,
+									_hidden,
+									{
+										block : 'button',
+										mods : { type : 'submit' },
+										text : 'Отправить'
+									},
+									this.ctx.inside
+								]
+							}
+						]
+					},
+					{ 
+						block : 'w-col w-col-7 contact-us-col-right',
+						content : ''
+					}
+				]
+			}
+		]
+	}.bind(this)();
+
+			return applyCtx([
+				{
+						block : 'page',
+						head: [
+								{ elem : 'js', url : '/js/jquery-1.8.3.min.js' },
+								{ elem : 'js', url : 'https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js' },
+								{ elem : 'js', url : '/js/modernizr.js' },
+								{ elem : 'js', content : 'WebFont.load({ google: { families: ["Montserrat:200,200italic,400,400italic,600,700"] }});' },
+								{ elem : 'js', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.js' : '_main.js' }
+						],
+						styles : [
+							{ elem : 'css', url : this.ctx.bundle ? '/' + this.ctx.bundle + '/_' + this.ctx.bundle + '.css' : '_enter.css' },
+							{ elem : 'css', url : '/css/webflow.css' },
+							{ elem : 'css', url : '/css/smartpage.webflow.css' }
+						],
+						title: this.ctx.title ? this.ctx.title : 'login',
+						content : [_begining, _inside, _end]
+				}
+			])
+		}
+	)
 )

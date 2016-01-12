@@ -5,6 +5,7 @@
     shouldDeps : [
         { block : 'page' },
         { block : 'header' },
+        { block : 'balance' },
         { elem : 'back' },
         { block : 'content-wrapper' },
         { block : 'jquery', elem : 'event', mods : { type : 'pointerpressrelease' } },

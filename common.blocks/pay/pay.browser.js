@@ -8,18 +8,22 @@ provide(BEMDOM.decl(this.name, {
             'inited': function() {
                 this._tarif = this.findBlockInside('tarif');
                 if (!this._tarif.hasMod('disabled', true)) {
-                	this._input = this.findBlockInside({ block : 'input', modName : 'number', modVal : true });
+                    this._input = this.findBlockInside({ block : 'input', modName : 'number', modVal : true });
                     this._summ = this.findBlockInside({ block : 'input', modName : 'summ', modVal : true });
                     this._sum = this.findBlockInside({ block : 'input', modName : 'sum', modVal : true });
                     this._save = this.findBlockInside({ block : 'input', modName : 'save', modVal : true });
                     this._hiddenEndDate = this.findBlockInside({ block : 'input', modName : 'endDate', modVal : true });
                     this._endDate = this.findBlockInside({ block : 'basic-text', modName : 'endDate', modVal : true });
-                	this._freeMonths = this.findBlockInside({ block : 'input', modName : 'freeMonths', modVal : true });
-                	this._term = this.findBlockInside('radio-group');
+                    this._freeMonths = this.findBlockInside({ block : 'input', modName : 'freeMonths', modVal : true });
+                    this._term = this.findBlockInside({ block : 'radio-group', modName : 'tarif', modVal : true });
+                    this._payMethod = this.findBlockInside({ block : 'radio-group', modName : 'payMethod', modVal : true });
+                    this._submit = this.findBlockInside({ block : 'button', modName : 'type', modVal : 'submit' });
 
-                	this._term.getVal() || this._term.setVal('year');
+                	this._balance = this.findBlockOutside('page').findBlockInside('balance');
 
                     this._term.on('change', this._setSumm, this);
+                    this._payMethod.on('change', this._checkBalance, this);
+
                 	this._input.on('change blur', this._onNumberInput, this);
                 	this._tarif.on({ modName : 'tarif', modVal : '*' }, this._onTarifChange.bind(this));
 
@@ -44,6 +48,21 @@ provide(BEMDOM.decl(this.name, {
         }
     },
 
+    _checkBalance : function(e) {
+        var balance = this._balance.getBalance();
+
+        if (this._payMethod.getVal() === 'fromBalance') {
+            if (this._currSumm <= balance) {
+                this._submit.delMod('disabled');
+
+            } else {
+                this._submit.setMod('disabled');
+            }
+        } else {
+            this._submit.delMod('disabled');
+        }
+    },
+
     _setSumm : function() {
         var _number = this._input.getVal();
         var _basePrice = this._cost.price;
@@ -61,8 +80,10 @@ provide(BEMDOM.decl(this.name, {
 
 
         this._summ.setVal('$' + _summ);
+        this._currSumm = _summ;
         this._save.setVal('$' + _save);
         this._sum.setVal(_summ);
+        this._checkBalance();
 
         this._freeMonths.setVal(_included);
         this._hiddenEndDate.setVal(_endDate.getTime());

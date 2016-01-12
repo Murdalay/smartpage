@@ -1,0 +1,19 @@
+block('balance')(content()(function() {
+	return [
+	{
+		elem : 'balance',
+		content : this.ctx.message ? this.ctx.message : ''
+
+	},
+	{
+		elem : 'currency',
+		content : this.ctx.currency ? this.ctx.currency : '$'
+
+	},
+	{
+		elem : 'amount',
+		content : this.ctx.balance ? this.ctx.balance : 0
+
+	}]
+}),
+js()(true));

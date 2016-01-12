@@ -1,5 +1,6 @@
 block('statistics')(content()(function(){
 			var _custom = this.ctx.uData.custom;
+			var _user = this.ctx.uData.user;
 			var _stat = _custom.statistic;
 			var _dates = _stat.visits;
 			var _dir = this.ctx.appData;
@@ -11,6 +12,65 @@ block('statistics')(content()(function(){
 			var _dayBefore = _now.getTime() - 86400000;
 			var _monthBefore = _now.setMonth(_now.getMonth - 1);
 
+
+			var _refPaymentModel = {
+				dataLayer: 'user',
+				type: 'info',
+				provider: 'refPayment',
+				messages: 'pay',
+				customData: true,
+				fileds: {
+					status: {
+					  type: 'status',
+					  extra : {
+					  	messageSource : 'messages.status.refPayment'
+					  }
+					},
+					amount: {
+					  type: 'cost'
+					},
+					transactionId: {
+					  type: false
+					},
+					payDate: {
+					  type: 'date-in-ms'
+					}
+				}
+			};
+			
+			function atomizer(itemLayout, itemData, wrapper) {
+				var _atom = {
+			    	block : 'atom',
+			    	mods : {}
+			    };
+
+			    if (!itemData) {
+					return wrapper ? wrapper : ''
+			    }
+
+			    var _wrapper = typeof wrapper === 'object' ? Object.create(wrapper) : null;
+
+			    if (itemLayout && itemLayout.type) {
+			    	_atom.content = itemData;
+			    	_atom.mods[itemLayout.type] = true;
+
+			    	if (_wrapper) {
+			    		_wrapper.content = _atom;
+
+			    		return _wrapper;
+			    	} else {
+			    		return _atom;
+			    	}
+			    } else {
+			    	if (_wrapper) {
+			    		_wrapper.content = itemData;
+
+			    		return _wrapper;
+			    	} else {
+			    		return itemData;
+			    	}
+			    }
+		    }
 
 			_dates && _dates.forEach(function(date){
 				if(date > _dayBefore) {
@@ -45,6 +105,95 @@ block('statistics')(content()(function(){
 				)
 			}
 
+	var _paymentTable = [];
+	var _referedAccTable = [];
+	var _tableHeader = false;
+	var _refNumber = 0;
+
+	if (_custom && _custom.refPayment && _custom.referredAccounts) {
+		function buildHeaderCells(obj, messages) {
+			var _head = [];
+			for(type in obj) {
+				_head.push(
+				    {
+				    	elem : 'cell',
+				    	mods : { header : true },
+					    content : messages[type] ? messages[type] : type
+				    }
+				);
+			}
+
+			return _head;
+		}
+
+		function buildBodyCells(obj, source, noData) {
+			var _cells = [];
+			noData || (noData = 'Data unavailable');
+			var _cell = {
+		    	elem : 'cell',
+			    content : noData
+		    };
+			for(type in obj) {
+				_cells.push(atomizer(obj[type], source[type], _cell));
+			}
+
+			return _cells;
+		}
+		    
+
+		function wrapInRow(cells) {
+			return {
+			    elem : 'row',
+			    content : cells
+			}
+		}
+
+		for (key in _custom.refPayment) {
+			_custom.refPayment[key].forEach(function(item) {
+				var _cells = [];
+				var _head = [];
+
+				if (!_tableHeader) {
+					_head.push(buildHeaderCells(_refPaymentModel.fileds, _messages.refPayment));
+					_head.push(buildHeaderCells({ payerId : null, payerMail : null }, _messages.refPayment));
+
+
+					_paymentTable.push(wrapInRow(_head));
+					_tableHeader = true;
+				}
+
+				_cells.push(buildBodyCells(_refPaymentModel.fileds, item, _messages.noData));
+				_cells.push(buildBodyCells({ payerId : null, payerMail : null }, { payerId : key, payerMail : _custom.referredAccounts[key] }, _messages.noData));
+
+				_paymentTable.push(wrapInRow(_cells));
+			});
+
+			_tableHeader = false;
+		}
+
+		for (key in _custom.referredAccounts) {
+			var _cells = [];
+			var _head = [];
+
+			if (!_tableHeader) {
+				_head.push(buildHeaderCells({ userId : null, userMail : null }, _messages));
+
+				_referedAccTable.push(wrapInRow(_head));
+				_tableHeader = true;
+			}
+
+			_cells.push(buildBodyCells({ payerId : null, payerMail : null }, { payerId : key, payerMail : _custom.referredAccounts[key] }, _messages.noData));
+
+			_referedAccTable.push(wrapInRow(_cells));
+			_refNumber += 1;
+		}
+
+		_tableHeader = false;
+	}
+
+	console.log(_user);
+
+
 			return [
 				{
 				    block : 'column',
@@ -73,10 +222,7 @@ block('statistics')(content()(function(){
 									    	elem : 'cell',
 										    content : _messages.creationDate
 									    },
-									    {
-									    	elem : 'cell',
-										    content : new Date(_custom.createdAt).toLocaleDateString('ru-RU')
-									    }
+									    buildBodyCells({ createdAt : { type : 'date-in-ms' }},  _user, _messages.noData)
 								    ]
 								},
 								{
@@ -93,24 +239,65 @@ block('statistics')(content()(function(){
 								    ]
 								}
 						    ]
+						},
+						{
+						    block : 'column',
+						    mods : { 'triple' : true },
+						    content : [
+								{
+								    block : 'group-title',
+								    content : _messages.visitorsStat
+								},
+								{
+								    block : 'info-table',
+								    content : _visits
+								}
+						    ]
 						}
 				    ]
 				},
+				!_custom.refPayment ? '' : [
+					{
+					    block : 'column',
+					    mods : { 'triple' : true },
+					    content : [
+							{
+							    block : 'group-title',
+							    content : _messages && _messages.refPayment ? _messages.refPayment.refPayment : ''
+							},
+							{
+							    block : 'info-table',
 
-				{
-				    block : 'column',
-				    mods : { 'triple' : true },
-				    content : [
-						{
-						    block : 'group-title',
-						    content : _messages.visitorsStat
-						},
-						{
-						    block : 'info-table',
-						    content : _visits
-						}
-				    ]
-				}
+							    content : _paymentTable
+							},
+							{
+							    block : 'group-title',
+							    content : _messages && _messages.refPayment ? _messages.refPayment.reffered : ''
+							},
+							{
+							    block : 'info-table',
+
+							    content : _referedAccTable
+							},
+							{
+							    block : 'margins',
+							    mods : { top : true },
+							    content : [
+								    {
+									    block : 'basic-text',
+									    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
+									},
+								    {
+									    block : 'basic-text',
+									    mods : { bold : true },
+									    mix: { block : 'margins', mods : { left : true } },
+									    content : _refNumber
+									}
+								]
+							}
+					    ]
+					}
+				]
 			]
 		}
 	),

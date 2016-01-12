@@ -1,8 +1,10 @@
 block('header')(content()(function(){
 	var menuItems = [],
+		secondaryItems = [],
 		_ctx = this.ctx,
 		_page = this.ctx.page,
 		_menu = this.ctx.menu,
+		_secondary = _menu.secondary,
 		menuTitles = _menu ? _menu.items : '',
 		_active;
 
@@ -29,24 +31,60 @@ block('header')(content()(function(){
         );
 	});
 
+	function addSecondary(item) {
+		secondaryItems.push(
+			{
+			    block : 'header',
+	            elem : 'secondary-wrapper',
+	            content : item
+	        }
+        );
+	}
+
+	addSecondary({
+	    block : 'link',
+	    mods : { theme : 'islands', logout : true },
+	    url : '/logout',
+	    content : this.ctx.logout
+	});
+	
+	_secondary && _secondary.forEach(function(item, index) {
+		addSecondary(item);
+	});
+
+
+
+
+
+
 	return [
 				{
-					block : 'content-wrapper',
+				    block : 'header',
+				    elem : 'primary',
 					content: [
 						{
-							block : 'logo'
-						},
+							block : 'content-wrapper',
+							content: [
+								{
+									block : 'logo'
+								},
+								{
+								    block : 'menu',
+								    mods : { theme : 'islands', size : 'xl', mode : 'radio', top: true },
+								    val : _active ? _active : '',
+								    content : _ctx.hideMenu ? '' : menuItems
+								}
+							]
+						}
+					]
+				},
+				{
+				    block : 'header',
+				    elem : 'secondary',
+					content: [
 						{
-						    block : 'menu',
-						    mods : { theme : 'islands', size : 'xl', mode : 'radio', top: true },
-						    val : _active ? _active : '',
-						    content : _ctx.hideMenu ? '' : menuItems
-						},
-						{
-						    block : 'link',
-						    mods : { theme : 'islands', logout : true },
-						    url : '/logout',
-						    content : this.ctx.logout
+							block : 'content-wrapper',
+							content: secondaryItems
 						}
 					]
 				}

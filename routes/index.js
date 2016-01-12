@@ -80,7 +80,6 @@ function extend(target, source) {
 };
 
 function stringifyToQuery(obj) {
-
     function addParam(res, name, val) {
         /* jshint eqnull: true */
         res.push(encodeURIComponent(name) + '=' + (val == null? '' : encodeURIComponent(val)));
@@ -115,8 +114,25 @@ function makeHashForEmail(email) {
 	return crypto.createHash('sha1').update(email).digest("hex");
 }
 
-console.log(makeHashForEmail('alexusss2@ukr.net'));
 
+function goBack(req, res, next) {
+	res.redirect('back');
+}
+
+function getMessageForError(messages, err, req) {
+	var _message;
+
+	console.error(err.code);
+	for (code in messages.errors.apiCodes) {
+		if(code == err.code + '') {
+			_message = messages.errors.apiCodes[code];
+			break
+		}
+	}
+
+	_message || (_message = err.userMessage ? err.userMessage : err.message);
+	req && req.flash('error', _message);
+}
 
 // @param 
 // group {String} A group name for merge
@@ -229,6 +245,28 @@ var endpointCallbacks = {
 				title : messages.register
 			});
 		});
+	},
+
+	resetPass : function(endpoint, messages, extra) {
+		console.log('Enabling registration routes');
+
+		// Render the registration page.
+		router.get(endpoint.url, function(req, res) {
+			res.render('enter', {
+				block : 'enter',
+				bundle : 'enter',
+				error : req.flash('error')[0],
+				info : req.flash('info'),
+				caption : messages.info.resetPasswordAlert,
+
+				firstInput: {
+					name : endpoint.extra.firstInputName,
+					placeholder : messages.email
+				},
+
+				title : messages.resetPass
+			});
+		});
 	}
 };
 
@@ -321,6 +359,53 @@ var dataProviders = {
 
 	groupAccounts : function(callback, url) {
 		spClient.group(url, { expand: 'accounts' }, callback);
+	},
+
+	app : function(callback) {
+		spClient.getApplication(process.env['STORMPATH_APP_HREF'], callback);
+	},
+
+	sendResetPassEmail : function(mail, callback) {
+		dataProviders.app(function(err, app) {
+			if (err) { return callback(err); };
+
+			var _username = process.env['STORMPATH_API_KEY_ID'],
+				_password = process.env['STORMPATH_API_KEY_SECRET'];
+
+
+			request.post({ url : app.passwordResetTokens.href, json : true, body : { email : mail }, 'auth': { 'user': _username, 'pass': _password, 'sendImmediately': false } }, 
+				function (error, response, body) {
+				if (error) { return callback(error) }
+				
+				if (response.statusCode === 200) {
+					return callback(null, 'done');
+				} else {
+					console.log(response.body);
+					return callback(null, response.body);
+				}
+			});
+		});
+	},
+
+	verifyPassResetToken : function(sptoken, callback) {
+		dataProviders.app(function(err, app) {
+			if (err) { return callback(err); };
+
+			app.verifyPasswordResetToken(sptoken, function(err, verificationResponse) {
+				if (err) { return callback(err) }
+
+			    spClient.getAccount(verificationResponse.account.href, function(err, account) {
+			    	return callback(null, 'done', account);
+			    });
+			});
+		});
+	},
+
+	resetUserPass : function(password, token, callback) {
+		dataProviders.app(function(err, app) {
+			if (err) { return callback(err); };
+				app.resetPassword(token, password, callback);
+		});
 	},
 
 	dir : function(callback) {
@@ -483,8 +568,6 @@ updateAccounts.bind(this);
 
 			_header.items.push({ value : item.id, title : item.title });
 
-			
-
 			function Page() {
 				this.name = item.id;
 				this.title = item.title;
@@ -521,8 +604,8 @@ updateAccounts.bind(this);
 								if(!!groupBemjson) {
 									var _bJson = groupBemjson; 
 									_bJson.data = result;
+									
 									resolve(_bJson);
-
 								} else {
 									resolve(result);
 								}
@@ -564,120 +647,119 @@ updateAccounts.bind(this);
 	passFieldToCb(funcGroupTypesCb, _getFuncGroupTypesCb);
 	console.log('DL is created');
 
+	function Dir() {
+		this.getName = function() {
+			return data.dir.name;
+		};
+		this.getPages = function() {
+			return data.dir.customData.Pages;
+		};
+		this.getEndpoints = function() {
+			return data.dir.customData.Endpoints;
+		};				
+		this.getUrl = function() {
+			return data.dir.customData.url;
+		};
+		this.getAccountByHash = function(hash) {
+			console.log(hash);
+			return data.accounts[hash] ? data.accounts[hash] : null;
+		};
+		this.getAccountByUrl = function(url, cb) {
+			return providers.accountByUrl.apply(this, [url, cb]);
+		};
+		this.getProviders = function() {
+			return providers;
+		};
+		this.getGroups = function() {
+			return groups;
+		};
+		this.getMessages = function() {
+			return data.dir.customData.messages;
+		};
+		this.getPaths = function() {
+			return data.dir.customData.PATHS;
+		};
+		this.getCustomData = function() {
+			return data.dir.customData;
+		};
+		this.getAccounts = function(query, cb) {
+			return providers.dirAccounts(query, cb);
+		};
+		this.accessDirCustomData = function(callback) {
+			return providers.dir(callback);
+		};
+		this.eachAccount = function(cb, endCb, query) {
+			return providers.eachAccount(cb, endCb, query);
+		};			
+		this.updateAccounts = updateAccounts;
+
+		this.name = data.dir.name;
+	}
+
+	function Grp(name) {
+
+		this.name = groups[name].name;
+		this.messages = groups[name].customData.mergedMessages;
+		this.Pages = groups[name].customData.Pages;
+		this.Endpoints = groups[name].customData.Endpoints;
+		this.url = groups[name].url;
+		this.fComponents = groups[name].customData.functionalComponents;
+		this.fGroups = groups[name].customData.functionalGroups;
+		this.providers = providers;
+		this.data = groups[name].customData;
+
+
+		this.getName = function() {
+			return this.name;
+		};
+		this.getMessages = function() {
+			return this.messages;
+		};
+		this.getPages = function() {
+			return this.Pages;
+		};
+		this.getEndpoints = function() {
+			return this.Endpoints;
+		};				
+		this.getUrl = function() {
+			this.url;
+		};
+		this.getFuncComponents = function() {
+			return this.fComponents;
+		};
+		this.getFuncGroups = function() {
+			return this.fGroups;
+		};
+		this.getProviders = function() {
+			return this.providers;
+		};
+		this.initPages = initPages.bind(this);
+		this.dirAccounts = this.getProviders().dirAccounts;
+		this.getCustomData = function() {
+			return this.data;
+		};
+		this.getPaths = function() {
+			var _cd = this.getCustomData();
+			return _cd.PATHS;
+		};	
+	}
 
 	// global setters
 	return function(action, layer, name) {
 		console.log('Creating data layer ');
 
 		function getGroup(cb) {
-			function Grp() {
+			var _dirCtx = new Dir();
+			var _newCtx = new Grp(name);
 
-				this.name = groups[name].name;
-				this.messages = groups[name].customData.mergedMessages;
-				this.Pages = groups[name].customData.Pages;
-				this.Endpoints = groups[name].customData.Endpoints;
-				this.url = groups[name].url;
-				this.fComponents = groups[name].customData.functionalComponents;
-				this.fGroups = groups[name].customData.functionalGroups;
-				this.providers = providers;
-				this.data = groups[name].customData;
-
-
-				this.getName = function() {
-					return this.name;
-				};
-				this.getMessages = function() {
-					return this.messages;
-				};
-				this.getPages = function() {
-					return this.Pages;
-				};
-				this.getEndpoints = function() {
-					return this.Endpoints;
-				};				
-				this.getUrl = function() {
-					this.url;
-				};
-				this.getFuncComponents = function() {
-					return this.fComponents;
-				};
-				this.getFuncGroups = function() {
-					return this.fGroups;
-				};
-				this.getProviders = function() {
-					return this.providers;
-				};
-				this.initPages = initPages.bind(this);
-				this.dirAccounts = this.getProviders().dirAccounts;
-				this.getCustomData = function() {
-					return this.data;
-				};
-				this.getPaths = function() {
-					var _cd = this.getCustomData();
-					return _cd.PATHS;
-				};	
-			}
-
-			var _newCtx = new Grp();
-
-			return cb.bind(extend({}, this, _newCtx))();
+			return cb.apply(extend(_dirCtx, _newCtx));
 		}
 
+
 		function getDir(cb) {
-			function Dir() {
-				this.getName = function() {
-					return data.dir.name;
-				};
-				this.getPages = function() {
-					return data.dir.customData.Pages;
-				};
-				this.getEndpoints = function() {
-					return data.dir.customData.Endpoints;
-				};				
-				this.getUrl = function() {
-					return data.dir.customData.url;
-				};
-				this.getAccountByHash = function(hash) {
-					console.log(hash);
-					return data.accounts[hash] ? data.accounts[hash] : null;
-				};
-				this.getAccountByUrl = function(url, cb) {
-					cb.bind(this);
-					return providers.accountByUrl(url, cb);
-				};
-				this.getProviders = function() {
-					return providers;
-				};
-				this.getGroups = function() {
-					return groups;
-				};
-				this.getMessages = function() {
-					return data.dir.customData.messages;
-				};
-				this.getPaths = function() {
-					return data.dir.customData.PATHS;
-				};
-				this.getCustomData = function() {
-					return data.dir.customData;
-				};
-				this.getAccounts = function(query, cb) {
-					return providers.dirAccounts(query, cb);
-				};
-				this.accessDirCustomData = function(callback) {
-					return providers.dir(callback);
-				};
-				this.eachAccount = function(cb, endCb, query) {
-					return providers.eachAccount(cb, endCb, query);
-				};			
-				this.updateAccounts = updateAccounts;
-
-				this.name = data.dir.name;
-
-			}
-
 			var _newCtx = new Dir();
 
-			return cb.bind(extend({}, this, _newCtx))();
+			return cb.apply(_newCtx);
 		}
 		
 
@@ -778,6 +860,141 @@ function initDataLayers() {
 
 			registerEndPoints(this.getEndpoints(), this.getMessages())
 			this.updateAccounts(function(err) {  });
+
+
+			function resetPassMidleware(req, res, next) {
+				var _email = req.body.email;
+				var _messages = this.getMessages();
+
+				if (!_email) {
+					console.error(err);
+					req.flash('error', _messages.errors.noMail);
+					return next();
+				}
+
+				var _mailRegexp = /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
+
+				var _isMail = _mailRegexp.test(_email);
+
+				if(!_isMail) {
+					req.flash('error', _messages.errors.notMail);
+					return next();
+				}
+
+				this.getProviders().sendResetPassEmail(_email, function(err, response) {
+					if (err) {
+						getMessageForError(_messages, err, req);
+						return next();
+					}
+
+					if (response) {
+						req.flash('info', _messages.info.resetSuccess);
+						return next();
+					}
+				});
+			}
+
+			function verifyPassTokenMidleware(req, res, next) {
+				var _messages = this.getMessages();
+				var _token = req.query.sptoken;
+
+				this.getProviders().verifyPassResetToken(_token, function(err, response, acc) {
+					if (err) {
+						return res.redirect('/verify-error.html');
+					}
+
+					if (response === 'done') {
+						req.user || (req.user = {});
+
+						req.user.href = acc.href;
+						req.user.email = acc.email;
+						req.user.resetToken = _token;
+						
+						return next();
+					} else {
+						return res.redirect('/verify-error.html');
+					}
+				});
+			}
+
+			function showPassUpdatePage(req, res, next) {
+				var _messages = this.getMessages();
+
+				res.render('enter', {
+					block : 'enter',
+					bundle : 'enter',
+					error : req.flash('error')[0],
+					info : req.flash('info'),
+					formUrl : '/passUpdate/' + makeHashForEmail(req.user.email),
+					hiddenInputs : [
+						{ name : 'secHash', val : makeHashForEmail(req.user.href) },
+						{ name : 'resetToken', val : req.user.resetToken }
+					],
+					caption : _messages.info.resetPasswordAlert,
+
+					firstInput: {
+						name : 'password',
+						placeholder : _messages.password,
+						type : 'password'
+					},
+
+					secondInput: {
+						name : 'password-re',
+						placeholder : _messages.password,
+						type : 'password'
+					},
+
+					title : _messages.renewPass
+				});
+			}
+
+			function updatePassMidleware(req, res, next) {
+				var _login = this.getEndpoints().login.failureRedirect;
+				var _messages = this.getMessages();
+				var _accHash = req.params.accHash;
+				var _secHash = req.body.secHash;
+				var _pass = req.body.password;
+				var _token = req.body.resetToken;
+
+				if (!_pass) {
+					req.flash('error', 'You must provide a new password to update');
+					return next();
+				} else if (req.body['password-re'] !== _pass) {
+					req.flash('error', 'Please check your input. The password confirmation field value differs from the original password');
+					return next();
+				}
+
+				if (_accHash && _secHash && _token) {
+					var _accToConfirm = this.getAccountByHash(_accHash);
+
+					if (_accToConfirm && makeHashForEmail(_accToConfirm.href) === _secHash) {
+						this.getProviders().resetUserPass(_pass, _token, function(err, result) {
+							if (err) {
+								// The token has been used or is expired, have user request a new token
+								getMessageForError(_messages, err, req);
+								return next();
+							}
+
+							// The response contains a link to the account which is associated
+							// with this password reset workflow:
+							req.flash('info', 'You password is successfully uptated');
+							return res.redirect(_login);
+						});
+
+					} else {
+						req.flash('error', 'Unable to confirm password update');
+						return next();
+					}
+				} else {
+					req.flash('error', 'Unable to verify password update');
+					return next();
+				}
+			}
+
+			router.post('/restore', resetPassMidleware.bind(this), goBack);
+			router.post('/passUpdate/:accHash', updatePassMidleware.bind(this), goBack);
+
+			router.get('/passwordReset', verifyPassTokenMidleware.bind(this), showPassUpdatePage.bind(this));
 		});
 
 		DL('get', 'dir', 'editors')(function() {
@@ -795,8 +1012,6 @@ function initDataLayers() {
 						}
 
 						console.log(this.getGroupName());
-						console.log(this.getEndpoints());
-
 						if (!req.user.groups || !req.user.groups[_grpName]) {
 							spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
 								account.getGroups({ name: _grpName }, 
@@ -812,14 +1027,14 @@ function initDataLayers() {
 
 											cb();
 										},
-											function(err) {
-												if (err) {
-													req.flash(err);
-													return res.redirect(_failRedirect);
-												}
-
-												req.flash('error', 'Печалька, но вы не админ (');
+										function(err) {
+											if (err) {
+												req.flash(err);
 												return res.redirect(_failRedirect);
+											}
+
+											req.flash('error', 'Печалька, но вы не админ (');
+											return res.redirect(_failRedirect);
 										});
 									} 
 								);
@@ -828,7 +1043,6 @@ function initDataLayers() {
 							return next()
 						}
 					}
-
 
 					registerEndPoints(this.getEndpoints(), this.getMessages());
 					
@@ -853,7 +1067,6 @@ function initDataLayers() {
 							});
 						}
 						// this.initFuncGroups();
-						// console.log(this.getFuncGroups()) 
 						console.log(this.getName()) 
 						console.log(this.getPage()) 
 						console.log(this.getTemplate()) 
@@ -893,6 +1106,7 @@ function setCookieByNameFromQueryParams(name) {
 		next();
 	};
 }
+
 function markWithCookie(name, val) {
 	return function (req, res, next) {
 		// check if client sent cookie
@@ -944,7 +1158,6 @@ router.get('/register', setCookieByNameFromQueryParams('ref_id'), function(req, 
 
 // Register a new user to Stormpath.
 router.post('/register', function(req, res) {
-
 	var email = req.body.email;
 	var password = req.body.password;
 
@@ -1030,6 +1243,11 @@ router.post('/register', function(req, res) {
 });
 
 
+
+
+// Register a new user to Stormpath.
+
+
 router.get('/verify/', function(req, res, next) {
 	var _username = process.env['STORMPATH_API_KEY_ID'],
 			_password = process.env['STORMPATH_API_KEY_SECRET'],
@@ -1043,10 +1261,12 @@ router.get('/verify/', function(req, res, next) {
 			req.flash('info', dir.messages.verifySuccess);
 			return res.redirect('/login');
 		} else {
-			return res.redirect('/reg-error.html')
+			return res.redirect('/verify-error.html')
 		}
 	});
 });
+
+
 
 // pay confirmation request
 
@@ -1057,9 +1277,6 @@ function confirmPayRequest(href, payId) {
 		DL('get', 'dir')(function() { 
 			console.log('updating payment data');
 			
-			console.log(_href);
-			console.log('\nn\n\n\n\n\n\n');
-
 			this.getAccountByUrl(_href, function(err, account) {
 			    if (err) reject(err);
 				account || reject('Unable to get payer account');
@@ -1082,7 +1299,6 @@ function confirmPayRequest(href, payId) {
 
 								function storePayerData(customData) {
 									return new Vow.Promise(function(resolve, reject, notify) {
-										console.log('ASHASSAHSUAHSAUSHAUSHSUHAUAHSUAHSAUSHAUSHASUAHSUAHSAUSHAUSAHSUAHS')
 										customData.template = customData.payRequest.subscription;
 										customData.payed = 'active';
 										
@@ -1098,6 +1314,7 @@ function confirmPayRequest(href, payId) {
 									
 										customData.save(function(err) {
 											if (err) reject(err);
+										    console.log('payer data updated');
 											resolve('done');
 										});
 									})
@@ -1108,7 +1325,6 @@ function confirmPayRequest(href, payId) {
 									});
 
 								_que.push(_payer);
-
 
 								function updatePaymentStatistic() {
 									var _payerMail = _payerMail;
@@ -1146,6 +1362,7 @@ function confirmPayRequest(href, payId) {
 
 														customData.save(function(err) {
 														    if (err) reject(err);
+														    console.log('transaction data stored in dir');
 														    resolve('transaction data stored in dir');
 														});
 													});
@@ -1162,13 +1379,7 @@ function confirmPayRequest(href, payId) {
 									})
 								);
 
-									console.log(customData.referrer);
-									console.log(_dir.refProgram);
-									console.log(_dir.refProgram.firstRef);
-									console.log('\n\n\n\n\n\n')
-									
 								if (customData.referrer && _dir.refProgram && _dir.refProgram.firstRef) {
-									console.log('URURURUURURURURR\n\n\n\n\n\n')
 									function updateReferrerPayouts(url) {
 										return new Vow.Promise(function(resolve, reject, notify) {
 											DL('get', 'dir')(function() { 
@@ -1191,6 +1402,7 @@ function confirmPayRequest(href, payId) {
 
 															customData.save(function(err) {
 															    if (err) reject(err);
+														    console.log('referrer payouts updated');
 															    resolve('referrer payouts updated');
 															});
 														});
@@ -1208,7 +1420,6 @@ function confirmPayRequest(href, payId) {
 										reject(err);
 									}));
 								}
-
 
 								Vow.all(_que)
 								    .then(function(result) {
@@ -1233,11 +1444,7 @@ function confirmPayRequest(href, payId) {
 }
 
 DL('get', 'dir')(function() { 
-
 	function checkPayRequest(req, res, next) {
-		console.log(req.params.payId);
-		console.log(req.body);
-
 		for (key in req.body) {
 			if(req.body.hasOwnProperty(key)) {
 				var _accToConfirm = this.getAccountByHash(key);
@@ -1262,18 +1469,90 @@ DL('get', 'dir')(function() {
 		}
 	}
 
-	function goBack(req, res, next) {
-		res.redirect('back');
-	}
-	
 	router.post('/api/pay/:payId', checkPayRequest.bind(this), goBack);
 });
 
+function renderSingleAccountPage(href, req, res) {
+	DL('get', 'dir')(function(){
+		function _renderAccountPage(err, account) {
+			if (err) { return next(err) }
+
+			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
+			var _referrer = { referrer : account.customData.referrer ? this.getAccountByHash(account.customData.referrer).fullName : false };
+		
+			res.render('profile', {
+				block : 'container',
+				bundle : 'profile',
+				error : req.flash('error'),
+				info : req.flash('info'),
+				menu : this.getCustomData().menuUserAdmin,
+				messages : this.getMessages(),
+				active : [ true, isProfileFiled(account) && account.customData.phone, !!account.customData.payed, !!account.customData.statistic ],
+				custom : account.customData,
+				inside: [
+					{
+						block : 'profile',
+						uData : 
+							{
+								isfiled : {
+									profile : isProfileFiled(account),
+									template : !!account.customData.template
+								},
+								user : account,
+								custom : extend({}, account.customData, _link, _referrer)
+							},
+						messages : this.getMessages(),
+						photo : account.customData.photo && account.customData.photo.path
+					}
+				]
+			});
+		}
+
+		this.getAccountByUrl(href, _renderAccountPage.bind(this));
+		}
+	);
+}
+
+function makeUserLoginRedirectMidleware(redirectPoint) {
+	return function(req, res, next) {
+	
+		if (!req.user || req.user.status !== 'ENABLED') {
+			return res.redirect(redirectPoint);
+		}
+
+		return next();
+	}
+}
+
+var checkIfUserLogedIn = makeUserLoginRedirectMidleware('/login');
 
 
-router.get('/restore/', function(req, res, next) {
-	res.redirect('/404.html')
-});
+function showUserProfilePageById(req, res, next) {
+	DL('get', 'dir')(function(){
+		var _id = req.params.userId;
+
+		if(!_id) { return next(); }
+
+		var _acc = this.getAccountByHash(_id);
+
+		if(!_acc) { return next(); }
+
+		renderSingleAccountPage(_acc.href, req, res);
+	});
+}
+
+function showCurrentUserProfilePage(req, res, next) {
+	renderSingleAccountPage(req.user.href, req, res);
+}
+
+router.get('/dashboard/profile', checkIfUserLogedIn, showCurrentUserProfilePage);
+router.get('/api/users/:userId', checkIfUserLogedIn, showUserProfilePageById, goBack);
+
+
+
+// router.get('/restore/', function(req, res, next) {
+// 	res.redirect('/404.html')
+// });
 
 
 // Logout the user, then redirect to the home page.
@@ -1284,59 +1563,12 @@ router.get('/logout', function(req, res) {
 
 
 // Render the dashboard page.
-router.get('/dashboard', function (req, res) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
+router.get('/dashboard', checkIfUserLogedIn, function (req, res) {
 	return res.redirect('/dashboard/profile');
 });
 
-router.get('/dashboard/profile', function (req, res) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
-	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-		if (err) { return next(err) }
-		console.log(account.customData);
-
-	var _link = { reflink : makeRefLink('ref_id', dir.domain + dir.Endpoints.register.url + '/', account.email) };
-	
-		res.render('profile', {
-			block : 'container',
-			bundle : 'profile',
-			error : req.flash('error'),
-			info : req.flash('info'),
-			menu : dir.menuUserAdmin,
-			messages : dir.messages,
-			active : [ true, isProfileFiled(req.user) && account.customData.phone, !!account.customData.payed, !!account.customData.statistic ],
-			custom : account.customData,
-			inside: [
-				{
-					block : 'profile',
-					uData : 
-						{
-							isfiled : {
-								profile : isProfileFiled(req.user),
-								template : !!account.customData.template
-							},
-							user : req.user,
-							custom : extend({}, account.customData, _link)
-						},
-					messages : dir.messages,
-					photo : account.customData.photo && account.customData.photo.path
-				}
-			]
-		});
-	});
-});
-
 // Render the payment page.
-router.get('/dashboard/payment', function (req, res) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
+router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
 		res.render('payment', {
 			block : 'container',
@@ -1344,6 +1576,7 @@ router.get('/dashboard/payment', function (req, res) {
 			info : req.flash('info'),
 			menu : dir.menuUserAdmin,
 			messages : dir.messages,
+			custom : account.customData,
 			bundle : 'payment',
 			active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
 			inside: [
@@ -1367,11 +1600,7 @@ router.get('/dashboard/payment', function (req, res) {
 });
 
 // Render the edit page.
-router.get('/dashboard/edit', function (req, res) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
+router.get('/dashboard/edit', checkIfUserLogedIn, function (req, res) {
 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
 		res.render('edit', {
 			block : 'container',
@@ -1397,11 +1626,7 @@ router.get('/dashboard/edit', function (req, res) {
 });
 
 // Render the statistics page.
-router.get('/dashboard/statistic', function (req, res) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
+router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
 		res.render('statistic', {
 			block : 'container',
@@ -1425,12 +1650,7 @@ router.get('/dashboard/statistic', function (req, res) {
 	});
 });
 
-
-router.post('/dashboard/edit', function (req, res, next) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
+router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.extraFields || (req.user.customData.extraFields = {});
 
 	for (key in req.body) {
@@ -1438,7 +1658,6 @@ router.post('/dashboard/edit', function (req, res, next) {
 	}
 	
 	// saving custom fields
-
 	req.user.customData.save(function (err) {
 		if (err) {
 			next(err);
@@ -1446,14 +1665,9 @@ router.post('/dashboard/edit', function (req, res, next) {
 			res.redirect('/dashboard/edit');
 		}
 	});
-
 });
 
-router.post('/dashboard/pay', function (req, res, next) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
+router.post('/dashboard/pay', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.payRequest || (req.user.customData.payRequest = {});
 
 	for (key in req.body) {
@@ -1463,7 +1677,6 @@ router.post('/dashboard/pay', function (req, res, next) {
 	req.user.customData.payRequest.date = Date.now();
 	
 	// saving custom fields
-
 	req.user.customData.payed || (req.user.customData.payed = 'waiting');
 	req.user.customData.save(function (err) {
 		if (err) {
@@ -1528,7 +1741,6 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 	})
 });
 
-
 router.post('/dashboard/profile/user', function (req, res, next) {
 	if (!req.user || req.user.status !== 'ENABLED') {
 		return res.redirect('/login');
@@ -1547,15 +1759,12 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 				req.flash('error', dir.messages.username + ' ' + req.body.username + ' ' + dir.messages.errors.alreadyExists);
 				return res.redirect('/dashboard/profile');
 
-
 			}, function(err) {
-
 				// saving default fields
 				req.user.givenName = req.body.name;
 				req.user.surname = req.body.surname;
 				req.user.username = req.body.username;
 				
-
 				req.user.save(function (err) {
 					if (err) {
 						next(err);
@@ -1565,26 +1774,14 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 				// saving custom fields
 				req.user.customData.phone = req.body.phone;
 
-				if(req.body.vk) {
-					req.user.customData.social = { type : 'vk', profile : req.body.vk };
-				} else if(req.body.facebook) {
-					req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
-				} else if(req.body.tweet) {
-					req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
-				} else {
-					req.user.customData.social = {};
-				}
-
 				req.user.customData.save(function (err) {
 					if (err) {
 						next(err);
 					} else {
 						return res.redirect('/dashboard/profile');
 					}
-
 				});
 			});
-
 			}.bind(this));
 		}.bind(this));
 	} else {
@@ -1600,16 +1797,6 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 
 		// saving custom fields
 		req.user.customData.phone = req.body.phone;
-
-		if(req.body.vk) {
-			req.user.customData.social = { type : 'vk', profile : req.body.vk };
-		} else if(req.body.facebook) {
-			req.user.customData.social = { type : 'facebook', profile : req.body.facebook };
-		} else if(req.body.tweet) {
-			req.user.customData.social = { type : 'tweet', profile : req.body.tweet };
-		} else {
-			req.user.customData.social = {};
-		}
 
 		req.user.customData.save(function (err) {
 			if (err) {

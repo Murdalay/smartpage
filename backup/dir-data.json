@@ -18,6 +18,14 @@
         "firstInputName": "email"
       }
     },
+    "resetPass": {
+      "url": "/restore",
+      "successRedirect": "/success.html",
+      "failureRedirect": "/restore",
+      "extra": {
+        "firstInputName": "email"
+      }
+    },
     "dLayers": {
       "tech": "true"
     }
@@ -72,7 +80,8 @@
         "2001": "В системе уже зарегистрирован такой адрес электронной почты. Используйте другой",
         "2007": "Пароль короче минимально допустимой длинны"
       },
-      "mustFillUsername": "Имя пользователя должно быть обязательно указано"
+      "mustFillUsername": "Имя пользователя должно быть обязательно указано",
+      "noMail": "Нужно указать адрес электронной почты"
     },
     "pay": {
       "forBilling": "Номер будет сохранен в базе, и, в дальнейшем, использован для нужд биллинга.",
@@ -135,7 +144,9 @@
     "enterValue": "Введите значение",
     "info": {
       "usernameAlert": "Допускаются только латинские символы в нижнем регистре и цифры. Имя пользователя служит именем поддомена – username.sp-helix.com",
-      "passwordAlert": "Пароль не должен быть короче 8 символов. В нем должны присутствовать минимум 1 цифра, 1 буква в верхнем регистре и 1 буква в нижнем"
+      "passwordAlert": "Пароль не должен быть короче 8 символов. В нем должны присутствовать минимум 1 цифра, 1 буква в верхнем регистре и 1 буква в нижнем",
+      "resetPasswordAlert": "Ведите адрес электронной почты на который зарегистрирован аккаунт",
+      "resetSuccess": "На указанный вами адрес отправлено письмо со ссылкой для восстановления пароля"
     },
     "company": "Компания",
     "phoneNumber": "Номер телефона",
@@ -143,7 +154,16 @@
     "userName": "Имя пользователя",
     "contactInfo": "Контакты",
     "fullName": "Полное имя",
-    "bonus": "Бонус"
+    "bonus": "Бонус",
+    "resetPass": "Восстановление пароля",
+    "renewPass": "Обновление пароля",
+    "referrer": "Ваш регистратор",
+    "refPayment":       {
+        "amount": "Сумма",
+        "payDate": "Дата платежа",
+        "transactionId": "Идентификатор транзакции",
+        "status": "Статус платежа"
+      }
   },
   "pathToStatic": "http://smartpage.com.ua/static",
   "payments": {
@@ -214,6 +234,12 @@
           "payDate": 1452239264698,
           "transactionId": "1ca42135123677303351c4431667b34fcb6ebb96",
           "status": "payed"
+        },
+        {
+          "amount": "152.1",
+          "payDate": 1452451414000,
+          "transactionId": "0e15645a21c36830c119bf9fb5dc709c36d6d06e",
+          "status": "payed"
         }
       ]
     },
@@ -271,6 +297,11 @@
       {
         "amount": "83.1",
         "transactionId": "1ca42135123677303351c4431667b34fcb6ebb96",
+        "status": "payed"
+      },
+      {
+        "amount": "152.1",
+        "transactionId": "0e15645a21c36830c119bf9fb5dc709c36d6d06e",
         "status": "payed"
       }
     ]
@@ -416,6 +447,19 @@
           "endDate": "1465368396818",
           "autoRenew": "true",
           "date": 1452239201770
+        },
+        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
+      },
+      "0e15645a21c36830c119bf9fb5dc709c36d6d06e": {
+        "transaction": {
+          "subscription": "start",
+          "durration": "3",
+          "subscription-type": "year",
+          "bonus": "Скидка 10%",
+          "sum": "152.1",
+          "endDate": "1549824183810",
+          "autoRenew": "true",
+          "date": 1452451388150
         },
         "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
       }
