@@ -17,7 +17,11 @@ var exec = require('child_process').exec;
 // create app and bem
 var app = Express();
 var bem = ExpressBem({
-  projectRoot: './',        // bem project root, used for bem make only
+  projectRoot: './',  
+  cache: {
+    load: true, // don't reload
+    exec: false // but execute with context
+  },      // bem project root, used for bem make only
   path: './desktop.bundles' // path to your bundles
 });
 

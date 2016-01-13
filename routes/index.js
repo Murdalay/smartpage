@@ -115,6 +115,45 @@ function makeHashForEmail(email) {
 }
 
 
+function setCookieByNameFromQueryParams(name) {
+	return function (req, res, next) {
+		var val = req.query[name];
+
+		// check if client sent cookie
+		if(val) {
+			var cookie = req.cookies[name];
+			if (cookie === undefined) {
+				res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
+				console.log('cookie created successfully');
+			} 
+			else { console.log('cookie exists', cookie); } 
+		}
+		next();
+	};
+}
+
+function markWithCookie(name, val) {
+	return function (req, res, next) {
+		// check if client sent cookie
+		if(val) {
+			var cookie = req.cookies[name];
+			if (cookie === undefined) {
+				res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
+				console.log('cookie created successfully');
+			} else { 
+				console.log('cookie exists', cookie); 
+			} 
+		} else {
+			// marking with unique string if no val passed
+			var val = Math.random().toString();
+			val = randomNumber.substring(2,randomNumber.length);
+			res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
+		}
+		next();
+	};
+}
+
+
 function goBack(req, res, next) {
 	res.redirect('back');
 }
@@ -174,6 +213,21 @@ function getMergedProperty(group, base, property) {
 
 	return _obj
 }
+
+
+function makeUserLoginRedirectMidleware(redirectPoint) {
+	return function(req, res, next) {
+	
+		if (!req.user || req.user.status !== 'ENABLED') {
+			return res.redirect(redirectPoint);
+		}
+
+		return next();
+	}
+}
+
+var checkIfUserLogedIn = makeUserLoginRedirectMidleware('/login');
+
 
 
 function isProfileFiled (user) {
@@ -668,7 +722,6 @@ updateAccounts.bind(this);
 			return data.dir.customData.url;
 		};
 		this.getAccountByHash = function(hash) {
-			console.log(hash);
 			return data.accounts[hash] ? data.accounts[hash] : null;
 		};
 		this.getAccountByUrl = function(url, cb) {
@@ -725,7 +778,6 @@ updateAccounts.bind(this);
 		this.getCustomData = function() {
 			return this.customData;
 		};
-
 		this.accessDirCustomData = function(callback) {
 			return providers.dir(callback, url);
 		};
@@ -1054,7 +1106,7 @@ function initDataLayers() {
 			var grpoups = this.getGroups();
 			
 			for (name in grpoups) {
-				DL('get', 'group', name)(function() { 
+				DL('get', 'group', name)(function() {
 					function verifyGroupAccess(req, res, next) {
 						var _failRedirect = this.getEndpoints().login.failureRedirect;
 						var _grpName = this.getGroupName();
@@ -1070,10 +1122,12 @@ function initDataLayers() {
 									function(err, groups) {
 										groups.each(function(group, cb) {
 											if (group) {
-												var _name = group.name;
+												var _name = {};
+												
+												_name[group.name] = true;
 
 												req.user.groups || (req.user.groups = {});
-												req.user.groups = extend(req.user.groups, { _name : true });
+												req.user.groups = extend(req.user.groups, _name);
 												return next()
 											}
 
@@ -1107,7 +1161,7 @@ function initDataLayers() {
 									block : this.getTemplate(),
 									error : req.flash('error'),
 									info : req.flash('info'),
-									appData : dir,
+									appData : this.getCustomData(),
 									menu : this.getHeader(),
 									title : this.getTitle(),
 									helpers : { makeHashForString : makeHashForEmail },
@@ -1142,43 +1196,6 @@ initDataLayers();
 
 //// end of Data Layer section ////
 
-function setCookieByNameFromQueryParams(name) {
-	return function (req, res, next) {
-		var val = req.query[name];
-
-		// check if client sent cookie
-		if(val) {
-			var cookie = req.cookies[name];
-			if (cookie === undefined) {
-				res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
-				console.log('cookie created successfully');
-			} 
-			else { console.log('cookie exists', cookie); } 
-		}
-		next();
-	};
-}
-
-function markWithCookie(name, val) {
-	return function (req, res, next) {
-		// check if client sent cookie
-		if(val) {
-			var cookie = req.cookies[name];
-			if (cookie === undefined) {
-				res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
-				console.log('cookie created successfully');
-			} else { 
-				console.log('cookie exists', cookie); 
-			} 
-		} else {
-			// marking with unique string if no val passed
-			var val = Math.random().toString();
-			val = randomNumber.substring(2,randomNumber.length);
-			res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
-		}
-		next();
-	};
-}
 
 
 
@@ -1318,7 +1335,76 @@ router.get('/verify/', function(req, res, next) {
 	});
 });
 
+function updatePaymentStatistic(payReq, mail) {
+	var _payerMail = mail;
+	var _payReq = payReq;
 
+	return new Vow.Promise(function(resolve, reject, notify) {
+		DL('get', 'layer', 'finance')(function() { 
+			this.accessDirCustomData(function(err, dirr) {
+				if (err) { reject(err) }
+
+				if (dirr) {
+					dirr.getCustomData(function(err, customData) {
+						if (err) { reject(err) }
+
+						var _payDate = Date.now()
+
+						customData.payments || (customData.payments = {});
+						customData.payments.byUser || (customData.payments.byUser = {});
+						customData.payments.byUser[_payerHash] || (customData.payments.byUser[_payerHash] = []);
+						
+						customData.payments.byUser[_payerHash].push({ 
+							email : _payerMail, 
+							amount : _payReq.sum, 
+							payDate : _payDate, 
+							transactionId : payId, 
+							status : 'payed' 
+						});
+
+						if(_payReq.payMethod && _payReq.payMethod === 'fromBalance') {
+							customData.payments.payouts || (customData.payments.payouts = []);
+							customData.payments.payouts.push({ 
+								amount : _payReq.sum, 
+								payDate : _payDate, 
+								transactionId : payId, 
+								method : 'buy', 
+								status : 'payed' 
+							});
+
+							customData.payments.refDebt || (customData.payments.refDebt = 0);
+							customData.payments.refDebt -= _payReq.sum;
+						} else {
+							customData.payments.incoming || (customData.payments.incoming = []);
+							
+							customData.payments.incoming.push({ 
+								amount : _payReq.sum, 
+								payDate : _payDate, 
+								transactionId : payId, 
+								status : 'payed' 
+							});
+
+							customData.balance || (customData.balance = 0);
+							customData.balance += _payReq.sum;
+						}
+											
+						customData.statistics || (customData.statistics = {});
+						customData.statistics.transactions || (customData.statistics.transactions = {});
+						customData.statistics.transactions[payId] = { transaction : _payReq, payerHash : _payerHash, payDate : _payDate };
+
+						customData.save(function(err) {
+						    if (err) reject(err);
+						    console.log('transaction data stored in dir');
+						    resolve('transaction data stored in dir');
+						});
+					});
+				} else {
+					reject('Unable to get dir customData');
+				}
+			});
+		});
+	});
+}
 
 // pay confirmation request
 
@@ -1360,6 +1446,10 @@ function confirmPayRequest(href, payId) {
 										
 										customData.statistic || (customData.statistic = {});
 										customData.statistic.lastPayment = _payReq;
+
+										if (_payReq.payMethod && _payReq.payMethod === 'fromBalance') {
+											customData.balance -= _payReq.sum;
+										}
 										
 										// the end
 										customData.remove('payRequest');
@@ -1378,8 +1468,10 @@ function confirmPayRequest(href, payId) {
 
 								_que.push(_payer);
 
-								function updatePaymentStatistic() {
-									var _payerMail = _payerMail;
+								function updatePaymentStatistic(payReq, mail) {
+									var _payerMail = mail;
+									var _payReq = payReq;
+
 									return new Vow.Promise(function(resolve, reject, notify) {
 										DL('get', 'layer', 'finance')(function() { 
 											this.accessDirCustomData(function(err, dirr) {
@@ -1389,6 +1481,8 @@ function confirmPayRequest(href, payId) {
 													dirr.getCustomData(function(err, customData) {
 														if (err) { reject(err) }
 
+														var _payDate = Date.now()
+
 														customData.payments || (customData.payments = {});
 														customData.payments.byUser || (customData.payments.byUser = {});
 														customData.payments.byUser[_payerHash] || (customData.payments.byUser[_payerHash] = []);
@@ -1396,21 +1490,40 @@ function confirmPayRequest(href, payId) {
 														customData.payments.byUser[_payerHash].push({ 
 															email : _payerMail, 
 															amount : _payReq.sum, 
-															payDate : Date.now(), 
-															transactionId : payId, 
-															status : 'payed' 
-														});
-																			
-														customData.payments.incoming || (customData.payments.incoming = []);
-														customData.payments.incoming.push({ 
-															amount : _payReq.sum, 
+															payDate : _payDate, 
 															transactionId : payId, 
 															status : 'payed' 
 														});
 
+														if(_payReq.payMethod && _payReq.payMethod === 'fromBalance') {
+															customData.payments.payouts || (customData.payments.payouts = []);
+															customData.payments.payouts.push({ 
+																amount : _payReq.sum, 
+																payDate : _payDate, 
+																transactionId : payId, 
+																method : 'buy', 
+																status : 'payed' 
+															});
+
+															customData.payments.refDebt || (customData.payments.refDebt = 0);
+															customData.payments.refDebt -= _payReq.sum;
+														} else {
+															customData.payments.incoming || (customData.payments.incoming = []);
+															
+															customData.payments.incoming.push({ 
+																amount : _payReq.sum, 
+																payDate : _payDate, 
+																transactionId : payId, 
+																status : 'payed' 
+															});
+
+															customData.balance || (customData.balance = 0);
+															customData.balance += _payReq.sum;
+														}
+																			
 														customData.statistics || (customData.statistics = {});
 														customData.statistics.transactions || (customData.statistics.transactions = {});
-														customData.statistics.transactions[payId] = { transaction : _payReq, payerHash : _payerHash };
+														customData.statistics.transactions[payId] = { transaction : _payReq, payerHash : _payerHash, payDate : _payDate };
 
 														customData.save(function(err) {
 														    if (err) reject(err);
@@ -1426,12 +1539,12 @@ function confirmPayRequest(href, payId) {
 									});
 								}
 
-								_que.push(updatePaymentStatistic().then(function() {}, function(err) {
+								_que.push(updatePaymentStatistic(_payReq, _payerMail).then(function() {}, function(err) {
 										reject(err);
 									})
 								);
 
-								if (customData.referrer && _dir.refProgram && _dir.refProgram.firstRef) {
+								if (customData.referrer && _dir.refProgram && _dir.refProgram.firstRef && _payReq.payMethod !== 'fromBalance') {
 									function updateReferrerPayouts(url) {
 										return new Vow.Promise(function(resolve, reject, notify) {
 											DL('get', 'dir')(function() { 
@@ -1524,22 +1637,25 @@ DL('get', 'dir')(function() {
 	router.post('/api/pay/:payId', checkPayRequest.bind(this), goBack);
 });
 
-function renderSingleAccountPage(href, req, res) {
+function renderSingleAccountPage(href, req, res, next) {
 	DL('get', 'dir')(function(){
 		function _renderAccountPage(err, account) {
 			if (err) { return next(err) }
 
 			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
 			var _referrer = { referrer : account.customData.referrer ? this.getAccountByHash(account.customData.referrer).fullName : false };
+			var _balance = account.customData.balance;
 		
 			res.render('profile', {
 				block : 'container',
 				bundle : 'profile',
 				error : req.flash('error'),
 				info : req.flash('info'),
-				menu : this.getCustomData().menuUserAdmin,
+				user : extend({}, account.customData),
+				menu : extend({}, this.getCustomData().menuUserAdmin),
+				balance : _balance,
 				messages : this.getMessages(),
-				active : [ true, isProfileFiled(account) && account.customData.phone, !!account.customData.payed, !!account.customData.statistic ],
+				active : [ true, isProfileFiled(account) && account.customData.phone, !!account.customData.payed, true ],
 				custom : account.customData,
 				inside: [
 					{
@@ -1554,6 +1670,7 @@ function renderSingleAccountPage(href, req, res) {
 								custom : extend({}, account.customData, _link, _referrer)
 							},
 						messages : this.getMessages(),
+						clientData : { balance : _balance },
 						photo : account.customData.photo && account.customData.photo.path
 					}
 				]
@@ -1564,19 +1681,6 @@ function renderSingleAccountPage(href, req, res) {
 		}
 	);
 }
-
-function makeUserLoginRedirectMidleware(redirectPoint) {
-	return function(req, res, next) {
-	
-		if (!req.user || req.user.status !== 'ENABLED') {
-			return res.redirect(redirectPoint);
-		}
-
-		return next();
-	}
-}
-
-var checkIfUserLogedIn = makeUserLoginRedirectMidleware('/login');
 
 
 function showUserProfilePageById(req, res, next) {
@@ -1589,12 +1693,12 @@ function showUserProfilePageById(req, res, next) {
 
 		if(!_acc) { return next(); }
 
-		renderSingleAccountPage(_acc.href, req, res);
+		renderSingleAccountPage(_acc.href, req, res, next);
 	});
 }
 
 function showCurrentUserProfilePage(req, res, next) {
-	renderSingleAccountPage(req.user.href, req, res);
+	renderSingleAccountPage(req.user.href, req, res, next);
 }
 
 router.get('/dashboard/profile', checkIfUserLogedIn, showCurrentUserProfilePage);
@@ -1628,9 +1732,10 @@ router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 			info : req.flash('info'),
 			menu : dir.menuUserAdmin,
 			messages : dir.messages,
+			user : account.customData,
 			custom : account.customData,
 			bundle : 'payment',
-			active : [ true, true, !!account.customData.payed, !!account.customData.statistic ],
+			active : [ true, true, !!account.customData.payed, true ],
 			inside: [
 				{
 					block : 'pay',
@@ -1644,7 +1749,10 @@ router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 						custom : account.customData,
 						bonus : dir.bonus[account.customData.bonus],
 						payed : account.customData.payed
-					}
+					},
+
+					clientData : { balance : account.customData.balance }
+
 				}
 			]
 		});
@@ -1659,9 +1767,10 @@ router.get('/dashboard/edit', checkIfUserLogedIn, function (req, res) {
 			error : req.flash('error'),
 			info : req.flash('info'),
 			menu : dir.menuUserAdmin,
+			user : account.customData,
 			messages : dir.messages,
 			bundle : 'edit',
-			active : [ true, true, true, !!account.customData.statistic ],
+			active : [ true, true, true, true ],
 			inside: [
 				{
 					block : 'edit',
@@ -1670,7 +1779,9 @@ router.get('/dashboard/edit', checkIfUserLogedIn, function (req, res) {
 						user : req.user,
 						custom : account.customData,
 						payed : account.customData.payed
-					}
+					},
+
+					clientData : { balance : account.customData.balance }
 				}
 			]
 		});
@@ -1684,6 +1795,7 @@ router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
 			block : 'container',
 			error : req.flash('error'),
 			info : req.flash('info'),
+			user : account.customData,
 			menu : dir.menuUserAdmin,
 			messages : dir.messages,
 			bundle : 'statistic',
@@ -1695,7 +1807,9 @@ router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
 					uData : {
 							user : req.user,
 							custom : account.customData
-					}
+					},
+
+					clientData : { balance : account.customData.balance }
 				}
 			]
 		});

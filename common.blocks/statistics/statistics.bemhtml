@@ -297,7 +297,11 @@ block('statistics')(content()(function(){
 							}
 					    ]
 					}
-				]
+				],
+			    !this.ctx.clientData ? '' : { 
+			    	block : 'data-provider',
+			    	js : this.ctx.clientData
+			    }
 			]
 		}
 	),

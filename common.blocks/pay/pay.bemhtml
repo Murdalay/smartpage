@@ -65,7 +65,8 @@ block('pay')(content()(function(){
 						{
 						    block : 'input',
 						    mods : { width : 'available', theme : 'islands', size: 'xl', disabled : true },
-						    val : _username && _username.indexOf('smartuser') === -1 ? _username + '.' +_domain : ''
+						    val : _username && _username.indexOf('smartuser') === -1 ? _domain + '/' + _username : ''
+						    // val : _username && _username.indexOf('smartuser') === -1 ? _username + '.' +_domain : ''
 						}
 				    ]
 				},
@@ -245,7 +246,11 @@ block('pay')(content()(function(){
 							]
 						}
 					]
-				}
+				},
+			    !this.ctx.clientData ? '' : { 
+			    	block : 'data-provider',
+			    	js : this.ctx.clientData
+			    }
 			]
 		}
 	),

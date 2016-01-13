@@ -10,7 +10,11 @@ block('profile')(content()(function(){
 	              user : this.ctx.uData.user,
 	              messages : this.ctx.messages,
 	              custom : this.ctx.uData.custom
-	            }
+	            },
+			    !this.ctx.clientData ? '' : { 
+			    	block : 'data-provider',
+			    	js : this.ctx.clientData
+			    }
 			]
 		}
 	)

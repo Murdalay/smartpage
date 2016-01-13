@@ -1,6 +1,7 @@
 [{
     shouldDeps : [
         { block : 'user-data' },
-        { block : 'user-photo' }
+        { block : 'user-photo' },
+        { block : 'data-provider' }
     ]
 }]

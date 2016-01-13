@@ -8,11 +8,12 @@
         { block : 'checkbox', mods: { theme: 'islands', size: 'l' } },
         { block : 'select', mods : { mode : 'radio', theme : 'islands', size : 'xl' }  },
         { block : 'field-title' },
-        { block : 'margins' },
         { block : 'image' },
         { block : 'padding' },
+        { block : 'data-provider' },
         { block : 'align' },
         { block : 'group-title' },
+        { block : 'margins' },
         { block : 'small-caption' }
     ]
 }]

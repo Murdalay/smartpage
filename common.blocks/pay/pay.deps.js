@@ -15,6 +15,7 @@
         { block : 'subscription-status' },
         { block : 'tarif' },
         { block : 'group-title' },
+        { block : 'data-provider' },
         { block : 'small-caption' }
     ]
 }]

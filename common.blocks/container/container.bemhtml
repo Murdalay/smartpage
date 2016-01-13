@@ -7,16 +7,19 @@ block('container')(def()(function(){
 			content : _ctx.error
 		} : '';
 
+		var _clientData = {};
+		var _levels = { user : this.ctx.user };
+
 		var _info = _ctx.info && _ctx.info.length ? {
 			block : 'info-message',
 			content : this.ctx.info
 			} : '';
 
-		var _menu = this.ctx.menu,
+		var _menu = this.extend({}, this.ctx.menu),
 			menuTitles = _menu ? _menu.items : '',
 			_title = '';
 
-		var _secondary = _menu && _menu.secondary ? _menu.secondary : null;
+		var _secondary = this.ctx.menu.secondary;
 
 		menuTitles && menuTitles.forEach(function(title, index) {
 			if (title.value === _bundle) {
@@ -28,24 +31,30 @@ block('container')(def()(function(){
 
 		// passing messages and appData to blocks
 		var _inside = [];
+		var _extend = this.extend;
 		this.ctx.inside && this.ctx.inside.length && this.ctx.inside.forEach(function(block) {
 			block.helpers = _ctx.helpers;
 			block.messages = _ctx.messages;
 			block.appDatas = _ctx.appData;
+			if (!!block.clientData) {
+				_extend(_clientData, block.clientData);
+ 			}
 			_inside.push(block);
 		})
 
 		// adding balance to secondary header
-		if (_secondary && typeof _secondary === 'object' && !!_secondary.length && _ctx.custom) {
+		if (_secondary && !!_secondary.length) {
 			_secondary.forEach(function(item, index) {
-				if(item === 'balance') {
-					_secondary[index] = {
-					    block : 'balance',
-					    balance : _ctx.custom.balance ? _ctx.custom.balance : 0,
-					    message : _ctx.messages.balance ? _ctx.messages.balance  : ''
+				if(item && item.value === 'balance') {
+					if(item.value === 'balance') {
+						_menu.secondary[index] = {
+						    block : 'balance',
+						    balance : 0,
+						    message : _ctx.messages.balance ? _ctx.messages.balance  : ''
+						};
 					}
 				}
-			})
+			}.bind(this));
 		}
 
 		_activeMenuItems && (_activeMenuItems = _activeMenuItems.indexOf(true) > -1);

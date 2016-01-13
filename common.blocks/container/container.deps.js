@@ -11,6 +11,7 @@
         { block : 'jquery', elem : 'event', mods : { type : 'pointerpressrelease' } },
         { block : 'section-title' },
         { block : 'inner-wrapper' },
+        { block : 'data-provider' },
         { block : 'info-message' },
         { block : 'user-data' },
         { block : 'error' },

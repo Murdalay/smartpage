@@ -17,8 +17,6 @@ block('edit')(content()(function(){
 			});
 			_extra = _activeSubscr.extraFields;
 
-			console.log(_extra);
-
 			_extra.forEach(function(field) {
 				if(field.type.indexOf('long') > -1) {
 					_fieldsForDouble.push(						
@@ -102,7 +100,11 @@ block('edit')(content()(function(){
 							]
 						}
 					]
-				}
+				},
+			    !this.ctx.clientData ? '' : { 
+			    	block : 'data-provider',
+			    	js : this.ctx.clientData
+			    }
 			]
 		}
 	),

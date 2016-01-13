@@ -11,6 +11,7 @@
         { block : 'padding' },
         { block : 'info-table' },
         { block : 'align' },
+        { block : 'data-provider' },
         { block : 'group-title' },
         { block : 'small-caption' }
     ]
