@@ -46,7 +46,7 @@ block('container')(def()(function(){
 		if (_secondary && !!_secondary.length) {
 			_secondary.forEach(function(item, index) {
 				if(item && item.value === 'balance') {
-					if(item.value === 'balance') {
+					if(!!_menu && item.value === 'balance') {
 						_menu.secondary[index] = {
 						    block : 'balance',
 						    balance : 0,
