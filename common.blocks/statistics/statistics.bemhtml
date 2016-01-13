@@ -5,7 +5,7 @@ block('statistics')(content()(function(){
 			var _dates = _stat ? _stat.visits : null;
 			var _dir = this.ctx.appData;
 			var _messages = this.ctx.appData.messages;
-			var _visitTypes = _messages.visitStatistic;
+			var _visitTypes = _messages ? _messages.visitStatistic : null;
 			var _visitsStat = {};
 			var _visits = [];
 			var _now = new Date;
@@ -278,26 +278,26 @@ block('statistics')(content()(function(){
 							    block : 'info-table',
 
 							    content : _referedAccTable
-							},
-							{
-							    block : 'margins',
-							    mods : { top : true },
-							    content : [
-								    {
-									    block : 'basic-text',
-									    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
-									},
-								    {
-									    block : 'basic-text',
-									    mods : { bold : true },
-									    mix: { block : 'margins', mods : { left : true } },
-									    content : _refNumber
-									}
-								]
 							}
 					    ]
 					}
 				],
+				!_custom.referredAccounts ? '' : {
+				    block : 'margins',
+				    mods : { top : true },
+				    content : [
+					    {
+						    block : 'basic-text',
+						    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
+						},
+					    {
+						    block : 'basic-text',
+						    mods : { bold : true },
+						    mix: { block : 'margins', mods : { left : true } },
+						    content : _refNumber
+						}
+					]
+				},
 			    !this.ctx.clientData ? '' : { 
 			    	block : 'data-provider',
 			    	js : this.ctx.clientData
