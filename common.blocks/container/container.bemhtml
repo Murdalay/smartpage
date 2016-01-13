@@ -19,7 +19,7 @@ block('container')(def()(function(){
 			menuTitles = _menu ? _menu.items : '',
 			_title = '';
 
-		var _secondary = this.ctx.menu.secondary;
+		var _secondary = this.ctx.menu ? this.ctx.menu.secondary : null;
 
 		menuTitles && menuTitles.forEach(function(title, index) {
 			if (title.value === _bundle) {
