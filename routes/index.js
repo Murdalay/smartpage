@@ -122,11 +122,8 @@ function setCookieByNameFromQueryParams(name) {
 		// check if client sent cookie
 		if(val) {
 			var cookie = req.cookies[name];
-			if (cookie === undefined) {
 				res.cookie(name, val, { maxAge: 9000000, httpOnly: true });
 				console.log('cookie created successfully');
-			} 
-			else { console.log('cookie exists', cookie); } 
 		}
 		next();
 	};
@@ -1270,8 +1267,6 @@ router.post('/register', function(req, res) {
 					});
 				})
 			});
-
-			req.cookies['ref_id'] = false;
 
 			return res.redirect('/success.html');
 		});
