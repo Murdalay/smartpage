@@ -544,7 +544,7 @@ function DataLayer(layersObj) {
 
 	function updateAccount(acc, cb) {
 		data.accounts[makeHashForEmail(acc.email)] = extend({}, acc);
-		cb()
+		cb && cb()
 	}
 
 	function updateAccounts(endCb) {
@@ -709,6 +709,7 @@ updateAccounts.bind(this);
 			return providers.eachAccount(cb, endCb, query);
 		};			
 		this.updateAccounts = updateAccounts;
+		this.updateAccount = updateAccount;
 
 		this.name = data.dir.name;
 	}
@@ -1237,35 +1238,42 @@ router.post('/register', function(req, res) {
 					}
 				}
 
+				DL('get', 'dir')(function() {
+					this.updateAccount(createdAccount);
+				});
+
 				_message || (_message = err.userMessage);
 
 				req.flash('error', _message);
 				return res.redirect('/register');
 
-			} else {
-				// ref program registration
-				var _email = email;
-				var _ref = req.cookies['ref_id'] ? req.cookies['ref_id'] : null
-
-				_ref && DL('get', 'dir')(function() { 
-					var _referrer = this.getAccountByHash(_ref);
-					_referrer && this.getAccountByUrl(_referrer.href, function(err, account) {
-						account && account.getCustomData(function(err, customData) {
-							console.log('updating referrer data');
-							customData.referredAccounts || (customData.referredAccounts = {});
-							customData.referredAccounts[makeHashForEmail(_email)] = _email;
-
-							customData.save(function(err) {
-							    if (err) next(err);
-							});
-						});
-					})
-				});
-
-				req.cookies['ref_id'] = false;
-
-				return res.redirect('/success.html');
 			}
+
+			// ref program registration
+			var _email = email;
+			var _ref = req.cookies['ref_id'] ? req.cookies['ref_id'] : null;
+
+			console.log(_ref);
+			console.log(_email);
+
+			_ref && DL('get', 'dir')(function() { 
+				var _referrer = this.getAccountByHash(_ref);
+				_referrer && this.getAccountByUrl(_referrer.href, function(err, account) {
+					account && account.getCustomData(function(err, customData) {
+						console.log('updating referrer data');
+						customData.referredAccounts || (customData.referredAccounts = {});
+						customData.referredAccounts[makeHashForEmail(_email)] = _email;
+
+						customData.save(function(err) {
+						    if (err) next(err);
+						});
+					});
+				})
+			});
+
+			req.cookies['ref_id'] = false;
+
+			return res.redirect('/success.html');
 		});
 	});
 });
@@ -1602,7 +1610,7 @@ function renderSingleAccountPage(href, req, res, next) {
 			if (err) { return next(err) }
 
 			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
-			var _referrer = { referrer : account.customData.referrer && this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer).fullName : false };
+			var _referrer = { referrer : account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer).fullName : false };
 			var _balance = account.customData.balance;
 		
 			res.render('profile', {
@@ -1823,7 +1831,7 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 
 		if (!req.file) {
 			res.redirect('/dashboard/profile');
-		} else if (req.file.size > 524288) {
+		} else if (req.file.size > 1024288) {
 			req.flash('error', dir.messages.errors.toBig);
 			res.redirect('/dashboard/profile');
 			fs.unlink(req.file.path, function(err) {
