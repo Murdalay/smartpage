@@ -1602,7 +1602,7 @@ function renderSingleAccountPage(href, req, res, next) {
 			if (err) { return next(err) }
 
 			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
-			var _referrer = { referrer : account.customData.referrer ? this.getAccountByHash(account.customData.referrer).fullName : false };
+			var _referrer = { referrer : account.customData.referrer && this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer).fullName : false };
 			var _balance = account.customData.balance;
 		
 			res.render('profile', {
