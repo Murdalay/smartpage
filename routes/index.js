@@ -173,47 +173,6 @@ function getMessageForError(messages, err, req) {
 	req && req.flash('error', _message);
 }
 
-// @param 
-// group {String} A group name for merge
-// property {String}|{Array[{Strings}]} The string value allows one to merge a top level group of properties. Also it is possible to pass an array of field names, to merge the nested
-
-function getMergedProperty(group, base, property) {
-	var _store = base;
-	var _common = group;
-	var _obj = {};
-
-	console.log(_common);
-	console.log('\n\n\n\n' + _store);
-
-	if(!_store || !property) { return null } 
-		else if(typeof property === 'object' && property.length) { 
-
-		property.forEach(function(level) {
-			if(typeof _store !== 'undefined'){
-				(_store = _store[level]);
-				(_common = _common[level]);
-			}
-		});
-
-		if (typeof _store !== 'undefined') {
-			typeof _common !== 'undefined' ? 
-				(_obj = extend({}, _common, _store)) : 
-					(_obj = extend({}, _store));
-		}
-
-	} else {
-		if(_store[property] !== 'undefined') {
-			_common[property] !== 'undefined' ? 
-				(_obj = extend({}, _common[property], _store[property])) : 
-					(_obj = extend({}, _store[property]));
-		} else {
-			_obj = null;
-		}
-	}
-
-	return _obj
-}
-
 
 function makeUserLoginRedirectMidleware(redirectPoint) {
 	return function(req, res, next) {
@@ -229,11 +188,9 @@ function makeUserLoginRedirectMidleware(redirectPoint) {
 var checkIfUserLogedIn = makeUserLoginRedirectMidleware('/login');
 
 
-
 function isProfileFiled (user) {
 	return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
 }
-
 
 
 var setingsStorage = { common : false };
@@ -1304,6 +1261,8 @@ router.post('/register', function(req, res) {
 						});
 					})
 				});
+
+				req.cookies['ref_id'] = false;
 
 				return res.redirect('/success.html');
 			}

@@ -31,14 +31,12 @@ block('container')(def()(function(){
 
 		// passing messages and appData to blocks
 		var _inside = [];
-		var _extend = this.extend;
+		
 		this.ctx.inside && this.ctx.inside.length && this.ctx.inside.forEach(function(block) {
 			block.helpers = _ctx.helpers;
 			block.messages = _ctx.messages;
 			block.appDatas = _ctx.appData;
-			if (!!block.clientData) {
-				_extend(_clientData, block.clientData);
- 			}
+
 			_inside.push(block);
 		})
 
