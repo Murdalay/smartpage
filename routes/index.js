@@ -1604,7 +1604,7 @@ DL('get', 'dir')(function() {
 	router.post('/api/pay/:payId', checkPayRequest.bind(this), goBack);
 });
 
-function renderSingleAccountPage(href, req, res, next) {
+function renderSingleAccountPage(href, req, res, next, bundle) {
 	DL('get', 'dir')(function(){
 		function _renderAccountPage(err, account) {
 			if (err) { return next(err) }
@@ -1613,9 +1613,9 @@ function renderSingleAccountPage(href, req, res, next) {
 			var _referrer = { referrer : account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer).fullName : false };
 			var _balance = account.customData.balance;
 		
-			res.render('profile', {
+			res.render(bundle ? bundle : 'statistic', {
 				block : 'container',
-				bundle : 'profile',
+				bundle : bundle ? bundle : 'statistic',
 				error : req.flash('error'),
 				info : req.flash('info'),
 				user : extend({}, account.customData),
@@ -1626,7 +1626,7 @@ function renderSingleAccountPage(href, req, res, next) {
 				custom : account.customData,
 				inside: [
 					{
-						block : 'profile',
+						block : bundle ? bundle : 'statistics',
 						uData : 
 							{
 								isfiled : {
@@ -1636,6 +1636,7 @@ function renderSingleAccountPage(href, req, res, next) {
 								user : account,
 								custom : extend({}, account.customData, _link, _referrer)
 							},
+						appData : this.getCustomData(),
 						messages : this.getMessages(),
 						clientData : { balance : _balance },
 						photo : account.customData.photo && account.customData.photo.path
@@ -1665,9 +1666,13 @@ function showUserProfilePageById(req, res, next) {
 }
 
 function showCurrentUserProfilePage(req, res, next) {
-	renderSingleAccountPage(req.user.href, req, res, next);
+	renderSingleAccountPage(req.user.href, req, res, next, 'profile');
 }
 
+function showCurrentUserStatPage(req, res, next) {
+	renderSingleAccountPage(req.user.href, req, res, next);
+}
+router.get('/dashboard/statistic', checkIfUserLogedIn, showCurrentUserStatPage);
 router.get('/dashboard/profile', checkIfUserLogedIn, showCurrentUserProfilePage);
 router.get('/api/users/:userId', checkIfUserLogedIn, showUserProfilePageById, goBack);
 
@@ -1755,33 +1760,33 @@ router.get('/dashboard/edit', checkIfUserLogedIn, function (req, res) {
 	});
 });
 
-// Render the statistics page.
-router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
-	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-		res.render('statistic', {
-			block : 'container',
-			error : req.flash('error'),
-			info : req.flash('info'),
-			user : account.customData,
-			menu : dir.menuUserAdmin,
-			messages : dir.messages,
-			bundle : 'statistic',
-			active : [ true, true, true, true ],
-			inside: [
-				{
-					block : 'statistics',
-					appData : dir,
-					uData : {
-							user : req.user,
-							custom : account.customData
-					},
+// // Render the statistics page.
+// router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
+// 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+// 		res.render('statistic', {
+// 			block : 'container',
+// 			error : req.flash('error'),
+// 			info : req.flash('info'),
+// 			user : account.customData,
+// 			menu : dir.menuUserAdmin,
+// 			messages : dir.messages,
+// 			bundle : 'statistic',
+// 			active : [ true, true, true, true ],
+// 			inside: [
+// 				{
+// 					block : 'statistics',
+// 					appData : dir,
+// 					uData : {
+// 							user : account,
+// 							custom : account.customData
+// 					},
 
-					clientData : { balance : account.customData.balance }
-				}
-			]
-		});
-	});
-});
+// 					clientData : { balance : account.customData.balance }
+// 				}
+// 			]
+// 		});
+// 	});
+// });
 
 router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.extraFields || (req.user.customData.extraFields = {});

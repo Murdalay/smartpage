@@ -110,44 +110,44 @@ block('statistics')(content()(function(){
 	var _tableHeader = false;
 	var _refNumber = 0;
 
-	if (_custom && _custom.refPayment && _custom.referredAccounts) {
-		function buildHeaderCells(obj, messages) {
-			var _head = [];
-			for(type in obj) {
-				_head.push(
-				    {
-				    	elem : 'cell',
-				    	mods : { header : true },
-					    content : messages[type] ? messages[type] : type
-				    }
-				);
-			}
-
-			return _head;
+	function buildHeaderCells(obj, messages) {
+		var _head = [];
+		for(type in obj) {
+			_head.push(
+			    {
+			    	elem : 'cell',
+			    	mods : { header : true },
+				    content : messages[type] ? messages[type] : type
+			    }
+			);
 		}
 
-		function buildBodyCells(obj, source, noData) {
-			var _cells = [];
-			noData || (noData = 'Data unavailable');
-			var _cell = {
-		    	elem : 'cell',
-			    content : noData
-		    };
-			for(type in obj) {
-				_cells.push(atomizer(obj[type], source[type], _cell));
-			}
+		return _head;
+	}
 
-			return _cells;
-		}
-		    
-
-		function wrapInRow(cells) {
-			return {
-			    elem : 'row',
-			    content : cells
-			}
+	function buildBodyCells(obj, source, noData) {
+		var _cells = [];
+		noData || (noData = 'Data unavailable');
+		var _cell = {
+	    	elem : 'cell',
+		    content : noData
+	    };
+		for(type in obj) {
+			_cells.push(atomizer(obj[type], source[type], _cell));
 		}
 
+		return _cells;
+	}
+	    
+
+	function wrapInRow(cells) {
+		return {
+		    elem : 'row',
+		    content : cells
+		}
+	}
+
+	if(_custom.refPayment && _custom.referredAccounts) {
 		for (key in _custom.refPayment) {
 			_custom.refPayment[key].forEach(function(item) {
 				var _cells = [];
@@ -170,7 +170,9 @@ block('statistics')(content()(function(){
 
 			_tableHeader = false;
 		}
+	}
 
+	if (_custom && _custom.referredAccounts) {
 		for (key in _custom.referredAccounts) {
 			var _cells = [];
 			var _head = [];
@@ -269,15 +271,6 @@ block('statistics')(content()(function(){
 							    block : 'info-table',
 
 							    content : _paymentTable
-							},
-							{
-							    block : 'group-title',
-							    content : _messages && _messages.refPayment ? _messages.refPayment.reffered : ''
-							},
-							{
-							    block : 'info-table',
-
-							    content : _referedAccTable
 							}
 					    ]
 					}
@@ -287,6 +280,15 @@ block('statistics')(content()(function(){
 				    block : 'column',
 				    mods : { 'triple' : true },
 				    content : [
+						{
+						    block : 'group-title',
+						    content : _messages && _messages.refPayment ? _messages.refPayment.reffered : ''
+						},
+						{
+						    block : 'info-table',
+
+						    content : _referedAccTable
+						},
 					    {
 					    	block : 'margins',
 						    mods : { top : true },
