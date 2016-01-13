@@ -1238,10 +1238,6 @@ router.post('/register', function(req, res) {
 					}
 				}
 
-				DL('get', 'dir')(function() {
-					this.updateAccount(createdAccount);
-				});
-
 				_message || (_message = err.userMessage);
 
 				req.flash('error', _message);
@@ -1252,6 +1248,10 @@ router.post('/register', function(req, res) {
 			// ref program registration
 			var _email = email;
 			var _ref = req.cookies['ref_id'] ? req.cookies['ref_id'] : null;
+
+			DL('get', 'dir')(function() {
+				this.updateAccount(createdAccount);
+			});
 
 			console.log(_ref);
 			console.log(_email);
