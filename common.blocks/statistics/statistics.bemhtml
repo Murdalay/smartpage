@@ -2,7 +2,7 @@ block('statistics')(content()(function(){
 			var _custom = this.ctx.uData.custom;
 			var _user = this.ctx.uData.user;
 			var _stat = _custom.statistic;
-			var _dates = _stat.visits;
+			var _dates = _stat ? _stat.visits : null;
 			var _dir = this.ctx.appData;
 			var _messages = this.ctx.appData.messages;
 			var _visitTypes = _messages.visitStatistic;
