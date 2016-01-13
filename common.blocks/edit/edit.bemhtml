@@ -1,8 +1,8 @@
 block('edit')(content()(function(){
-			var _messages = this.ctx.appData.messages;
-			var _custom = this.ctx.uData.custom;
-			var _active = _custom.template;
-			var _subscriptions = this.ctx.appData.subscriptions;
+			var _messages = this.ctx.appData ? this.ctx.appData.messages : null;
+			var _custom = this.ctx.uData ? this.ctx.uData.custom : null;
+			var _active = _custom ? _custom.template : null;
+			var _subscriptions = this.ctx.appData ? this.ctx.appData.subscriptions : null;
 			var _activeSubscr;
 			var _fields = [];
 			var _fieldsForDouble = [];

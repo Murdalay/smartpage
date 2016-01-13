@@ -282,22 +282,30 @@ block('statistics')(content()(function(){
 					    ]
 					}
 				],
+
 				!_custom.referredAccounts ? '' : {
-				    block : 'margins',
-				    mods : { top : true },
+				    block : 'column',
+				    mods : { 'triple' : true },
 				    content : [
 					    {
-						    block : 'basic-text',
-						    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
-						},
-					    {
-						    block : 'basic-text',
-						    mods : { bold : true },
-						    mix: { block : 'margins', mods : { left : true } },
-						    content : _refNumber
+					    	block : 'margins',
+						    mods : { top : true },
+						    content : [
+							    {
+								    block : 'basic-text',
+								    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
+								},
+							    {
+								    block : 'basic-text',
+								    mods : { bold : true },
+								    mix: { block : 'margins', mods : { left : true } },
+								    content : _refNumber
+								}
+							]
 						}
 					]
 				},
+
 			    !this.ctx.clientData ? '' : { 
 			    	block : 'data-provider',
 			    	js : this.ctx.clientData
