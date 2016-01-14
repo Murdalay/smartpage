@@ -1606,7 +1606,7 @@ function renderSingleAccountPage(href, req, res, next, bundle) {
 
 			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
 			var _ref = account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer) : null;
-			var _referrer = _ref ? { referrer : _ref.fullName ? _ref.fullName : _ref.email } : {};
+			var _referrer = _ref ? { referrer : _ref.fullName && _ref.fullName !== 'null null' ? _ref.fullName : _ref.email } : {};
 			var _balance = account.customData.balance;
 		
 			res.render(bundle ? bundle : 'statistic', {
