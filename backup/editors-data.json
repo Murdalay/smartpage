@@ -2,7 +2,7 @@
   "Endpoints": {
     "login": {
       "url": "/useradmin",
-      "successRedirect": "/useradmin/home",
+      "successRedirect": "/useradmin/request",
       "failureRedirect": "/useradmin",
       "extra": {
         "secondInputName": "password",
@@ -22,36 +22,98 @@
       "tech": "true"
     }
   },
+  "PATHS": {
+    "basePath": "/useradmin"
+  },
   "Pages": [
     {
       "id": "request",
       "title": "Обработка заявок",
-      "template": "dash",
-      "fGroups": [
-        "payRequests"
-      ],
+      "template": "container",
+      "fGroups": {
+        "payRequests": {
+          "level": "dir",
+          "customData": true,
+          "criteria": {
+            "field": "payRequest",
+            "shouldBe": true
+          }
+        }
+      },
       "bundle": "admin"
     }
   ],
+  "feeldSets": {
+    "payRequest": {
+      "dataLayer": "user",
+      "type": "user-subscription",
+      "provider": "payRequest",
+      "messages": "pay",
+      "customData": true,
+      "fileds": {
+        "subscription": {
+          "type": "selector-list"
+        },
+        "durration": {
+          "type": "input-quant"
+        },
+        "subscription-type": {
+          "type": "selector-kind"
+        },
+        "autoRenew": {
+          "type": "input-logic"
+        },
+        "date": {
+          "type": "submit-date"
+        },
+        "sum": {
+          "type": "cost"
+        }
+      }
+    },
+    "userInfoBasic": {
+      "dataLayer": "user",
+      "type": "user-info",
+      "customData": false,
+      "fileds": {
+        "email": {
+          "type": "field",
+          "mutable": false
+        },
+        "username": {
+          "type": "field"
+        },
+        "fullName": {
+          "type": "field"
+        }
+      }
+    }
+  },
+  "functionalComponents": {
+    "cells-userInfo": {
+      "fieldSets": {
+        "userInfoBasic": "row"
+      }
+    },
+    "cells-userPayRequest": {
+      "fieldSets": {
+        "payRequest": "row"
+      }
+    }
+  },
   "functionalGroups": {
     "payRequests": {
       "block": "adm-payrequests",
-      "fieldSet": [
-        {
-          "id": "users",
-          "dataLayer": "users",
-          "type": "filter",
-          "provider": "payRequest.date",
-          "customData": true
+      "fComponents": {
+        "cells-userPayRequest": {
+          "addHeader": true
         },
-        {
-          "id": "email",
-          "dataLayer": "self",
-          "type": "field",
-          "provider": "email",
-          "customData": false
+        "cells-userInfo": {
+          "addHeader": true
         }
-      ]
+      },
+      "type": "filter",
+      "dataLayer": "users"
     }
   },
   "messages": {

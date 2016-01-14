@@ -428,7 +428,7 @@ var dataProviders = {
 		})
 	},
 
-	extendDirCustomData : function(callback, obj, url) {
+	extendDirCustomData : function(obj, url) {
 		return new Vow.Promise(function(resolve, reject, notify) {
 			if (typeof obj !== 'object') {
 				return reject('You should provide the object to extend customData')
@@ -728,7 +728,12 @@ updateAccounts.bind(this);
 			return providers.dir(callback);
 		};
 		this.eachAccount = function(cb, endCb, query) {
+			cb.bind(this);
+			endCb.bind(this);
 			return providers.eachAccount(cb, endCb, query);
+		};	
+		this.extendDirCustomData = function(obj, url) {
+			return providers.extendDirCustomData.apply(this, arguments);
 		};			
 		this.updateAccounts = updateAccounts;
 		this.updateAccount = updateAccount;
@@ -759,8 +764,12 @@ updateAccounts.bind(this);
 			return this.customData;
 		};
 		this.accessDirCustomData = function(callback) {
-			return providers.dir(callback, url);
+			return providers.dir(callback, this.getUrl());
 		};
+
+		this.extendDirCustomData = function(obj, url) {
+			return providers.extendDirCustomData.apply(this, [obj, url ? url : this.getUrl()]);
+		};	
 		
 		this.customData = layers[name] && layers[name].customData ? layers[name].customData : data.dir.customData;
 		this.name = name;
@@ -939,12 +948,14 @@ function initDataLayers() {
 		if(err) {  throw new Error('Error initing basic data layers') };
 		console.dir('WOW!');
 
+
+
 		DL('get', 'dir')(function() { 
 			console.log(this.getEndpoints());
 
 			registerEndPoints(this.getEndpoints(), this.getMessages())
 			this.updateAccounts(function(err) {  });
-
+			
 
 			function resetPassMidleware(req, res, next) {
 				var _email = req.body.email;
@@ -1130,6 +1141,117 @@ function initDataLayers() {
 						}
 					}
 
+					function updateAccountsRefPayment () {
+						DL('get', 'layer', 'finance')(function() {
+							function _getUnpayedRefPayments(referrer) {
+								if (referrer && referrer.length) {
+									var _unpayed = [];
+
+									referrer.forEach(function(payment, index) {
+										if (payment.status === 'not-payed') {
+											_unpayed.push({ index : index, sum : payment.amount });
+										}
+									});
+
+									return _unpayed.length ? _unpayed : null;
+								} else {
+									return null
+								}
+
+							}
+
+							function payUnpayedRefPayments(account, payList) {
+								if (account.customData && account.customData.refPayment) {
+									var _profit = 0;
+
+									for (key in payList) {
+										payList[key].length && payList[key].forEach(function(item) {
+											if(item.sum) {
+												var _payment = account.customData.refPayment[key][item.index];
+												_payment.status = 'confirmed';
+												_profit += item.sum;
+
+												account.customData.refPayment[key][item.index] = _payment;
+											}
+										});
+									}
+
+									account.customData.balance ? (account.customData.balance += _profit) : (account.customData.balance = _profit);
+
+									return { account : account, payouts : _profit };
+								} else {
+									return null
+								}
+							}
+
+							var _refPayments = 0;
+
+							function _onProccessEnd(err, res) {
+ 								console.log('All accounts are processed\n\n');
+ 								console.log('Referal debt is: ');
+ 								console.log(_refPayments);
+
+ 								if (_refPayments > 0) {
+									this.accessDirCustomData(function(err, dirr) {
+										if (err) { return console.log(err) }
+
+										dirr.customData.payments.refDebt += _refPayments;
+										dirr.customData.save(function(err) {
+										    if (err) throw new Error(err);
+			 								
+			 								console.log('Referal debt is stored succesfuly\n');
+										});
+									});
+ 								}
+ 							}
+
+							this.eachAccount(function(account, cb) {
+								if (account.customData && account.customData.refPayment) {
+									var _needToPay = false;
+
+									for (key in account.customData.refPayment) {
+										var _unpayed = _getUnpayedRefPayments(account.customData.refPayment[key]);
+
+										if(_unpayed) {
+											_needToPay || (_needToPay = {});
+											_needToPay[key] = _unpayed;
+										}
+									}
+
+									if(_needToPay) {
+										var _processed = payUnpayedRefPayments(account, _needToPay);
+
+										if (_processed)	{
+
+											_processed.account.customData.save(function(err) {
+												if (err) { 
+													console.log(err);
+												    console.log('unable to update referrer data');
+												} else {
+												    console.log('referrer data updated');
+													_refPayments += _processed.payouts;
+
+													cb();
+												}
+											});
+
+										} else {
+											throw new Error('Something went wrong with the refPayments processing')
+										}							
+									} else {
+										cb();
+									}
+
+								} else {
+									cb();
+								}
+
+ 							}, _onProccessEnd.bind(this));
+						});
+					}
+
+					updateAccountsRefPayment();
+
 					registerEndPoints(this.getEndpoints(), this.getMessages());
 					
 					// summon routes for each registred page
@@ -1152,6 +1274,7 @@ function initDataLayers() {
 								});
 							});
 						}
+
 						// this.initFuncGroups();
 						console.log(this.getName()) 
 						console.log(this.getPage()) 
@@ -1177,9 +1300,6 @@ initDataLayers();
 //// end of Data Layer section ////
 
 
-
-
-
 // Render the registration page.
 router.get('/register', setCookieByNameFromQueryParams('ref_id'), function(req, res) {
 	res.render('enter', {
@@ -1201,8 +1321,6 @@ router.get('/register', setCookieByNameFromQueryParams('ref_id'), function(req, 
 		title : dir.messages.register
 	});
 });
-
-
 
 
 // Register a new user to Stormpath.
