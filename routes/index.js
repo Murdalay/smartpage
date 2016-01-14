@@ -428,14 +428,39 @@ var dataProviders = {
 		})
 	},
 
+	extendDirCustomData : function(callback, obj, url) {
+		return new Vow.Promise(function(resolve, reject, notify) {
+			if (typeof obj !== 'object') {
+				return reject('You should provide the object to extend customData')
+			}
+
+			dataProviders.dir(function(err, dirr) {
+					if (err) { return reject(err) }
+
+					dirr.getCustomData(function(err, customData) {
+						if (err) { return reject(err) }
+
+						customData = extend(customData, obj);
+
+						customData.save(function(err) {
+						    if (err) reject(err);
+						    resolve('done');
+						});
+					});
+
+			}, url);
+		});
+	},
+
 	dirAccounts : function(searchObj, callback) {
+		var _cb = callback ? callback : searchObj;
+
 		spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
-			if (err) callback(new Error(err));
+			if (err) _cb(new Error(err));
 			if(callback) {
 				dirr.getAccounts(searchObj, callback);
 			} else {
-				callback = searchObj;
-				dirr.getAccounts(callback);
+				dirr.getAccounts(_cb);
 			}
 		})
 	},
@@ -1876,14 +1901,33 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 });
 
 router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, next) {
+	if (!req.body.name || !req.body.surname) {
+		req.flash('error', dir.messages.errors.mustFillPersonalData);
+		return res.redirect('back');
+	}
+
+	var _href = req.user.href;
+	var _updateAcc = function(href) {
+		DL('get', 'dir')(function() {
+			this.getAccountByUrl(href,  function(err, account) {
+				if (err) {
+					console.warn(err)
+				} else {
+					this.updateAccount(account);
+				}
+			}.bind(this));
+		});
+	};
+	
 	if(req.user.username !== req.body.username){
 
 		if (!req.body.username){
 			req.flash('error', dir.messages.errors.mustFillUsername);
 			return res.redirect('back');
 		}
-		
+
 		spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
+
 			directory.getAccounts({ username: req.body.username }, function(err, accounts) {
 			accounts.each(function(account, cb) {
 
@@ -1891,13 +1935,7 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 				return res.redirect('back');
 
 			}, function(err) {
-
 				if (err) { console.log(err)}
-
-				if (!req.body.name || !req.body.surname) {
-					req.flash('error', dir.messages.errors.mustFillPersonalData);
-					return res.redirect('back');
-				}
 
 				// saving default fields
 				req.user.givenName = req.body.name;
@@ -1919,16 +1957,7 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 						console.log(err)
 						next(err);
 					} else {
-
-						DL('get', 'dir')(function() {
-							this.getAccountByUrl(_href,  function(err, account) {
-								if (err) {
-									console.warn(err)
-								} else {
-									this.updateAccount(account);
-								}
-							}.bind(this));
-						});
+						_updateAcc(_href);
 
 						return res.redirect('back');
 					}
@@ -1937,11 +1966,6 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 			}.bind(this));
 		}.bind(this));
 	} else {
-		if (!req.body.name || !req.body.surname) {
-			req.flash('error', dir.messages.errors.mustFillPersonalData);
-			return res.redirect('back');
-		}
-
 		req.user.givenName = req.body.name;
 		req.user.surname = req.body.surname;
 
@@ -1954,22 +1978,12 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 
 		// saving custom fields
 		req.user.customData.phone = req.body.phone;
-		var _href = req.user.href;
 
 		req.user.customData.save(function (err) {
 			if (err) {
 				next(err);
 			} else {
-
-				DL('get', 'dir')(function() {
-					this.getAccountByUrl(_href,  function(err, account) {
-						if (err) {
-							console.warn(err)
-						} else {
-							this.updateAccount(account);
-						}
-					}.bind(this));
-				});
+				_updateAcc(_href);
 
 				return res.redirect('back');
 			}
