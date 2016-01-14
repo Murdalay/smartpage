@@ -1240,7 +1240,6 @@ function initDataLayers() {
 		});
 
 		DL('get', 'dir', 'editors')(function() {
-					
 			var grpoups = this.getGroups();
 			
 			for (name in grpoups) {
@@ -1398,8 +1397,7 @@ router.post('/register', function(req, res) {
 				billing : null,
 				hash : makeHashForEmail(email),
 				referrer : req.cookies['ref_id'] ? req.cookies['ref_id'] : null,
-				payDates: null,
-				social: {}
+				payDates: null
 			}
 		},
 
