@@ -191,6 +191,7 @@ function isProfileFiled (user) {
 
 
 var setingsStorage = { common : false };
+
 var endpointCallbacks = {
 	login : function(endpoint, messages, extra) {
 		router.get(endpoint.url, function(req, res, next) {
@@ -533,6 +534,152 @@ function passFieldToCb(launchlist, cb) {
 			cb(launchlist[key], key);
 		}
 	}
+}
+
+var _motivatorLaunchList = {
+	hourly : [
+		{ func : updateAccountsRefPayment, args : [], runOnLoad : false }
+	]
+}
+
+function motivator(launchlist) {
+	var supportedTime = {
+			hourly : 3600000,
+			dayly : 86400000,
+			weekly : 604800000 
+		};
+
+	function motivate(runlist, name) {
+		var _timeout = supportedTime[name];
+
+		function launcher(cb, args, ctx) {
+			return function() {
+				cb.apply(ctx ? ctx : this, args ? args : []);
+			}
+
+		}
+
+		if (_timeout) {
+			runlist.length && runlist.forEach(function(item) {
+				var _funcToRun = launcher(item.func, item.args, item.ctx);
+				setInterval(_funcToRun, _timeout);
+
+				item.runOnLoad ? _funcToRun() : ''
+			});
+		}
+	}
+
+	passFieldToCb(launchlist, motivate)
+}
+
+function updateAccountsRefPayment () {
+	DL('get', 'layer', 'finance')(function() {
+		function _getUnpayedRefPayments(referrer) {
+			if (referrer && referrer.length) {
+				var _unpayed = [];
+
+				referrer.forEach(function(payment, index) {
+					if (payment.status === 'not-payed') {
+						_unpayed.push({ index : index, sum : payment.amount });
+					}
+				});
+
+				return _unpayed.length ? _unpayed : null;
+			} else {
+				return null
+			}
+
+		}
+
+		function payUnpayedRefPayments(account, payList) {
+			if (account.customData && account.customData.refPayment) {
+				var _profit = 0;
+
+				for (key in payList) {
+					payList[key].length && payList[key].forEach(function(item) {
+						if(item.sum) {
+							var _payment = account.customData.refPayment[key][item.index];
+							_payment.status = 'confirmed';
+							_profit += item.sum;
+
+							account.customData.refPayment[key][item.index] = _payment;
+						}
+					});
+				}
+
+				account.customData.balance ? (account.customData.balance += _profit) : (account.customData.balance = _profit);
+
+				return { account : account, payouts : _profit };
+			} else {
+				return null
+			}
+		}
+
+		var _refPayments = 0;
+
+		function _onProccessEnd(err, res) {
+				console.log('All accounts are processed\n\n');
+				console.log('Referal debt is: ');
+				console.log(_refPayments);
+
+				if (_refPayments > 0) {
+				this.accessDirCustomData(function(err, dirr) {
+					if (err) { return console.log(err) }
+
+					dirr.customData.payments.refDebt += _refPayments;
+					dirr.customData.save(function(err) {
+					    if (err) throw new Error(err);
+							
+							console.log('Referal debt is stored succesfuly\n');
+					});
+				});
+				}
+			}
+
+		this.eachAccount(function(account, cb) {
+			if (account.customData && account.customData.refPayment) {
+				var _needToPay = false;
+
+				for (key in account.customData.refPayment) {
+					var _unpayed = _getUnpayedRefPayments(account.customData.refPayment[key]);
+
+					if(_unpayed) {
+						_needToPay || (_needToPay = {});
+						_needToPay[key] = _unpayed;
+					}
+				}
+
+				if(_needToPay) {
+					var _processed = payUnpayedRefPayments(account, _needToPay);
+
+					if (_processed)	{
+
+						_processed.account.customData.save(function(err) {
+							if (err) { 
+								console.log(err);
+							    console.log('unable to update referrer data');
+							} else {
+							    console.log('referrer data updated');
+								_refPayments += _processed.payouts;
+
+								cb();
+							}
+						});
+
+					} else {
+						throw new Error('Something went wrong with the refPayments processing')
+					}							
+				} else {
+					cb();
+				}
+
+			} else {
+				cb();
+			}
+
+			}, _onProccessEnd.bind(this)
+		);
+	});
 }
 
 var _layers = {
@@ -1141,116 +1288,6 @@ function initDataLayers() {
 						}
 					}
 
-					function updateAccountsRefPayment () {
-						DL('get', 'layer', 'finance')(function() {
-							function _getUnpayedRefPayments(referrer) {
-								if (referrer && referrer.length) {
-									var _unpayed = [];
-
-									referrer.forEach(function(payment, index) {
-										if (payment.status === 'not-payed') {
-											_unpayed.push({ index : index, sum : payment.amount });
-										}
-									});
-
-									return _unpayed.length ? _unpayed : null;
-								} else {
-									return null
-								}
-
-							}
-
-							function payUnpayedRefPayments(account, payList) {
-								if (account.customData && account.customData.refPayment) {
-									var _profit = 0;
-
-									for (key in payList) {
-										payList[key].length && payList[key].forEach(function(item) {
-											if(item.sum) {
-												var _payment = account.customData.refPayment[key][item.index];
-												_payment.status = 'confirmed';
-												_profit += item.sum;
-
-												account.customData.refPayment[key][item.index] = _payment;
-											}
-										});
-									}
-
-									account.customData.balance ? (account.customData.balance += _profit) : (account.customData.balance = _profit);
-
-									return { account : account, payouts : _profit };
-								} else {
-									return null
-								}
-							}
-
-							var _refPayments = 0;
-
-							function _onProccessEnd(err, res) {
- 								console.log('All accounts are processed\n\n');
- 								console.log('Referal debt is: ');
- 								console.log(_refPayments);
-
- 								if (_refPayments > 0) {
-									this.accessDirCustomData(function(err, dirr) {
-										if (err) { return console.log(err) }
-
-										dirr.customData.payments.refDebt += _refPayments;
-										dirr.customData.save(function(err) {
-										    if (err) throw new Error(err);
-			 								
-			 								console.log('Referal debt is stored succesfuly\n');
-										});
-									});
- 								}
- 							}
-
-							this.eachAccount(function(account, cb) {
-								if (account.customData && account.customData.refPayment) {
-									var _needToPay = false;
-
-									for (key in account.customData.refPayment) {
-										var _unpayed = _getUnpayedRefPayments(account.customData.refPayment[key]);
-
-										if(_unpayed) {
-											_needToPay || (_needToPay = {});
-											_needToPay[key] = _unpayed;
-										}
-									}
-
-									if(_needToPay) {
-										var _processed = payUnpayedRefPayments(account, _needToPay);
-
-										if (_processed)	{
-
-											_processed.account.customData.save(function(err) {
-												if (err) { 
-													console.log(err);
-												    console.log('unable to update referrer data');
-												} else {
-												    console.log('referrer data updated');
-													_refPayments += _processed.payouts;
-
-													cb();
-												}
-											});
-
-										} else {
-											throw new Error('Something went wrong with the refPayments processing')
-										}							
-									} else {
-										cb();
-									}
-
-								} else {
-									cb();
-								}
-
- 							}, _onProccessEnd.bind(this));
-						});
-					}
-
-					updateAccountsRefPayment();
 
 					registerEndPoints(this.getEndpoints(), this.getMessages());
 					
@@ -2110,5 +2147,6 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 	}
 });
 
+motivator(_motivatorLaunchList);
 
 module.exports = router;

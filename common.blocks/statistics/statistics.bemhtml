@@ -155,7 +155,7 @@ block('statistics')(content()(function(){
 
 				if (!_tableHeader) {
 					_head.push(buildHeaderCells(_refPaymentModel.fileds, _messages.refPayment));
-					_head.push(buildHeaderCells({ payerId : null, payerMail : null }, _messages.refPayment));
+					_head.push(buildHeaderCells({ payerMail : null }, _messages.refPayment));
 
 
 					_paymentTable.push(wrapInRow(_head));
@@ -163,7 +163,7 @@ block('statistics')(content()(function(){
 				}
 
 				_cells.push(buildBodyCells(_refPaymentModel.fileds, item, _messages.noData));
-				_cells.push(buildBodyCells({ payerId : null, payerMail : null }, { payerId : key, payerMail : _custom.referredAccounts[key] }, _messages.noData));
+				_cells.push(buildBodyCells({ payerMail : null }, { payerId : key, payerMail : _custom.referredAccounts[key] }, _messages.noData));
 
 				_paymentTable.push(wrapInRow(_cells));
 			});
