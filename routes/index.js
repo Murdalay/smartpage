@@ -1605,7 +1605,8 @@ function renderSingleAccountPage(href, req, res, next, bundle) {
 			if (err) { return next(err) }
 
 			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
-			var _referrer = { referrer : account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer).fullName : false };
+			var _ref = account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer) : null;
+			var _referrer = _ref ? { referrer : _ref.fullName ? _ref.fullName : _ref.email } : {};
 			var _balance = account.customData.balance;
 		
 			res.render(bundle ? bundle : 'statistic', {
@@ -1795,7 +1796,7 @@ router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 		if (err) {
 			next(err);
 		} else {
-			res.redirect('/dashboard/edit');
+			res.redirect('back');
 		}
 	});
 });
@@ -1816,7 +1817,7 @@ router.post('/dashboard/pay', checkIfUserLogedIn, function (req, res, next) {
 			next(err);
 		} else {
 			req.flash('info', dir.messages.pay.thanks);
-			res.redirect('/dashboard/payment');
+			res.redirect('back');
 		}
 	});
 });
@@ -1830,10 +1831,10 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 		}
 
 		if (!req.file) {
-			res.redirect('/dashboard/profile');
+			res.redirect('back');
 		} else if (req.file.size > 1024288) {
 			req.flash('error', dir.messages.errors.toBig);
-			res.redirect('/dashboard/profile');
+			res.redirect('back');
 			fs.unlink(req.file.path, function(err) {
 				if (err) {
 					// An error occurred when deleting old photo
@@ -1858,7 +1859,7 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 					if (err) {
 						next(err);
 					} else {
-						res.redirect('/dashboard/profile');
+						res.redirect('back');
 
 						_oldPhoto && fs.unlink(_oldPhoto, function(err) {
 							if (err) {
@@ -1874,32 +1875,38 @@ router.post('/dashboard/profile/user/photo', function(req, res, next){
 	})
 });
 
-router.post('/dashboard/profile/user', function (req, res, next) {
-	if (!req.user || req.user.status !== 'ENABLED') {
-		return res.redirect('/login');
-	}
-
-	if (!req.body.username) {
-		req.flash('error', dir.messages.errors.mustFillUsername);
-		return res.redirect('/dashboard/profile');
-	}
-
+router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, next) {
 	if(req.user.username !== req.body.username){
+
+		if (!req.body.username){
+			req.flash('error', dir.messages.errors.mustFillUsername);
+			return res.redirect('back');
+		}
+		
 		spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
 			directory.getAccounts({ username: req.body.username }, function(err, accounts) {
 			accounts.each(function(account, cb) {
 
 				req.flash('error', dir.messages.username + ' ' + req.body.username + ' ' + dir.messages.errors.alreadyExists);
-				return res.redirect('/dashboard/profile');
+				return res.redirect('back');
 
 			}, function(err) {
+
+				if (err) { console.log(err)}
+
+				if (!req.body.name || !req.body.surname) {
+					req.flash('error', dir.messages.errors.mustFillPersonalData);
+					return res.redirect('back');
+				}
+
 				// saving default fields
 				req.user.givenName = req.body.name;
 				req.user.surname = req.body.surname;
 				req.user.username = req.body.username;
-				
+
 				req.user.save(function (err) {
 					if (err) {
+						console.log(err)
 						next(err);
 					}
 				});
@@ -1909,15 +1916,32 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 
 				req.user.customData.save(function (err) {
 					if (err) {
+						console.log(err)
 						next(err);
 					} else {
-						return res.redirect('/dashboard/profile');
+
+						DL('get', 'dir')(function() {
+							this.getAccountByUrl(_href,  function(err, account) {
+								if (err) {
+									console.warn(err)
+								} else {
+									this.updateAccount(account);
+								}
+							}.bind(this));
+						});
+
+						return res.redirect('back');
 					}
 				});
 			});
 			}.bind(this));
 		}.bind(this));
 	} else {
+		if (!req.body.name || !req.body.surname) {
+			req.flash('error', dir.messages.errors.mustFillPersonalData);
+			return res.redirect('back');
+		}
+
 		req.user.givenName = req.body.name;
 		req.user.surname = req.body.surname;
 
@@ -1930,12 +1954,24 @@ router.post('/dashboard/profile/user', function (req, res, next) {
 
 		// saving custom fields
 		req.user.customData.phone = req.body.phone;
+		var _href = req.user.href;
 
 		req.user.customData.save(function (err) {
 			if (err) {
 				next(err);
 			} else {
-				return res.redirect('/dashboard/profile');
+
+				DL('get', 'dir')(function() {
+					this.getAccountByUrl(_href,  function(err, account) {
+						if (err) {
+							console.warn(err)
+						} else {
+							this.updateAccount(account);
+						}
+					}.bind(this));
+				});
+
+				return res.redirect('back');
 			}
 
 		});
