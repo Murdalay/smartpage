@@ -60,7 +60,7 @@ block('enter')(def()(function(){
 										name : this.ctx.secondInput.name,
 										placeholder : this.ctx.secondInput.placeholder
 									},
-									'<div class="w-editable block-title small small-gray"><a class="link" href="/restore">Восстановить пароль</a> |&nbsp;<a class="link" href="/login">Вход</a></div>',
+									'<div class="w-editable block-title small small-gray"><a class="link" href="/restore">Восстановить пароль</a> |&nbsp;<a class="link" href="/register">Регистрация</a></div>',
 									_caption,
 									_err,
 									_info,

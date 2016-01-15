@@ -134,7 +134,7 @@ block('user-data')(content()(function(){
 								    mods : { width : 'available', theme : 'islands', size: 'xl' },
 								    name : 'phone',
 								    placeholder : '+380ХХХХХХХХХ',
-								    maxLength : 12,
+								    maxLength : 13,
 								    val : this.ctx.custom.phone ? this.ctx.custom.phone : ''
 								}
 							]
