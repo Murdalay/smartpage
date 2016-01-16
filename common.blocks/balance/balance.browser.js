@@ -5,14 +5,12 @@ provide(BEMDOM.decl(this.name, {
         js: {
             inited: function() {
             	this._provider = this.findBlockOutside('page').findBlockInside('data-provider');
-            	
+
             	if(this._provider) {
 	            	this._balance = this._provider.getProvide('balance');
 	            	this._balance && this.setBalance(this._balance);
 
             	}
-
-
             }
         }
     },

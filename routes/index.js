@@ -7,10 +7,10 @@ var Vow = require('../libs/bem-core/common.blocks/vow/vow.vanilla');
 var multer  = require('multer');
 var crypto = require('crypto');
 var fs = require('fs');
-var undef;
 var dir;
-var GRP;
 var DL;
+var undef;
+var noop = function(){};
 
 console.log(Vow);
 var uploader = multer({ 
@@ -173,7 +173,6 @@ function getMessageForError(messages, err, req) {
 
 function makeUserLoginRedirectMidleware(redirectPoint) {
 	return function(req, res, next) {
-	
 		if (!req.user || req.user.status !== 'ENABLED') {
 			return res.redirect(redirectPoint);
 		}
@@ -1839,16 +1838,42 @@ function showUserProfilePageById(req, res, next) {
 	});
 }
 
+function showUserPageById(page){
+	return function(req, res, next) {
+		DL('get', 'dir')(function(){
+			var _id = req.params.userId;
+
+			if(!_id) { return next(); }
+
+			var _acc = this.getAccountByHash(_id);
+
+			if(!_acc) { return next(); }
+
+			renderSingleAccountPage(_acc.href, req, res, next, page);
+		});
+	}
+}
+
 function showCurrentUserProfilePage(req, res, next) {
 	renderSingleAccountPage(req.user.href, req, res, next, 'profile');
+}
+
+function showCurrentUserEditPage(req, res, next) {
+	renderSingleAccountPage(req.user.href, req, res, next, 'edit');
 }
 
 function showCurrentUserStatPage(req, res, next) {
 	renderSingleAccountPage(req.user.href, req, res, next);
 }
+
 router.get('/dashboard/statistic', checkIfUserLogedIn, showCurrentUserStatPage);
 router.get('/dashboard/profile', checkIfUserLogedIn, showCurrentUserProfilePage);
-router.get('/api/users/:userId', checkIfUserLogedIn, showUserProfilePageById, goBack);
+router.get('/dashboard/edit', checkIfUserLogedIn, showCurrentUserEditPage);
+
+// it gives us an ability to view pages of other users
+router.get('/api/users/profile/:userId', checkIfUserLogedIn, showUserPageById('profile'), goBack);
+router.get('/api/users/edit/:userId', checkIfUserLogedIn, showUserPageById('edit'), goBack);
+router.get('/api/users/statistic/:userId', checkIfUserLogedIn, showUserPageById(), goBack);
 
 
 
@@ -1898,69 +1923,11 @@ router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 					},
 
 					clientData : { balance : account.customData.balance }
-
 				}
 			]
 		});
 	});
 });
-
-// Render the edit page.
-router.get('/dashboard/edit', checkIfUserLogedIn, function (req, res) {
-	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-		res.render('edit', {
-			block : 'container',
-			error : req.flash('error'),
-			info : req.flash('info'),
-			menu : dir.menuUserAdmin,
-			user : account.customData,
-			messages : dir.messages,
-			bundle : 'edit',
-			active : [ true, true, true, true ],
-			inside: [
-				{
-					block : 'edit',
-					appData : dir,
-					uData : {
-						user : req.user,
-						custom : account.customData,
-						payed : account.customData.payed
-					},
-
-					clientData : { balance : account.customData.balance }
-				}
-			]
-		});
-	});
-});
-
-// // Render the statistics page.
-// router.get('/dashboard/statistic', checkIfUserLogedIn, function (req, res) {
-// 	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
-// 		res.render('statistic', {
-// 			block : 'container',
-// 			error : req.flash('error'),
-// 			info : req.flash('info'),
-// 			user : account.customData,
-// 			menu : dir.menuUserAdmin,
-// 			messages : dir.messages,
-// 			bundle : 'statistic',
-// 			active : [ true, true, true, true ],
-// 			inside: [
-// 				{
-// 					block : 'statistics',
-// 					appData : dir,
-// 					uData : {
-// 							user : account,
-// 							custom : account.customData
-// 					},
-
-// 					clientData : { balance : account.customData.balance }
-// 				}
-// 			]
-// 		});
-// 	});
-// });
 
 router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.extraFields || (req.user.customData.extraFields = {});
@@ -2144,6 +2111,20 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 		});
 	}
 });
+
+/// mail
+var mailer = require('../helpers/mailer');
+
+router.post('/api/mailer', function (req, res, next) {
+	mailer.sendMail('smartpage.support@yandex.ru', req.body.ownerMail, 'Запись на семинар', '123', '<h2>Отправка формы на вашей страничке на smartpage.com.ua.</h2><h4>Отправитель: ' + req.body.name + '</h4><div> Адрес отправителя : <a href="mailto:' + req.body.Email + '"></a>' + req.body.Email + '</div><br> \n<div>Номер телефона отправителя: <a href="phone:' + req.body.number + '">' + req.body.number + '</a></div>' ).then(function(response) {
+			res.status(200).end();
+		}, function(response) {
+			res.status(500).end('Unable to send mail');
+		});
+});
+
+
+
 
 motivator(_motivatorLaunchList);
 

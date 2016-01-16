@@ -30,13 +30,15 @@
     "morgan": "^1.6.1",
     "multer": "^1.1.0",
     "node-watch": "^0.3.5",
+    "nodemailer": "^2.0.0",
+    "nodemailer-smtp-transport": "^2.0.0",
     "passport": "~0.2.0",
     "passport-stormpath": "^0.2.4",
     "q": "^1.4.1",
     "reqf": "^1.0.0",
     "request": "latest",
     "stormpath": "~0.6.0",
-    "vow": "^0.4.7",
+    "vow": "^0.4.12",
     "ym": "^0.1.2"
   },
   "devDependencies": {
