@@ -1,0 +1,1 @@
+block('component-client').mod('instagram', true)(js()(true));

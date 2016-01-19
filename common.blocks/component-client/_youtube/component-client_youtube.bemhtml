@@ -1,0 +1,1 @@
+block('component-client')(js()(true));

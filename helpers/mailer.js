@@ -1,4 +1,4 @@
-var Q = require('vow'); // предпочитаю работать с промисами а не колбеками
+var Q = require('vow');
 var nodemailer = require('nodemailer');
 // var emailTemplates = require('email-templates');
 var smtpTransport = require('nodemailer-smtp-transport');

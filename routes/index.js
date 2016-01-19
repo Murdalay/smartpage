@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var userRoutes = express.Router();
 var passport = require('passport');
 var stormpath = require('stormpath');
 var request = require('request');
@@ -187,9 +188,6 @@ var checkIfUserLogedIn = makeUserLoginRedirectMidleware('/login');
 function isProfileFiled (user) {
 	return user.username !== 'null' && user.givenName  !== 'null' && user.surname !== 'null';
 }
-
-
-var setingsStorage = { common : false };
 
 var endpointCallbacks = {
 	login : function(endpoint, messages, extra) {
@@ -452,10 +450,10 @@ var dataProviders = {
 		});
 	},
 
-	dirAccounts : function(searchObj, callback) {
+	dirAccounts : function(searchObj, callback, url) {
 		var _cb = callback ? callback : searchObj;
 
-		spClient.getDirectory(dirUrl, { expand: 'customData' }, function(err, dirr) {
+		spClient.getDirectory(url ? url : dirUrl, { expand: 'customData' }, function(err, dirr) {
 			if (err) _cb(new Error(err));
 			if(callback) {
 				dirr.getAccounts(searchObj, callback);
@@ -465,18 +463,52 @@ var dataProviders = {
 		})
 	},
 
+	createAccountStore : function(callback, url) {
+		dataProviders.app(function(err, app) {
+			if (err) { return callback(err); };
+
+			var mapping = {
+			  accountStore: {
+			    href: url ? url : dirUrl
+			  },
+			  isDefaultAccountStore: !url,
+			  isDefaultGroupStore: !url
+			};
+
+			app.createAccountStoreMapping(mapping, callback);
+		})
+	},
+
+	getAccountStores : function(callback) {
+		dataProviders.app(function(err, app) {
+			if (err) { return callback(err); };
+
+			app.getAccountStoreMappings({ expand: 'accountStore' }, callback);
+		})
+	},
+
 	eachAccount : function(callback, endCb, searchObj) {
 		dataProviders.dirAccounts(searchObj ? searchObj : { expand: 'customData' }, function(err, accounts) {
-			if (err) callback(new Error(err));
+			if (err) callback(err);
 			accounts.each(callback, endCb);
 		})
 	},
 
-	detectAccounts : function(searchObj, callback) {
+	getAccountByName : function(name, callback) {
+		dataProviders.getAccountByParam(name,  callback, 'username');
+	},
+
+	getAccountByParam : function(name, callback, param, reverse) {
+		function isParamExist(application, cb) {
+		  cb(!reverse ? application[param] === name : application[param] !== name );
+		}
+
+		dataProviders.detectAccounts(isParamExist, callback);
+	},
+
+	detectAccounts : function(searchFunc, callback) {
 		dataProviders.dirAccounts(function(err, accounts) {  
-			accounts.detect(searchObj, function(result){
-				callback(result);
-			})
+			accounts.detect(searchFunc, callback)
 		})
 	}
 };
@@ -497,8 +529,6 @@ var DlPreInitFunctions = {
 			}
 			dir = _dir;
 
-			setingsStorage.common = _dir;
-			
 			console.log('dirs data Source is inited\n');
 			return callback(null, name, dirr, 'dir');
 		});
@@ -516,6 +546,7 @@ var DlPreInitFunctions = {
 				}, 
 
 				function(err, ress) {
+					if (err) throw new Error(err);
 				});
 			});
 		});
@@ -573,6 +604,8 @@ function motivator(launchlist) {
 
 function updateAccountsRefPayment () {
 	DL('get', 'layer', 'finance')(function() {
+		var _refPayments = 0;
+
 		function _getUnpayedRefPayments(referrer) {
 			if (referrer && referrer.length) {
 				var _unpayed = [];
@@ -614,8 +647,6 @@ function updateAccountsRefPayment () {
 			}
 		}
 
-		var _refPayments = 0;
-
 		function _onProccessEnd(err, res) {
 				console.log('All accounts are processed\n\n');
 				console.log('Referal debt is: ');
@@ -632,8 +663,8 @@ function updateAccountsRefPayment () {
 							console.log('Referal debt is stored succesfuly\n');
 					});
 				});
-				}
 			}
+		}
 
 		this.eachAccount(function(account, cb) {
 			if (account.customData && account.customData.refPayment) {
@@ -730,7 +761,7 @@ updateAccounts.bind(this);
 	function registerGroup(name, group) {
 		groups[name] = extend(null, { url : group.href, name: name }, group);
 		groups[name].customData.mergedMessages = extend({}, data.dir.customData.messages, groups[name].customData.messages);
-		console.log('grop ' + name + ' registred\n\n');
+		console.log('group ' + name + ' registred\n\n');
 	}
 
 	function initPages(cb) {
@@ -837,6 +868,17 @@ updateAccounts.bind(this);
 		this.getName = function() {
 			return data.dir.name;
 		};
+		this.getUsers = function(cb) {
+			var _that = this;
+			var _layer = registredLayers['users'];
+
+			this.getAccountStore(function(err, asm) {
+				var _newCtx = new Users(asm);
+				var _base = _layer ? new Layer('users', _layer) : {};
+
+				return cb.apply(extend({}, _that, _base, _newCtx));
+			});
+		};
 		this.getPages = function() {
 			return data.dir.customData.Pages;
 		};
@@ -878,6 +920,9 @@ updateAccounts.bind(this);
 			endCb.bind(this);
 			return providers.eachAccount(cb, endCb, query);
 		};	
+		this.getAccountStore = function(cb) {
+			return providers.createAccountStore.apply(this, [cb]);
+		};
 		this.extendDirCustomData = function(obj, url) {
 			return providers.extendDirCustomData.apply(this, arguments);
 		};			
@@ -915,11 +960,28 @@ updateAccounts.bind(this);
 
 		this.extendDirCustomData = function(obj, url) {
 			return providers.extendDirCustomData.apply(this, [obj, url ? url : this.getUrl()]);
-		};	
+		};
+
 		
 		this.customData = layers[name] && layers[name].customData ? layers[name].customData : data.dir.customData;
 		this.name = name;
 		this.url = url;
+	}
+
+	function Users(store) {
+		this.getAccountStore = function() {
+			return this.accStore;
+		};
+		this.getAccountByName = function(name, callback) {
+			_cb = callback.bind(this);
+
+			return providers.getAccountByName.apply(this, [name, _cb]);
+		};	
+		this.getAccountByParam = function() {
+			return providers.getAccountByParam.apply(this, [arguments]);
+		};	
+		
+		this.accStore = store;
 	}
 
 	function Grp(name) {
@@ -964,6 +1026,10 @@ updateAccounts.bind(this);
 		this.getCustomData = function() {
 			return this.data;
 		};
+		this.getAccountStore = function(cb) {
+			return providers.createAccountStore.apply(this, [cb, this.getUrl()]);
+		};
+
 		this.getPaths = function() {
 			var _cd = this.getCustomData();
 			return _cd.PATHS;
@@ -981,6 +1047,13 @@ updateAccounts.bind(this);
 			return cb.apply(extend(_dirCtx, _newCtx));
 		}
 
+		function runGroup(cb) {
+			var _dirCtx = new Dir();
+			var _newCtx = new Grp(name);
+
+			return cb.bind(extend(_dirCtx, _newCtx));
+		}
+
 
 		function getDir(cb) {
 			var _newCtx = new Dir();
@@ -988,11 +1061,24 @@ updateAccounts.bind(this);
 			return cb.apply(_newCtx);
 		}
 
-		function getLayer(cb) {
+		function runInDirContext(cb) {
+			var _newCtx = new Dir();
+
+			return cb.bind(_newCtx);
+		}
+
+		function getLayer(cb, layerName) {
 			var _dir = new Dir();
 			var _newCtx = new Layer(name, registredLayers[name]);
 
 			return cb.apply(extend(_dir, _newCtx));
+		}
+
+		function runInLayerContextLayer(cb, layerName) {
+			var _dir = new Dir();
+			var _newCtx = new Layer(name, registredLayers[name]);
+
+			return cb.bind(extend(_dir, _newCtx));
 		}
 		
 
@@ -1014,6 +1100,20 @@ updateAccounts.bind(this);
 					return getLayer
 				} else {
 					return null
+				}
+			}
+		}
+
+		if (action === 'run') {
+			if(layer === 'group') {
+				return runGroup
+			} else if (layer === 'dir') {
+				return runInDirContext
+			} else if (layer === 'layer') {
+				if (registredLayers[name]) {
+					return runInLayerContextLayer
+				} else {
+					return runInDirContext
 				}
 			}
 		}
@@ -1464,14 +1564,15 @@ router.get('/verify/', function(req, res, next) {
 
 	request.post({ url : _url + req.query.sptoken, 'auth': { 'user': _username, 'pass': _password, 'sendImmediately': false }}, 
 		function (error, response, body) {
-		if (error) { return next(error) }
-		if (response.statusCode === 200) {
-			req.flash('info', dir.messages.verifySuccess);
-			return res.redirect('/login');
-		} else {
-			return res.redirect('/verify-error.html')
+			if (error) { return next(error) }
+			if (response.statusCode === 200) {
+				req.flash('info', dir.messages.verifySuccess);
+				return res.redirect('/login');
+			} else {
+				return res.redirect('/verify-error.html')
+			}
 		}
-	});
+	);
 });
 
 function updatePaymentStatistic(payReq, mail) {
@@ -1551,6 +1652,7 @@ function confirmPayRequest(href, payId) {
 	return new Vow.Promise(function(resolve, reject, notify) {
 		var _href = href;
 		var _payId = payId;
+
 		DL('get', 'dir')(function() { 
 			console.log('updating payment data');
 			
@@ -1620,7 +1722,7 @@ function confirmPayRequest(href, payId) {
 													dirr.getCustomData(function(err, customData) {
 														if (err) { reject(err) }
 
-														var _payDate = Date.now()
+														var _payDate = Date.now();
 
 														customData.payments || (customData.payments = {});
 														customData.payments.byUser || (customData.payments.byUser = {});
@@ -1821,21 +1923,6 @@ function renderSingleAccountPage(href, req, res, next, bundle) {
 		this.getAccountByUrl(href, _renderAccountPage.bind(this));
 		}
 	);
-}
-
-
-function showUserProfilePageById(req, res, next) {
-	DL('get', 'dir')(function(){
-		var _id = req.params.userId;
-
-		if(!_id) { return next(); }
-
-		var _acc = this.getAccountByHash(_id);
-
-		if(!_acc) { return next(); }
-
-		renderSingleAccountPage(_acc.href, req, res, next);
-	});
 }
 
 function showUserPageById(page){
@@ -2123,9 +2210,76 @@ router.post('/api/mailer', function (req, res, next) {
 		});
 });
 
+function renderUserLandingPage(req, res, next) {
+	return DL('run', 'dir')(function (account) {
 
+		console.log(account);
+		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
+	
+		res.render(_name, {
+			block : _name,
+			bundle : _name,
+			user : extend({}, account.customData),
+			clientData : extend({}, account.customData.extraFields, { name : account.fullName, phone : account.customData.phone, email : account.email, ava : !!account.customData.photo ? account.customData.photo.path : '/images/avatar.png' })
+		});
+	});
+}
+
+function getUserByNameAsync(name) {
+	return new Vow.Promise(function(resolve, reject, notify) {
+		if (typeof name !== 'string') {
+			return reject('You should provide the name string to get user')
+		}
+
+		function _getAcc(err, account) {
+			console.log('Getting account');
+			if (err) {
+				return reject(err);
+			} else {
+				return resolve(account);
+			}
+		}
+
+		DL('get', 'dir')(function(){
+			function _checName(result) {
+				console.log('Checking name');
+				console.log(result);
+				if (!result) {
+					return reject('username not found')
+				}
+
+				this.getAccountByUrl(result.href, _getAcc);
+			}
+
+			this.getUsers(function() {
+				this.getAccountByName(name, _checName);
+			});
+		});
+	});
+}
+
+
+userRoutes.get('/:username', function(req, res, next) {
+	var _username = req.params.username;
+
+	console.log(_username);
+
+	getUserByNameAsync(_username)
+		.then(renderUserLandingPage.apply(this, arguments), next);
+});
+
+
+// function makeUserLoginRedirectMidleware(redirectPoint) {
+// 	return function(req, res, next) {
+// 		if (!req.user || req.user.status !== 'ENABLED') {
+// 			return res.redirect(redirectPoint);
+// 		}
+
+// 		return next();
+// 	}
+// }
 
 
 motivator(_motivatorLaunchList);
 
-module.exports = router;
+module.exports = { userRoutes : userRoutes, router : router };

@@ -193,126 +193,123 @@ block('statistics')(content()(function(){
 		_tableHeader = false;
 	}
 
-	console.log(_user);
+		return [
+			{
+			    block : 'column',
+			    mods : { 'triple' : true },
+			    content : [
+					{
+					    mix: [{ block : 'margins', mods : { none : true } }],
 
+					    block : 'group-title',
+					    content : _messages.profileStat
+					}
+			    ]
+			},
+			{
+			    block : 'column',
+			    mods : { 'double' : true },
+			    content : [
+					{
+					    block : 'info-table',
 
-			return [
-				{
-				    block : 'column',
-				    mods : { 'triple' : true },
-				    content : [
-						{
-						    mix: [{ block : 'margins', mods : { none : true } }],
-
-						    block : 'group-title',
-						    content : _messages.profileStat
-						}
-				    ]
-				},
-				{
-				    block : 'column',
-				    mods : { 'double' : true },
-				    content : [
-						{
-						    block : 'info-table',
-
-						    content : [
-								{
-								    elem : 'row',
-								    content : [
-									    {
-									    	elem : 'cell',
-										    content : _messages.creationDate
-									    },
-									    buildBodyCells({ createdAt : { type : 'date-in-ms' }},  _user, _messages.noData)
-								    ]
-								},
-								{
-								    elem : 'row',
-								    content : [
-									    {
-									    	elem : 'cell',
-										    content : _messages.activeBonus
-									    },
-									    {
-									    	elem : 'cell',
-										    content : _custom.bonus ? _dir.bonus[_custom.bonus].description : _messages.noBonus
-									    }
-								    ]
-								}
-						    ]
-						},
-						{
-						    block : 'column',
-						    mods : { 'triple' : true },
-						    content : [
-								{
-								    block : 'group-title',
-								    content : _messages.visitorsStat
-								},
-								{
-								    block : 'info-table',
-								    content : _visits
-								}
-						    ]
-						}
-				    ]
-				},
-				!_custom.refPayment ? '' : [
+					    content : [
+							{
+							    elem : 'row',
+							    content : [
+								    {
+								    	elem : 'cell',
+									    content : _messages.creationDate
+								    },
+								    buildBodyCells({ createdAt : { type : 'date-in-ms' }},  _user, _messages.noData)
+							    ]
+							},
+							{
+							    elem : 'row',
+							    content : [
+								    {
+								    	elem : 'cell',
+									    content : _messages.activeBonus
+								    },
+								    {
+								    	elem : 'cell',
+									    content : _custom.bonus ? _dir.bonus[_custom.bonus].description : _messages.noBonus
+								    }
+							    ]
+							}
+					    ]
+					},
 					{
 					    block : 'column',
 					    mods : { 'triple' : true },
 					    content : [
 							{
 							    block : 'group-title',
-							    content : _messages && _messages.refPayment ? _messages.refPayment.refPayment : ''
+							    content : _messages.visitorsStat
 							},
 							{
 							    block : 'info-table',
-
-							    content : _paymentTable
+							    content : _visits
 							}
 					    ]
 					}
-				],
-
-				!_custom.referredAccounts ? '' : {
+			    ]
+			},
+			!_custom.refPayment ? '' : [
+				{
 				    block : 'column',
 				    mods : { 'triple' : true },
 				    content : [
 						{
 						    block : 'group-title',
-						    content : _messages && _messages.refPayment ? _messages.refPayment.reffered : ''
+						    content : _messages && _messages.refPayment ? _messages.refPayment.refPayment : ''
 						},
 						{
 						    block : 'info-table',
 
-						    content : _referedAccTable
-						},
-					    {
-					    	block : 'margins',
-						    mods : { top : true },
-						    content : [
-							    {
-								    block : 'basic-text',
-								    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
-								},
-							    {
-								    block : 'basic-text',
-								    mods : { bold : true },
-								    mix: { block : 'margins', mods : { left : true } },
-								    content : _refNumber
-								}
-							]
+						    content : _paymentTable
 						}
-					]
-				},
+				    ]
+				}
+			],
 
-			    !this.ctx.clientData ? '' : { 
-			    	block : 'data-provider',
-			    	js : this.ctx.clientData
-			    }
-			]
+			!_custom.referredAccounts ? '' : {
+			    block : 'column',
+			    mods : { 'triple' : true },
+			    content : [
+					{
+					    block : 'group-title',
+					    content : _messages && _messages.refPayment ? _messages.refPayment.reffered : ''
+					},
+					{
+					    block : 'info-table',
+
+					    content : _referedAccTable
+					},
+				    {
+				    	block : 'margins',
+					    mods : { top : true },
+					    content : [
+						    {
+							    block : 'basic-text',
+							    content : _messages && _messages.pay ? _messages.refPayment.refNumber : ''
+							},
+						    {
+							    block : 'basic-text',
+							    mods : { bold : true },
+							    mix: { block : 'margins', mods : { left : true } },
+							    content : _refNumber
+							}
+						]
+					}
+				]
+			},
+
+		    !this.ctx.clientData ? '' : { 
+		    	block : 'data-provider',
+		    	js : this.ctx.clientData
+		    }
+		]
 		}
 	),
 	js()(true)

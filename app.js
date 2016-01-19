@@ -85,7 +85,8 @@ app.set('view engine', '.bem');
 
 
 
-var routes = require('./routes/index');
+var routes = require('./routes/index').router;
+var userRoutes = require('./routes/index').userRoutes;
 var strategy = new StormpathStrategy();
 
 
@@ -110,6 +111,7 @@ app.use('/photos', Express.static(path.join(__dirname, 'photos')));
 
 
 app.use(routes);
+app.use(userRoutes);
 
 /// catch 404 and forwarding to error handler
 // app.use(function(req, res, next) {

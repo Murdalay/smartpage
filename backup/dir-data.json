@@ -190,304 +190,8 @@
     "balance": "Баланс:"
   },
   "pathToStatic": "http://smartpage.com.ua/static",
-  "payments": {
-    "byUser": {
-      "53e75ce9eecf661a53e03df26eb37a3b9a392451": [
-        {
-          "amount": "79.1",
-          "payDate": 1452026956799,
-          "transactionId": "b2c30da90951e735776c6f80d10f533c68f8ce43",
-          "status": "payed"
-        },
-        {
-          "amount": "89.1",
-          "payDate": 1452029200531,
-          "transactionId": "45df0deef6a43f16e76d694b90b90812ace45f07",
-          "status": "payed"
-        },
-        {
-          "amount": "239.1",
-          "payDate": 1452031371937,
-          "transactionId": "547d452d5c04311e178bf71f69c9e903361244cb",
-          "status": "payed"
-        },
-        {
-          "amount": "191.1",
-          "payDate": 1452112573599,
-          "transactionId": "61472eb5e468ab4d65e2a3e1c38e337c59d1d92f",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452192140402,
-          "transactionId": "6cc5e7ef9b518584701d6646459ef06b9d5c9bc3",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452193205222,
-          "transactionId": "4ca930850acae25fa1b983f0ab614a2ecfb12500",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452193689504,
-          "transactionId": "e1d872073de30378b74d16005a47a7953c61fe79",
-          "status": "payed"
-        },
-        {
-          "amount": "296.1",
-          "payDate": 1452194565496,
-          "transactionId": "9d44ff338efc3c2a88d65453fe12aa9984c1068f",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452194939387,
-          "transactionId": "c8a0ac852f8cd6df4d1f74a57b1f19fff38eb708",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452195127435,
-          "transactionId": "d412b060dc3e493373e367d2094b2480f1693c6d",
-          "status": "payed"
-        },
-        {
-          "amount": "83.1",
-          "payDate": 1452239264698,
-          "transactionId": "1ca42135123677303351c4431667b34fcb6ebb96",
-          "status": "payed"
-        },
-        {
-          "amount": "152.1",
-          "payDate": 1452451414000,
-          "transactionId": "0e15645a21c36830c119bf9fb5dc709c36d6d06e",
-          "status": "payed"
-        }
-      ]
-    },
-    "incoming": [
-      {
-        "amount": "79.1",
-        "transactionId": "b2c30da90951e735776c6f80d10f533c68f8ce43",
-        "status": "payed"
-      },
-      {
-        "amount": "89.1",
-        "transactionId": "45df0deef6a43f16e76d694b90b90812ace45f07",
-        "status": "payed"
-      },
-      {
-        "amount": "239.1",
-        "transactionId": "547d452d5c04311e178bf71f69c9e903361244cb",
-        "status": "payed"
-      },
-      {
-        "amount": "191.1",
-        "transactionId": "61472eb5e468ab4d65e2a3e1c38e337c59d1d92f",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "6cc5e7ef9b518584701d6646459ef06b9d5c9bc3",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "4ca930850acae25fa1b983f0ab614a2ecfb12500",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "e1d872073de30378b74d16005a47a7953c61fe79",
-        "status": "payed"
-      },
-      {
-        "amount": "296.1",
-        "transactionId": "9d44ff338efc3c2a88d65453fe12aa9984c1068f",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "c8a0ac852f8cd6df4d1f74a57b1f19fff38eb708",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "d412b060dc3e493373e367d2094b2480f1693c6d",
-        "status": "payed"
-      },
-      {
-        "amount": "83.1",
-        "transactionId": "1ca42135123677303351c4431667b34fcb6ebb96",
-        "status": "payed"
-      },
-      {
-        "amount": "152.1",
-        "transactionId": "0e15645a21c36830c119bf9fb5dc709c36d6d06e",
-        "status": "payed"
-      }
-    ]
-  },
   "refProgram": {
     "firstRef": "20"
-  },
-  "statistics": {
-    "transactions": {
-      "b2c30da90951e735776c6f80d10f533c68f8ce43": {
-        "transaction": {
-          "subscription": "business",
-          "durration": "2",
-          "subscription-type": "month",
-          "bonus": "Скидка 10%",
-          "sum": "79.1",
-          "endDate": "1462477383550",
-          "date": 1452026589575
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "45df0deef6a43f16e76d694b90b90812ace45f07": {
-        "transaction": {
-          "subscription": "premium",
-          "durration": "0",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "89.1",
-          "endDate": "1459887932883",
-          "date": 1452029150904
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "547d452d5c04311e178bf71f69c9e903361244cb": {
-        "transaction": {
-          "subscription": "premium",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "239.1",
-          "endDate": "1554498100451",
-          "date": 1452031313934
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "61472eb5e468ab4d65e2a3e1c38e337c59d1d92f": {
-        "transaction": {
-          "subscription": "business",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "191.1",
-          "endDate": "1551825374008",
-          "autoRenew": "true",
-          "date": 1452033389045
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "6cc5e7ef9b518584701d6646459ef06b9d5c9bc3": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549564888389",
-          "autoRenew": "true",
-          "date": 1452192107691
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "4ca930850acae25fa1b983f0ab614a2ecfb12500": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549565866275",
-          "autoRenew": "true",
-          "date": 1452193068218
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "e1d872073de30378b74d16005a47a7953c61fe79": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549566429592",
-          "autoRenew": "true",
-          "date": 1452193633403
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "9d44ff338efc3c2a88d65453fe12aa9984c1068f": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "7",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "296.1",
-          "endDate": "1675797642903",
-          "date": 1452194452098
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "c8a0ac852f8cd6df4d1f74a57b1f19fff38eb708": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549567713646",
-          "autoRenew": "true",
-          "date": 1452194918492
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "d412b060dc3e493373e367d2094b2480f1693c6d": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549567842687",
-          "autoRenew": "true",
-          "date": 1452195046482
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "1ca42135123677303351c4431667b34fcb6ebb96": {
-        "transaction": {
-          "subscription": "business",
-          "durration": "3",
-          "subscription-type": "month",
-          "bonus": "Скидка 10%",
-          "sum": "83.1",
-          "endDate": "1465368396818",
-          "autoRenew": "true",
-          "date": 1452239201770
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      },
-      "0e15645a21c36830c119bf9fb5dc709c36d6d06e": {
-        "transaction": {
-          "subscription": "start",
-          "durration": "3",
-          "subscription-type": "year",
-          "bonus": "Скидка 10%",
-          "sum": "152.1",
-          "endDate": "1549824183810",
-          "autoRenew": "true",
-          "date": 1452451388150
-        },
-        "payerHash": "53e75ce9eecf661a53e03df26eb37a3b9a392451"
-      }
-    }
   },
   "subscriptions": [
     {
@@ -644,20 +348,44 @@
         },
         {
           "name": "Facebook",
-          "id": "facebook",
+          "id": "fb",
           "placeholder": "Введите ссылку на профиль в социальной сети",
+          "type": "text"
+        },
+        {
+          "name": "Skype",
+          "id": "skype",
+          "placeholder": "Введите имя пользователя skype",
+          "type": "text"
+        },
+        {
+          "name": "Instagram",
+          "id": "instagram",
+          "placeholder": "Введите ссылку на профиль",
+          "type": "text"
+        },
+        {
+          "name": "Instagram",
+          "id": "instagram",
+          "placeholder": "Введите ссылку на профиль",
           "type": "text"
         },
         {
           "name": "VKontakte",
           "id": "vk",
-          "placeholder": "Введите ссылку на профиль в социальной сети",
+          "placeholder": "Введите ссылку на профиль",
+          "type": "text"
+        },
+        {
+          "name": "YouTube",
+          "id": "youtube",
+          "placeholder": "Введите ссылку на профиль",
           "type": "text"
         },
         {
           "name": "Twitter",
-          "id": "tweet",
-          "placeholder": "Введите ссылку на профиль в социальной сети",
+          "id": "tw",
+          "placeholder": "Введите ссылку на профиль",
           "type": "text"
         },
         {
