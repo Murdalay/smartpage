@@ -494,7 +494,7 @@ var dataProviders = {
 		})
 	},
 
-	getAccountByName : function(name, callback) {
+	getAccountByUsername : function(name, callback) {
 		dataProviders.getAccountByParam(name,  callback, 'username');
 	},
 
@@ -972,10 +972,10 @@ updateAccounts.bind(this);
 		this.getAccountStore = function() {
 			return this.accStore;
 		};
-		this.getAccountByName = function(name, callback) {
+		this.getAccountByUsername = function(name, callback) {
 			_cb = callback.bind(this);
 
-			return providers.getAccountByName.apply(this, [name, _cb]);
+			return providers.getAccountByUsername.apply(this, [name, _cb]);
 		};	
 		this.getAccountByParam = function() {
 			return providers.getAccountByParam.apply(this, [arguments]);
@@ -2225,7 +2225,7 @@ function renderUserLandingPage(req, res, next) {
 	});
 }
 
-function getUserByNameAsync(name) {
+function getUserByUsernameAsync(name) {
 	return new Vow.Promise(function(resolve, reject, notify) {
 		if (typeof name !== 'string') {
 			return reject('You should provide the name string to get user')
@@ -2252,21 +2252,33 @@ function getUserByNameAsync(name) {
 			}
 
 			this.getUsers(function() {
-				this.getAccountByName(name, _checName);
+				this.getAccountByUsername(name, _checName);
 			});
 		});
 	});
 }
 
-
-userRoutes.get('/:username', function(req, res, next) {
+function showPayedUserPages(req, res, next) {
 	var _username = req.params.username;
+	var _arg = arguments;
 
-	console.log(_username);
+	function _checIfPayed(account) {
+		console.log(account.username);
 
-	getUserByNameAsync(_username)
-		.then(renderUserLandingPage.apply(this, arguments), next);
-});
+
+		if(account.customData.payed === 'active') {
+			renderUserLandingPage.apply(this, _arg)(account);
+		} else {
+			next();
+		}
+
+	}
+
+	getUserByUsernameAsync(_username)
+		.then(_checIfPayed, next);
+}
+
+userRoutes.get('/:username', showPayedUserPages);
 
 
 // function makeUserLoginRedirectMidleware(redirectPoint) {
