@@ -77,7 +77,7 @@ block('tarif')(content()(function(){
 							    content : [
 									{
 									    block : 'image',
-									    url : _conf.pathToStatic + '/' + subcript.val + '.jpg'
+									    url : _conf ? _conf.pathToStatic + '/' + subcript.val + '.jpg' : ''
 									}
 							    ]
 							},
