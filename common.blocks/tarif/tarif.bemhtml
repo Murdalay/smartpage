@@ -3,6 +3,7 @@ block('tarif')(content()(function(){
 			var _payOptions = [];
 			var _payDescription = [];
 			var _val = this.ctx.val;
+			var _conf = this.ctx.conf;
 			var _messages = this.ctx.messages.pay;
 
 
@@ -70,6 +71,16 @@ block('tarif')(content()(function(){
 							        }
 					        	]
 					        },
+	        				{
+							    block : 'margins',
+							    mods : { 'double' : true, top : true, bottom : true },
+							    content : [
+									{
+									    block : 'image',
+									    url : _conf.pathToStatic + '/' + subcript.val + '.jpg'
+									}
+							    ]
+							},
 					        { 
 						        elem : 'description',
 					        	content : subcript.description

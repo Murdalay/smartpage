@@ -2,11 +2,12 @@ block('pay')(content()(function(){
 			var _user = this.ctx.uData.user;
 			var _username = _user.username + '';
 			var _custom = this.ctx.uData.custom;
+			var _conf = this.ctx.conf;
 			var _payed = _custom.payed;
 			var _subscription = _custom.userSubcription;
 			var _subscriptions = this.ctx.appData.subscriptions;
 			var _defSubscription = this.ctx.appData.defaultSubcription;
-			var _domain = this.ctx.appData.domain;
+			var _domain = this.ctx.conf.def.domain;
 			var _messages = this.ctx.appData.messages;
 			var _bonus = '';
 
@@ -95,6 +96,7 @@ block('pay')(content()(function(){
 						    mods : { disabled : isPayed() },
 						    name : 'subscription',
 						    messages : _messages,
+						    conf : _conf,
 							val : getActiveSubcription(),
 							subscript : _subscriptions
 						}

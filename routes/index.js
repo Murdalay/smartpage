@@ -500,7 +500,7 @@ var dataProviders = {
 
 	getAccountByParam : function(name, callback, param, reverse) {
 		function isParamExist(application, cb) {
-		  cb(!reverse ? application[param] === name : application[param] !== name );
+		  cb(!reverse ? application[param].replace(' ', '') === name.replace(' ', '') : application[param].replace(' ', '') !== name.replace(' ', '') );
 		}
 
 		dataProviders.detectAccounts(isParamExist, callback);
@@ -887,6 +887,12 @@ updateAccounts.bind(this);
 		};				
 		this.getUrl = function() {
 			return data.dir.customData.url;
+		};
+		this.getConf = function() {
+			return data.dir.customData._conf;
+		};
+		this.getDefConf = function() {
+			return this.getConf().def;
 		};
 		this.getAccountByHash = function(hash) {
 			return data.accounts[hash] ? data.accounts[hash] : null;
@@ -1883,7 +1889,7 @@ function renderSingleAccountPage(href, req, res, next, bundle) {
 		function _renderAccountPage(err, account) {
 			if (err) { return next(err) }
 
-			var _link = { reflink : makeRefLink('ref_id', this.getCustomData().domain + this.getEndpoints().register.url + '/', account.email) };
+			var _link = { reflink : makeRefLink('ref_id', this.getDefConf().domain + this.getEndpoints().register.url + '/', account.email) };
 			var _ref = account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer) : null;
 			var _referrer = _ref ? { referrer : _ref.fullName && _ref.fullName !== 'null null' ? _ref.fullName : _ref.email } : {};
 			var _balance = account.customData.balance;
@@ -1913,6 +1919,7 @@ function renderSingleAccountPage(href, req, res, next, bundle) {
 							},
 						appData : this.getCustomData(),
 						messages : this.getMessages(),
+						conf : this.getConf(),
 						clientData : { balance : _balance },
 						photo : account.customData.photo && account.customData.photo.path
 					}
@@ -1982,14 +1989,14 @@ router.get('/dashboard', checkIfUserLogedIn, function (req, res) {
 });
 
 // Render the payment page.
-router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
-	spClient.getAccount(req.user.href, { expand: 'customData' }, function(err, account) {
+router.get('/dashboard/payment', checkIfUserLogedIn, DL('run', 'dir')(function (req, res) {
+	this.getAccountByUrl(req.user.href, function(err, account) {
 		res.render('payment', {
 			block : 'container',
 			error : req.flash('error'),
 			info : req.flash('info'),
-			menu : dir.menuUserAdmin,
-			messages : dir.messages,
+			menu : this.getCustomData().menuUserAdmin,
+			messages : this.getMessages(),
 			user : account.customData,
 			custom : account.customData,
 			bundle : 'payment',
@@ -1997,15 +2004,16 @@ router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 			inside: [
 				{
 					block : 'pay',
-					appData : dir,
+					appData : this.getCustomData(),
+					conf : this.getConf(),
 					js : {
-						subscriptions : dir.subscriptions,
+						subscriptions : this.getCustomData().subscriptions,
 						bonus : account.customData.bonus ? dir.bonus[account.customData.bonus] : ''
 					},
 					uData : {
 						user : req.user,
 						custom : account.customData,
-						bonus : dir.bonus[account.customData.bonus],
+						bonus : this.getCustomData().bonus[account.customData.bonus],
 						payed : account.customData.payed
 					},
 
@@ -2013,8 +2021,8 @@ router.get('/dashboard/payment', checkIfUserLogedIn, function (req, res) {
 				}
 			]
 		});
-	});
-});
+	}.bind(this));
+}));
 
 router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.extraFields || (req.user.customData.extraFields = {});
@@ -2033,7 +2041,7 @@ router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	});
 });
 
-router.post('/dashboard/pay', checkIfUserLogedIn, function (req, res, next) {
+router.post('/dashboard/pay', checkIfUserLogedIn, DL('run', 'dir')(function (req, res, next) {
 	req.user.customData.payRequest || (req.user.customData.payRequest = {});
 
 	for (key in req.body) {
@@ -2041,18 +2049,44 @@ router.post('/dashboard/pay', checkIfUserLogedIn, function (req, res, next) {
 	}
 
 	req.user.customData.payRequest.date = Date.now();
-	
+
+	var _fromBalance = req.body.payMethod === 'fromBalance';
+
 	// saving custom fields
 	req.user.customData.payed || (req.user.customData.payed = 'waiting');
 	req.user.customData.save(function (err) {
 		if (err) {
 			next(err);
 		} else {
-			req.flash('info', dir.messages.pay.thanks);
+			req.flash('info', this.getMessages().pay.thanks);
 			res.redirect('back');
+		
+			if (!_fromBalance) {
+				// sending billing email to user
+				var _locals = { 
+					title : this.getMessages().pay.billName,
+					name : req.user.givenName,
+					invoice : { 
+						payer : req.user.fullName,
+						name : req.user.username,
+						sum : req.body.sum,
+						date : Date.now()
+					},
+					services : [{ 
+						name : this.getMessages().pay.buySubscription + req.body.subscription,
+						sum : req.body.sum
+					}],
+					supportMail : this.getConf().def.emails.Support
+				};
+
+				mailer.sendMailTemplate(this.getDefConf().emails.Support, 
+					req.user.email, this.getMessages().pay.billingMailTheme, 
+					'payrequest-invoice.html', 
+					_locals);
+			}
 		}
-	});
-});
+	}.bind(this));
+}));
 
 // photo upload handling
 router.post('/dashboard/profile/user/photo', function(req, res, next){
@@ -2113,6 +2147,11 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 		return res.redirect('back');
 	}
 
+	if (!req.body.username){
+		req.flash('error', dir.messages.errors.mustFillUsername);
+		return res.redirect('back');
+	}
+
 	var _href = req.user.href;
 	var _updateAcc = function(href) {
 		DL('get', 'dir')(function() {
@@ -2125,14 +2164,11 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 			}.bind(this));
 		});
 	};
-	
+
+	// removing spaces from username
+	req.body.username = req.body.username.replace(' ', '');
+
 	if(req.user.username !== req.body.username){
-
-		if (!req.body.username){
-			req.flash('error', dir.messages.errors.mustFillUsername);
-			return res.redirect('back');
-		}
-
 		spClient.getDirectory(dirUrl,  { expand: 'accounts' }, function(err, directory) {
 
 			directory.getAccounts({ username: req.body.username }, function(err, accounts) {
@@ -2194,21 +2230,32 @@ router.post('/dashboard/profile/user', checkIfUserLogedIn, function (req, res, n
 
 				return res.redirect('back');
 			}
-
 		});
 	}
 });
 
-/// mail
 var mailer = require('../helpers/mailer');
 
-router.post('/api/mailer', function (req, res, next) {
-	mailer.sendMail('smartpage.support@yandex.ru', req.body.ownerMail, 'Запись на семинар', '123', '<h2>Отправка формы на вашей страничке на smartpage.com.ua.</h2><h4>Отправитель: ' + req.body.name + '</h4><div> Адрес отправителя : <a href="mailto:' + req.body.Email + '"></a>' + req.body.Email + '</div><br> \n<div>Номер телефона отправителя: <a href="phone:' + req.body.number + '">' + req.body.number + '</a></div>' ).then(function(response) {
-			res.status(200).end();
-		}, function(response) {
-			res.status(500).end('Unable to send mail');
-		});
-});
+/// pages form submit mail
+router.post('/api/mailer', DL('run', 'dir')(function (req, res, next) {
+	var _locals = { 
+		type : 'good', 
+		alert : 'Запись на семинар',
+		sender : { 
+			name : req.body.name,
+			phone : req.body.number,
+			email : req.body.Email
+		},
+		supportMail : this.getDefConf().emails.Support
+	};
+
+	mailer.sendMailTemplate(this.getDefConf().emails.Support, req.body.ownerMail, 'Запись на семинар', 'form-submit.html', _locals)
+		.then(function(response) {
+				res.status(200).end();
+			}, function(response) {
+				res.status(500).end('Unable to send mail');
+			});
+}));
 
 function renderUserLandingPage(req, res, next) {
 	return DL('run', 'dir')(function (account) {
@@ -2226,7 +2273,7 @@ function renderUserLandingPage(req, res, next) {
 }
 
 function getUserByUsernameAsync(name) {
-	return new Vow.Promise(function(resolve, reject, notify) {
+	return new Vow.Promise(DL('run', 'dir')(function(resolve, reject, notify) {
 		if (typeof name !== 'string') {
 			return reject('You should provide the name string to get user')
 		}
@@ -2234,62 +2281,60 @@ function getUserByUsernameAsync(name) {
 		function _getAcc(err, account) {
 			console.log('Getting account');
 			if (err) {
+				console.warn('Failed to get account');
 				return reject(err);
 			} else {
+				console.warn('Success!');
 				return resolve(account);
 			}
 		}
 
-		DL('get', 'dir')(function(){
-			function _checName(result) {
-				console.log('Checking name');
-				console.log(result);
-				if (!result) {
-					return reject('username not found')
-				}
-
-				this.getAccountByUrl(result.href, _getAcc);
+		function _checkName(result) {
+			console.log('Checking name');
+			if (!result) {
+				return reject('username not found')
 			}
 
-			this.getUsers(function() {
-				this.getAccountByUsername(name, _checName);
-			});
+			this.getAccountByUrl(result.href, _getAcc);
+		}
+
+		this.getUsers(function() {
+			this.getAccountByUsername(name, _checkName);
 		});
-	});
+	}));
 }
 
 function showPayedUserPages(req, res, next) {
 	var _username = req.params.username;
 	var _arg = arguments;
 
-	function _checIfPayed(account) {
+	function _checkIfPayed(account) {
 		console.log(account.username);
 
-
 		if(account.customData.payed === 'active') {
+			if(!req.cookies['counted']) {
+				account.customData.statistic && account.customData.statistic.visits || (account.customData.statistic = extend(account.customData.statistic, { visits : [] }))
+				account.customData.statistic.visits.push(Date.now());
+				
+				account.customData.save(function(err) {
+				    if (err) console.error(err);
+				    console.log('done');
+				});
+
+				res.cookie('counted', Date.now(), { maxAge: 3600000, httpOnly: true });
+			}
+
 			renderUserLandingPage.apply(this, _arg)(account);
 		} else {
 			next();
 		}
-
 	}
 
 	getUserByUsernameAsync(_username)
-		.then(_checIfPayed, next);
+		.then(_checkIfPayed, next);
 }
 
 userRoutes.get('/:username', showPayedUserPages);
-
-
-// function makeUserLoginRedirectMidleware(redirectPoint) {
-// 	return function(req, res, next) {
-// 		if (!req.user || req.user.status !== 'ENABLED') {
-// 			return res.redirect(redirectPoint);
-// 		}
-
-// 		return next();
-// 	}
-// }
 
 
 motivator(_motivatorLaunchList);

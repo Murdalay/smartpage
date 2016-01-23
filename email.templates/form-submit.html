@@ -1,0 +1,41 @@
+{% extends "alert.html" %}
+
+{% block css %}
+  {% parent %}
+  <link rel="stylesheet" href="reminder.css">
+{% endblock %}
+
+{% block alert %}
+  {% parent %}
+  <h1>{{ alert|title }}</h1>
+{% endblock %}
+
+{% block first %}
+	<tr>
+		<td class="content-block">
+			Отправка формы на вашей страничке на smartpage.com.ua.
+		</td>
+	</tr>
+{% endblock %}
+
+{% block content %}
+	<tr>
+		<td class="content-block">
+			Отправитель: 
+			  <strong>{{ sender.name }}</strong>
+	</tr>
+	<tr>
+		<td class="content-block">
+			Адрес отправителя: 
+			  <strong>{{ sender.email|makeEmailLink|safe }}</strong>
+	</tr> 
+	<tr>
+		<td class="content-block">
+			Номер телефона отправителя:
+			  <strong>{{ sender.phone|makePhoneLink|safe }}</strong>
+	</tr>
+{% endblock %}
+
+{% block footer %}
+  По всем возникшим вопросам пишите на <a href="mailto:{{ supportMail|lower }}">{{ supportMail }}</a>.
+{% endblock %}

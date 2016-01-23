@@ -19,8 +19,6 @@ provide(BEMDOM.decl(this.name, {
 	            			this._data = this._provider.getProvide(key);
 	            		}
 	            	}
-
-	            	console.log(this._data);
             	}
             }
         }

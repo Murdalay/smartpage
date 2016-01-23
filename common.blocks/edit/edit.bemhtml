@@ -58,7 +58,7 @@ block('edit')(content()(function(){
 				    content : [
 						{
 						    block : 'image',
-						    url : this.ctx.appData.pathToStatic + '/' + _activeSubscr.val + '.jpg'
+						    url : this.ctx.appData._conf.pathToStatic + '/' + _activeSubscr.val + '.jpg'
 						}
 				    ]
 				},
