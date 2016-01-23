@@ -7,7 +7,7 @@ block('pay')(content()(function(){
 			var _subscription = _custom.userSubcription;
 			var _subscriptions = this.ctx.appData.subscriptions;
 			var _defSubscription = this.ctx.appData.defaultSubcription;
-			var _domain = this.ctx.conf.def.domain;
+			var _domain = this.ctx.conf ? this.ctx.conf.def.domain : '';
 			var _messages = this.ctx.appData.messages;
 			var _bonus = '';
 
