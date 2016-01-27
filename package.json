@@ -10,6 +10,7 @@
     "node": ">=0.10"
   },
   "dependencies": {
+    "baobab": "^2.3.3",
     "bem": "^0.10.2",
     "bem-environ": "~1.4.0",
     "bem-xjst": "0.9.0",

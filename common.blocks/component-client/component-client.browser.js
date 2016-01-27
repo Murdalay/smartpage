@@ -42,7 +42,7 @@ provide(BEMDOM.decl(this.name, {
     },
 
     setAvatar : function(link) {
-        this.domElem.css('backgroundImage', 'url(' + link + ')');
+        this.domElem.css('backgroundImage', 'url(' + '/' + link + ')');
     }
 }));
 
