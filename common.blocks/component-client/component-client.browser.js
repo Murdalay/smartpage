@@ -8,7 +8,6 @@ provide(BEMDOM.decl(this.name, {
 
             	if(this._provider) {
 	            	this._mods = this.getMods();
-	            	console.log(this._mods);
 
 	            	for (key in this._mods) {
 	            		if(key === 'reflink') {

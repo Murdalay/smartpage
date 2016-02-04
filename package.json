@@ -41,6 +41,8 @@
     "stormpath": "~0.6.0",
     "swig-email-templates": "^2.0.0",
     "vow": "^0.4.12",
+    "winston": "^2.1.1",
+    "winston-mail": "^1.0.1",
     "ym": "^0.1.2"
   },
   "devDependencies": {

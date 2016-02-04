@@ -2326,12 +2326,18 @@ function showPayedUserPages(req, res, next) {
 
 			renderUserLandingPage.apply(this, _arg)(account);
 		} else {
-			next();
+			res.status(404);
+			return next();
 		}
 	}
 
+	function _notFound(err) {
+		res.status(404);
+		return next();
+	}
+
 	getUserByUsernameAsync(_username)
-		.then(_checkIfPayed, next);
+		.then(_checkIfPayed, _notFound);
 }
 
 userRoutes.get('/:username', showPayedUserPages);
