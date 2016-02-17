@@ -844,7 +844,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 				req.flash('error', this.getMessages().username + ' ' + req.body.username + ' ' + this.getMessages().errors.alreadyExists);
 				return res.redirect('back');
 
-			}, function(err) {
+			}.bind(this), function(err) {
 				if (err) { log.error(err) }
 
 				// saving default fields
