@@ -28,7 +28,7 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 	function updateAccount(acc, cb) {
 		var _hash = makeHashForEmail(acc.email);
 		users.set(_hash, extend({}, acc));
-		userByUsername[acc.username] = users.select(_hash);
+		userByUsername[acc.username.replace(/[\ ]/g, '')] = users.select(_hash);
 
 		cb && cb()
 	}
