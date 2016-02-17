@@ -182,7 +182,8 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		this.getAccountByHash = function(hash) {
 			return users.get(hash) ? users.get(hash) : null;
 		};
-		this.getAccountByUsername = function(usrName) {
+		this.getAccountByUsername = function(username) {
+			var usrName = (username + '').replace(/[\ ]/g, '');
 			return userByUsername[usrName] ? userByUsername[usrName].get() : null;
 		};
 		this.getAccountByUrl = function(url, cb) {
