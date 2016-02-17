@@ -995,14 +995,11 @@ function showPayedUserPagesMidleware(req, res, next) {
 	});
 }
 
-log.verbose(swig.render( '{% marked %}# **hello** world{% endmarked %}' ));
-
-
 userRoutes.get('/:username', showPayedUserPagesMidleware);
 
 var _motivatorLaunchList = {
 	sixHours : [
-		{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : true }
+		{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false }
 	]
 }
 

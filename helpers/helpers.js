@@ -5,7 +5,7 @@ var markedSwig = require('swig-marked'),
     swig = require('swig');
 
 	swig.setDefaults({ cache: 'memory' });
-	swig.setDefaults({ loader: swig.loaders.fs(path.join(__dirname, '..', 'user.templates') });
+	swig.setDefaults({ loader: swig.loaders.fs(path.join(__dirname, '..', 'user.templates'))});
 	
 
     markedSwig.useFilter( swig );
