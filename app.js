@@ -3,7 +3,6 @@ var ExpressBem = require('express-bem');
 var watch = require('node-watch');
 var path = require('path');
 var logger = require('morgan');
-var winston = require('winston');
 var isDevMode = process.env.NODE_ENV === 'Dev' || process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'development';
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -12,16 +11,7 @@ var StormpathStrategy = require('passport-stormpath');
 var session = require('express-session');
 var flash = require('connect-flash');
 var exec = require('child_process').exec;
-var mail_opts = {
-    to: 'murdalay@gmail.com',
-    host: 'smtp.gmail.com',
-    secure: true,
-    username: 'jozhsbr@gmail.com',
-    password: 'Omhg2P[33o<',
-    level: 'error'
-};
-
-var Mail = require('winston-mail').Mail;
+var log = require(path.join(__dirname, 'helpers', 'logger'))(isDevMode);
 
 // create app and bem
 var app = Express();
@@ -64,17 +54,6 @@ if (isDevMode) {
 }
 
 
-var log = new (winston.Logger)({
-    transports: [
-        new winston.transports.Console({ level: 'info', colorize: true })
-    ],
-    exceptionHandlers: [
-        new winston.transports.Console({ humanReadableUnhandledException : true, colorize: true }),
-        new winston.transports.Mail(mail_opts),
-        new winston.transports.File({ html : true, filename: path.join(__dirname, 'logs', 'errors.log') })
-    ],
-    exitOnError: false
-});
 
 // register engines
 bem.usePlugin('express-bem-bemtree'); // requires module express-bem-bemtree
@@ -109,11 +88,9 @@ var routes = require('./routes/index').router;
 var userRoutes = require('./routes/index').userRoutes;
 var strategy = new StormpathStrategy();
 
-
 passport.use(strategy);
 passport.serializeUser(strategy.serializeUser);
 passport.deserializeUser(strategy.deserializeUser);
-
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -145,18 +122,16 @@ app.use(userRoutes);
 // development error handler
 // will print stacktrace
 if (isDevMode) {
-        app.use(function(err, req, res, next) {
-                res.status(err.status || 500);
-                res.render('global-error', {
-                        block : 'page',
-                        content: err
-                });
-
-                log.warn(err);
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('global-error', {
+            block : 'page',
+            content: err
         });
+
+        log.warn(err);
+    });
 }
-
-
 
 // production error handler
 // no stacktraces leaked to user
@@ -169,9 +144,8 @@ if (isDevMode) {
 // });
 
 
-
 var server = app.listen(process.env.NODE_PORT || process.env.PORT || 80, function () {
-    console.log(process.env.NODE_PORT);
+    log.verbose('In your enviropment is setted port %d', process.env.NODE_PORT);
     var listenOn = server.address();
     console.log('Server listen on ' + listenOn.address + ':' + listenOn.port);
 });
