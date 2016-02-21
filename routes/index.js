@@ -277,7 +277,7 @@ function makeVerifyGroupAccessMidleware(grpName) {
 		if (!req.user.groups || !req.user.groups[_grpName]) {
 
 			log.debug('req.user.groups', req.user.groups);
-			this.getAccountByUrl(req.user.href, function(err, account) {
+			this.getAccountByUrl(req.user.href, (err, account) => {
 				
 				this.updateAccount(account);
 
@@ -285,7 +285,7 @@ function makeVerifyGroupAccessMidleware(grpName) {
 					function(err, groups) {
 						groups.each(function(group, cb) {
 							if (group) {
-								var _name = {};
+								let _name = {};
 								
 								_name[group.name] = true;
 
