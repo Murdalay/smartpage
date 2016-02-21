@@ -996,7 +996,7 @@ function showPayedUserPagesMidleware(req, res, next) {
 		if(account.customData.payed === 'active') {
 			if(!req.cookies['counted']) {
 				var addVisitToUserStat = DL('run', 'dir')(function(url) {
-					this.getAccountByUrl(url, function(err, account) {
+					this.getAccountByUrl(url, (err, account) => {
 					    if (err) { return log.error(err); }
 						
 						log.verbose('Trying to store visits statistic for %s', account.username);
