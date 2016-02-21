@@ -10,7 +10,7 @@ block('statistics')(content()(function(){
 			var _visits = [];
 			var _now = new Date;
 			var _dayBefore = _now.getTime() - 86400000;
-			var _monthBefore = _now.setMonth(_now.getMonth - 1);
+			var _monthBefore = _now.setMonth(_now.getMonth() - 1);
 
 
 			var _refPaymentModel = {
@@ -87,7 +87,7 @@ block('statistics')(content()(function(){
 			_dates && (_visitsStat.totalVisits = _dates.length);
 			_dates && _dates.length > 0 && (_visitsStat.lastVisit = new Date(_dates[_dates.length - 1]).toLocaleDateString('ru-RU'));
 			
-			for(type in _visitTypes) {
+			for(var type in _visitTypes) {
 				_visits.push(
 					{
 					    elem : 'row',

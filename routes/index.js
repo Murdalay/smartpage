@@ -76,7 +76,7 @@ function onInit(err, data) {
 	log.verbose('Data layers successfully inited!');
 	DL('get', 'dir')(function() { 
 		this.registerEndPoints(endpointCallbacks);
-		this.updateAccounts(function(err) {  });
+		// this.updateAccounts(function(err) {  });
 
 		function showPassUpdatePage(req, res, next) {
 			var _messages = this.getMessages();
@@ -112,6 +112,7 @@ function onInit(err, data) {
 		router.post('/restore', resetPassMidleware.bind(this), goBack);
 		router.post('/passUpdate/:accHash', updatePassMidleware, goBack);
 		router.get('/passwordReset', makeCheckEmailSubmissionMidleware(this.getMessages()), verifyPassTokenMidleware.bind(this), showPassUpdatePage.bind(this));
+		
 		var grpoups = this.getGroups();
 		
 		for (let name in grpoups) {
@@ -277,6 +278,9 @@ function makeVerifyGroupAccessMidleware(grpName) {
 
 			log.debug('req.user.groups', req.user.groups);
 			this.getAccountByUrl(req.user.href, function(err, account) {
+				
+				this.updateAccount(account);
+
 				account.getGroups({ name: _grpName }, 
 					function(err, groups) {
 						groups.each(function(group, cb) {
@@ -586,6 +590,8 @@ var renderSingleAccountPage = DL('run', 'dir')(function(href, req, res, next, bu
 	function _renderAccountPage(err, account) {
 		if (err) { return next(err); }
 
+		this.updateAccount(account);
+
 		var _link = { reflink : makeRefLink('ref_id', this.getDefConf().domain + this.getEndpoints().register.url + '/', account.email) };
 		var _ref = account.customData.referrer && !!this.getAccountByHash(account.customData.referrer) ? this.getAccountByHash(account.customData.referrer) : null;
 		var _referrer = _ref ? { referrer : _ref.fullName && _ref.fullName !== 'null null' ? _ref.fullName : _ref.email } : {};
@@ -676,6 +682,9 @@ router.get('/dashboard', checkIfUserLogedIn, function (req, res) {
 // Render the payment page.
 router.get('/dashboard/payment', checkIfUserLogedIn, DL('run', 'dir')(function (req, res) {
 	this.getAccountByUrl(req.user.href, (err, account) => {
+		
+		this.updateAccount(account);
+		
 		res.render('payment', {
 			block : 'container',
 			error : req.flash('error'),
@@ -803,6 +812,7 @@ function storeUserPhotoMidleware(req, res, next) {
 
 				req.user.customData.photo = { path : req.file.path, ext : _ext };
 
+				this.updateAccount(account);
 				req.user.customData.save(function (err) {
 					if (err) {
 						next(err);
@@ -934,27 +944,26 @@ router.post('/api/mailer', DL('run', 'dir')(function (req, res, next) {
 			});
 }));
 
-function renderUserLandingPage(req, res, next) {
-	return DL('run', 'dir')(function (account) {
-		log.debug('Rendering user %s landing page', account.username);
-		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
+// function renderUserLandingPage(req, res, next) {
+// 	return DL('run', 'dir')(function (account) {
+// 		log.debug('Rendering user %s landing page', account.username);
+// 		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
 	
-		res.render(_name, {
-			block : _name,
-			bundle : _name,
-			user : extend({}, account.customData),
-			clientData : extend({}, account.customData.extraFields, { name : account.fullName, phone : account.customData.phone, email : account.email, ava : !!account.customData.photo ? account.customData.photo.path : '/images/avatar.png' })
-		});
-	});
-}
+// 		res.render(_name, {
+// 			block : _name,
+// 			bundle : _name,
+// 			user : extend({}, account.customData),
+// 			clientData : extend({}, account.customData.extraFields, { name : account.fullName, phone : account.customData.phone, email : account.email, ava : !!account.customData.photo ? account.customData.photo.path : '/images/avatar.png' })
+// 		});
+// 	});
+// }
 
 function renderUserLP(req, res, next) {
 	return DL('run', 'dir')(function (account) {
 		log.debug('Rendering user %s landing page', account.username, account);
 		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
 		var _news = this.getCustomData().news;
-		log.debug('News is', _news);
-		
+
 		var localData = extend(
 			{}, 
 			account.customData.extraFields, 
@@ -995,6 +1004,7 @@ function showPayedUserPagesMidleware(req, res, next) {
 						account.customData.statistic && account.customData.statistic.visits || (account.customData.statistic = extend(account.customData.statistic, { visits : [] }))
 						account.customData.statistic.visits.push(Date.now());
 						
+						this.updateAccount(account);
 						account.customData.save(function(err) {
 						    if (err) { log.error(err); }
 

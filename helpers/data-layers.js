@@ -1,3 +1,5 @@
+'use strict'
+
 var Baobab = require('baobab')
 
 function DataLayer(layersObj, dataProviders, dlCallbacks) {
@@ -74,7 +76,7 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 		function _initPage(item) {
 			var fGroups = [];
 
-			for (var key in item.fGroups) {
+			for (let key in item.fGroups) {
 				fGroups.push({ fGroup : _fGroups[key], params : item.fGroups[key] });
 			}
 
@@ -114,7 +116,7 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 						var _cb = fGroupTypesCb[item.fGroup.type];
 						var _comp = item.fGroup.fComponents;
 
-						for(var cName in _comp) {
+						for(let cName in _comp) {
 							var _currComp = _components[cName];
 
 							if(_currComp) {
@@ -125,11 +127,11 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 								if (_currFieldSets) {
 									var _fsArray = [];
 
-									_currFieldSets.forEach(function(fSet) {
+									_currFieldSets.forEach((fSet) => {
 										if(_fieldSets[fSet]) {
 											_fsArray.push(_fieldSets[fSet]);
 										}
-									}.bind(this));
+									});
 									
 									var _currCompCb = fCompTypesCb[_currComp.type];
 
@@ -272,7 +274,7 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 			var endpoints = this.getEndpoints();
 			var msg = this.getMessages();
 
-			for (point in endpoints) {
+			for (let point in endpoints) {
 				if(!!endpointCallbacks[point]) {
 					endpointCallbacks[point](endpoints[point], msg, extra);
 				}

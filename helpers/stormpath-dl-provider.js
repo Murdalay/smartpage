@@ -1,6 +1,4 @@
 var path = require('path');
-// do some voodoo magic – registring helpers in current context //
-
 var DataLayer = require(path.join(__dirname, 'data-layers'));
 var prc = require(path.join(__dirname, 'dl-procedures'));
 var motivator = require(path.join(__dirname, 'motivator'));
@@ -189,6 +187,7 @@ var DlPreInitFunctions = {
 
 
 function provideSpDataLayer(layers, funcGroupTypesCb, onInit) {
+	// do some voodoo magic – registering helpers in current context //
 	require(path.join(__dirname, 'helpers'))(this);
 	var DL = new DataLayer(layers, dataProviders, funcGroupTypesCb);
 	
@@ -216,11 +215,22 @@ function provideSpDataLayer(layers, funcGroupTypesCb, onInit) {
 	initDataLayers(onInit, DLmap);
 	DL = prc(DL);
 
+	var upAccs = DL('run', 'dir')(function() { 
+		this.updateAccounts(function(err) {  });
+	});
+
 	var _motivatorLaunchList = {
 		sixHours : [
 			{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false }
+		],
+		hourly : [
+			{ fn : upAccs, args : [], runOnLoad : true }
+		],
+		threeHours : [
+			{ fn : initDataLayers, args : [noop, DLmap], runOnLoad : false }
 		]
 	}
+	
 	// scheduling the tasks
 	motivator(_motivatorLaunchList);
 
