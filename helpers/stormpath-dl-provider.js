@@ -3,6 +3,7 @@ var path = require('path');
 
 var DataLayer = require(path.join(__dirname, 'data-layers'));
 var prc = require(path.join(__dirname, 'dl-procedures'));
+var motivator = require(path.join(__dirname, 'motivator'));
 
 var stormpath = require('stormpath');
 
@@ -213,8 +214,20 @@ function provideSpDataLayer(layers, funcGroupTypesCb, onInit) {
 
 	// start all thing
 	initDataLayers(onInit, DLmap);
-	return prc(DL);
+	DL = prc(DL);
+
+	var _motivatorLaunchList = {
+		sixHours : [
+			{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false }
+		]
+	}
+	// scheduling the tasks
+	motivator(_motivatorLaunchList);
+
+	return DL;
 }
+
+
 
 
 module.exports = provideSpDataLayer;

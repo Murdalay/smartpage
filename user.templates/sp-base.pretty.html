@@ -22,13 +22,11 @@
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
     <link rel="dns-prefetch" href="//i.ytimg.com" />
     <link rel="dns-prefetch" href="//api-maps.yandex.ru" />
-    <link name="apple-mobile-web-app-capable" content="yes" />
-    {% block css %}
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/3.3.0/ekko-lightbox.min.css" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.1/animate.min.css" />
-    {% endblock %}
+    <link name="apple-mobile-web-app-capable" content="yes" /> {% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/3.3.0/ekko-lightbox.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.1/animate.min.css" /> {% endblock %}
     <meta name="viewport" content="maximum-scale=1,initial-scale=1,user-scalable=0" />
     <meta name="format-detection" content="telephone=no" />
     <link name="apple-mobile-web-app-capable" content="yes" />
@@ -41,8 +39,7 @@
         <video class="hidden-xs" id="bgvidu2578" loop="" preload="auto" muted="" poster="/static/assets/fon.jpg" autoplay="" style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -1000; background: url(/static/assets/fon.jpg) no-repeat; background-size: cover">
             <source src="/static/assets/Fon.webm" type="video/webm"></source>
             <source src="/static/assets/Fon.mp4" type="video/mp4"></source>
-        </video>
-        {% endblock %}
+        </video> {% endblock %}
         <div id="img" class="clearfix"></div>
         <div class="container">
             <div class="row">
@@ -123,7 +120,7 @@
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
-                </button> <a class="navbar-brand hidden-sm avatar i-bem component-client component-client_ava" href="#"  style="background-image: url(/{{ ava }});"><span class="sr-only">Helix</span></a><span class="sr-only">Helix</span>
+                </button> <a class="navbar-brand hidden-sm avatar i-bem component-client component-client_ava" href="#" style="background-image: url(/{{ ava }});"><span class="sr-only">Helix</span></a><span class="sr-only">Helix</span>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav">
@@ -716,7 +713,7 @@
                     <div class="col-sm-8">
                         <div class="row sponsor">
                             <div class="pull-left ava">
-                                <div class="avatar ava-big component-client_ava"  style="background-image: url(/{{ ava }});"></div>
+                                <div class="avatar ava-big component-client_ava" style="background-image: url(/{{ ava }});"></div>
                             </div>
                             <div class="sponsor-adr pull-left">
                                 <p><span class="gold i-bem component-client component-client_name">{{ name }}</span>
@@ -824,7 +821,7 @@
     </div>
     <div id="autor_block" class="hidden-xs">
         <div>
-            <div class="avatar ava-big component-client_ava"  style="background-image: url(/{{ ava }});"></div>
+            <div class="avatar ava-big component-client_ava" style="background-image: url(/{{ ava }});"></div>
             <h2 class="i-bem component-client component-client_name">{{ name }}</h2>
             <p class="text-center i-bem component-client component-client_rank">{{ rank }}</p>
             <p class="i-bem component-client component-client_extra">{{ extra|marked }}</p>
@@ -913,8 +910,7 @@
                 toValue: 12
             });
         </script>
-        {% endblock %}
-        {{ ga|safe }}
+        {% endblock %} {{ ga|safe }}
     </div>
 </body>
 

@@ -1,11 +1,12 @@
 var Baobab = require('baobab')
 
-function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
+function DataLayer(layersObj, dataProviders, dlCallbacks) {
 	var data = { accounts : {}, dir : {}, groups : {} };
 	var providers = {};
 	var components = {};
 	var groups = {};
 	var fGroupTypesCb = {};
+	var fCompTypesCb = {};
 	var layers = {};
 	var users = new Baobab({});
 	var userByUsername = {};
@@ -19,6 +20,11 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 	function _getFuncGroupTypesCb(res, key) {
 		fGroupTypesCb[key] = res;
 		log.info('registring callbacks for functional Group type ' + key)
+	}
+
+	function _getFuncCompTypesCb(res, key) {
+		fCompTypesCb[key] = res;
+		log.info('registring callbacks for functional Component type ' + key)
 	}
 
 	function getAccounts (query, cb) {
@@ -43,6 +49,11 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		log.info('dir %s registred\n\n', name);
 	}
 
+	function registerLayer(name, dir) {	
+		layers[name] = extend(layers[name], dir);
+		log.info('lasyer %s registred\n\n', name);
+	}
+
 	function registerGroup(name, group) {
 		groups[name] = extend(null, { url : group.href, name: name }, group);
 		groups[name].customData.mergedMessages = extend({}, data.dir.customData.messages, groups[name].customData.messages);
@@ -63,7 +74,7 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		function _initPage(item) {
 			var fGroups = [];
 
-			for (key in item.fGroups) {
+			for (var key in item.fGroups) {
 				fGroups.push({ fGroup : _fGroups[key], params : item.fGroups[key] });
 			}
 
@@ -95,11 +106,42 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 				this.dirAccounts = this.getProviders().dirAccounts.bind(this);
 				this.initFuncGroups = function(cb) {
 					var _grp = this.getFuncGroups();
+					var _fieldSets = this.getFieldSets();
 					var _grpPromises = [];
 
 					log.debug('Initing fGroup', _grp);
 					function _initGrp(item) {
 						var _cb = fGroupTypesCb[item.fGroup.type];
+						var _comp = item.fGroup.fComponents;
+
+						for(var cName in _comp) {
+							var _currComp = _components[cName];
+
+							if(_currComp) {
+								var _currFieldSets = _currComp.fieldSets;
+
+								log.verbose('current fComponent is %s', cName, _currComp);
+
+								if (_currFieldSets) {
+									var _fsArray = [];
+
+									_currFieldSets.forEach(function(fSet) {
+										if(_fieldSets[fSet]) {
+											_fsArray.push(_fieldSets[fSet]);
+										}
+									}.bind(this));
+									
+									var _currCompCb = fCompTypesCb[_currComp.type];
+
+									_currCompCb && _currCompCb(_currComp, _comp[cName], _fsArray);
+								}
+
+
+							}
+						}
+
+						log.verbose('fComponents is', _components);
+
 						var _promise = new Vow.Promise(function(resolve, reject, notify) {
 							function getDataForfGroup(result) {
 								if(!!groupBemjson) {
@@ -144,12 +186,17 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 	}
 
 	passFieldToCb(dataProviders, _getActiveDataProviders);
-	passFieldToCb(funcGroupTypesCb, _getFuncGroupTypesCb);
+	passFieldToCb(dlCallbacks.funcGroupTypesCb, _getFuncGroupTypesCb);
+	passFieldToCb(dlCallbacks.funcCompTypesCb, _getFuncCompTypesCb);
 
 	log.verbose('DL is created');
 
 	// Base Directory class definitions
 	function Dir() {
+		this.name = data.dir.name;
+		this.updateAccounts = updateAccounts;
+		this.updateAccount = updateAccount;
+
 		this.getName = function() {
 			return data.dir.name;
 		};
@@ -232,9 +279,15 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 			}
 		};
 
-		this.updateAccounts = updateAccounts;
-		this.updateAccount = updateAccount;
-		this.name = data.dir.name;
+		this.getFuncComponents = function() {
+			return data.dir.customData.functionalComponents;
+		};
+		this.getFuncGroups = function() {
+			return data.dir.customData.functionalGroups;
+		};
+		this.getFieldSets = function() {
+			return data.dir.customData.fieldSets;
+		};
 	}
 
 	// Arbitrary Data Layer class definitions
@@ -297,8 +350,9 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		this.Pages = groups[name].customData.Pages;
 		this.Endpoints = groups[name].customData.Endpoints;
 		this.url = groups[name].url;
-		this.fComponents = groups[name].customData.functionalComponents;
 		this.fGroups = groups[name].customData.functionalGroups;
+		this.fComponents = groups[name].customData.functionalComponents;
+		this.fieldSets = groups[name].customData.fieldSets;
 		this.providers = providers;
 		this.data = groups[name].customData;
 
@@ -317,12 +371,6 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		this.getUrl = function() {
 			this.url;
 		};
-		this.getFuncComponents = function() {
-			return this.fComponents;
-		};
-		this.getFuncGroups = function() {
-			return this.fGroups;
-		};
 		this.getProviders = function() {
 			return this.providers;
 		};
@@ -337,7 +385,17 @@ function DataLayer(layersObj, dataProviders, funcGroupTypesCb) {
 		this.getPaths = function() {
 			var _cd = this.getCustomData();
 			return _cd.PATHS;
-		};	
+		};
+
+		this.getFuncComponents = function() {
+			return this.fComponents;
+		};
+		this.getFuncGroups = function() {
+			return this.fGroups;
+		};
+		this.getFieldSets = function() {
+			return this.fieldSets;
+		};
 	}
 
 	// global setters

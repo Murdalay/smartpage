@@ -1,0 +1,24 @@
+{% extends "sp-base.min.html" %}
+
+{% block css %}
+  {% parent %}
+    <link rel="stylesheet" href="/static/css/_landing-premium.min.css" />
+{% endblock %}
+<!-- getting video from base template -->
+{% block video %}
+  {% parent %}
+{% endblock %}
+
+{% block extra %}
+{{ extra|marked }}
+{% endblock %}
+
+{% block right %}
+  {% parent %}
+{% endblock %}
+
+
+{% block endScripts %}
+  {% parent %}
+	<script src="/js/helix6.js"></script>
+{% endblock %}

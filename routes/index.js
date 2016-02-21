@@ -1,3 +1,4 @@
+'use strict'
 var path = require('path');
 var express = require('express');
 var router = express.Router();
@@ -7,7 +8,6 @@ var request = require('request');
 var multer  = require('multer');
 var fs = require('fs');
 var dir;
-var motivator = require(path.join(__dirname, '..', 'helpers', 'motivator'));
 var DataLayer = require(path.join(__dirname, '..', 'helpers', 'stormpath-dl-provider'));
 var DL;
 
@@ -55,6 +55,14 @@ var funcGroupTypesCb = {
 		} else {
 			log.info('dataLayer is unsupported by filter');
 		}
+	}
+};
+
+var funcCompTypesCb = {
+	content : function(fComp, params, fileldset) {
+		log.debug('fComp is', fComp);
+		log.debug('params is', params);
+		log.debug('fileldset is', fileldset);
 	}
 };
 
@@ -106,26 +114,27 @@ function onInit(err, data) {
 		router.get('/passwordReset', makeCheckEmailSubmissionMidleware(this.getMessages()), verifyPassTokenMidleware.bind(this), showPassUpdatePage.bind(this));
 		var grpoups = this.getGroups();
 		
-		for (name in grpoups) {
+		for (let name in grpoups) {
+			// performing initialization for each group in dir with apropriate context
 			DL('get', 'group', name)(function() {
 				this.registerEndPoints(endpointCallbacks);
 				
-				// summon routes for each registred page
+				// summoning routes for each registred page
 				this.initPages(function() {
 					//TODO : remove active
 					function displayPage(req, res, next) {
 						this.initFuncGroups(function(data) {
 							res.render(this.getBundle(), {
 								block : this.getTemplate(),
+								bundle : this.getBundle(),
 								error : req.flash('error'),
 								info : req.flash('info'),
 								appData : this.getCustomData(),
 								menu : this.getHeader(),
 								title : this.getTitle(),
-								helpers : { makeHashForString : makeHashForEmail },
 								messages : this.getMessages(),
 								active : [ true, true, false, false ],
-								bundle : this.getBundle(),
+								helpers : { makeHashForString : makeHashForEmail },
 								inside: data
 							});
 						});
@@ -149,7 +158,7 @@ function onInit(err, data) {
 	});
 }
 
-DL = DataLayer(_layers, funcGroupTypesCb, onInit);
+DL = DataLayer(_layers, { funcGroupTypesCb : funcGroupTypesCb, funcCompTypesCb : funcCompTypesCb }, onInit);
 
 
 function setCookieByNameFromQueryParams(name) {
@@ -666,7 +675,7 @@ router.get('/dashboard', checkIfUserLogedIn, function (req, res) {
 
 // Render the payment page.
 router.get('/dashboard/payment', checkIfUserLogedIn, DL('run', 'dir')(function (req, res) {
-	this.getAccountByUrl(req.user.href, function(err, account) {
+	this.getAccountByUrl(req.user.href, (err, account) => {
 		res.render('payment', {
 			block : 'container',
 			error : req.flash('error'),
@@ -697,7 +706,7 @@ router.get('/dashboard/payment', checkIfUserLogedIn, DL('run', 'dir')(function (
 				}
 			]
 		});
-	}.bind(this));
+	});
 }));
 
 router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
@@ -730,7 +739,7 @@ router.post('/dashboard/pay', checkIfUserLogedIn, DL('run', 'dir')(function (req
 
 	// saving custom fields
 	req.user.customData.payed || (req.user.customData.payed = 'waiting');
-	req.user.customData.save(function (err) {
+	req.user.customData.save(err => {
 		if (err) {
 			next(err);
 		} else {
@@ -761,7 +770,7 @@ router.post('/dashboard/pay', checkIfUserLogedIn, DL('run', 'dir')(function (req
 					_locals);
 			}
 		}
-	}.bind(this));
+	});
 }));
 
 function storeUserPhotoMidleware(req, res, next) {
@@ -825,13 +834,13 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 
 	var _href = req.user.href;
 	var _updateAcc = DL('run', 'dir')(function(href) {
-		this.getAccountByUrl(href,  function(err, account) {
+		this.getAccountByUrl(href, (err, account) => {
 			if (err) {
 				log.error(err)
 			} else {
 				this.updateAccount(account);
 			}
-		}.bind(this));
+		});
 	});
 
 	// removing spaces from username
@@ -840,11 +849,11 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 	if(req.user.username !== req.body.username){
 		this.getAccounts({ username: req.body.username }, function(err, accounts) {
 
-			accounts.each(function(account, cb) {
+			accounts.each((account, cb) => {
 				req.flash('error', this.getMessages().username + ' ' + req.body.username + ' ' + this.getMessages().errors.alreadyExists);
 				return res.redirect('back');
 
-			}.bind(this), function(err) {
+			}, (err) => {
 				if (err) { log.error(err) }
 
 				// saving default fields
@@ -873,7 +882,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 					}
 				});
 			});
-		}.bind(this));
+		});
 	} else {
 		req.user.givenName = req.body.name;
 		req.user.surname = req.body.surname;
@@ -927,7 +936,7 @@ router.post('/api/mailer', DL('run', 'dir')(function (req, res, next) {
 
 function renderUserLandingPage(req, res, next) {
 	return DL('run', 'dir')(function (account) {
-		log.debug('Rendering user %s landing page', account.username, account);
+		log.debug('Rendering user %s landing page', account.username);
 		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
 	
 		res.render(_name, {
@@ -935,6 +944,35 @@ function renderUserLandingPage(req, res, next) {
 			bundle : _name,
 			user : extend({}, account.customData),
 			clientData : extend({}, account.customData.extraFields, { name : account.fullName, phone : account.customData.phone, email : account.email, ava : !!account.customData.photo ? account.customData.photo.path : '/images/avatar.png' })
+		});
+	});
+}
+
+function renderUserLP(req, res, next) {
+	return DL('run', 'dir')(function (account) {
+		log.debug('Rendering user %s landing page', account.username, account);
+		var _name = 'landing-' + (account.customData.template ? account.customData.template : 'start');
+		var _news = this.getCustomData().news;
+		log.debug('News is', _news);
+		
+		var localData = extend(
+			{}, 
+			account.customData.extraFields, 
+			{ 
+				name : account.fullName, 
+				phone : account.customData.phone, 
+				email : account.email, 
+				ava : !!account.customData.photo ? account.customData.photo.path : '/images/avatar.png' 
+			},
+			{ 
+				news : _news
+			});
+		
+		swig.renderFile(_name +'.html', localData, function (err, output) {
+		  if (err) {
+		    throw err;
+		  }
+		  res.send(output);
 		});
 	});
 }
@@ -948,7 +986,7 @@ function showPayedUserPagesMidleware(req, res, next) {
 
 		if(account.customData.payed === 'active') {
 			if(!req.cookies['counted']) {
-				addVisitToUserStat = DL('run', 'dir')(function(url) {
+				var addVisitToUserStat = DL('run', 'dir')(function(url) {
 					this.getAccountByUrl(url, function(err, account) {
 					    if (err) { return log.error(err); }
 						
@@ -971,7 +1009,7 @@ function showPayedUserPagesMidleware(req, res, next) {
 				res.cookie('counted', Date.now(), { maxAge: 3600000, httpOnly: true });
 			}
 
-			renderUserLandingPage.apply(this, _arg)(account);
+			renderUserLP.apply(this, _arg)(account);
 		} else {
 			res.status(404);
 			return next();
@@ -984,7 +1022,7 @@ function showPayedUserPagesMidleware(req, res, next) {
 	}
 
 	DL('get', 'dir')(function() {
-		var _usr = this.getAccountByUsername(_username);
+		let _usr = this.getAccountByUsername(_username);
 		log.warn('User is', _usr)
 
 		if(_usr) {
@@ -996,14 +1034,6 @@ function showPayedUserPagesMidleware(req, res, next) {
 }
 
 userRoutes.get('/:username', showPayedUserPagesMidleware);
-
-var _motivatorLaunchList = {
-	sixHours : [
-		{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false }
-	]
-}
-
-motivator(_motivatorLaunchList);
 
 
 module.exports = { userRoutes : userRoutes, router : router };
