@@ -144,7 +144,7 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 
 						log.verbose('fComponents is', _components);
 
-						var _promise = new Vow.Promise(function(resolve, reject, notify) {
+						var _promise = new Vow.Promise((resolve, reject, notify) => {
 							function getDataForfGroup(result) {
 								if(!!groupBemjson) {
 									var _bJson = groupBemjson; 
@@ -167,7 +167,7 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 								var groupBemjson = false;
 								_cb && _cb.apply(this, [item.fGroup, item.params, getDataForfGroup]);
 							}
-					    }.bind(this));
+					    });
 
 						_grpPromises.push(_promise);
 					}
@@ -483,6 +483,5 @@ function DataLayer(layersObj, dataProviders, dlCallbacks) {
 		}
 	}
 };
-
 
 module.exports = DataLayer;

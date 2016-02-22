@@ -803,7 +803,7 @@ function storeUserPhotoMidleware(req, res, next) {
 			var _oldFile = req.file.originalname.split('.');
 			var _ext = _oldFile[_oldFile.length - 1];
 
-			this.getAccountByUrl(req.user.href, function(err, account) {
+			this.getAccountByUrl(req.user.href, (err, account) => {
 				if (err) { return next(err) }
 
 				// checking if photo is already assigned for the account and deleting the photo if so
@@ -813,7 +813,7 @@ function storeUserPhotoMidleware(req, res, next) {
 				req.user.customData.photo = { path : req.file.path, ext : _ext };
 
 				this.updateAccount(account);
-				req.user.customData.save(function (err) {
+				req.user.customData.save((err) => {
 					if (err) {
 						next(err);
 					} else {
@@ -871,7 +871,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 				req.user.surname = req.body.surname;
 				req.user.username = req.body.username;
 
-				req.user.save(function (err) {
+				req.user.save((err) => {
 					if (err) {
 						log.error(err);
 						next(err);
@@ -881,7 +881,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 				// saving custom fields
 				req.user.customData.phone = req.body.phone;
 
-				req.user.customData.save(function (err) {
+				req.user.customData.save((err) => {
 					if (err) {
 						log.error(err)
 						next(err);
@@ -897,7 +897,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 		req.user.givenName = req.body.name;
 		req.user.surname = req.body.surname;
 
-		req.user.save(function (err) {
+		req.user.save((err) => {
 			if (err) {
 				log.error(err);
 				next(err);

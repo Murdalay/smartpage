@@ -2,6 +2,7 @@ var crypto = require('crypto');
 var hasOwnProp = Object.prototype.hasOwnProperty;
 var path = require('path');
 var markedSwig = require('swig-marked'),
+    extras = require('swig-extras'),
     swig = require('swig');
 
 	swig.setDefaults({ cache: 'memory' });
@@ -9,6 +10,8 @@ var markedSwig = require('swig-marked'),
 	
 
     markedSwig.useFilter( swig );
+	extras.useFilter(swig, 'batch');
+	
     markedSwig.useTag( swig );
  
 
