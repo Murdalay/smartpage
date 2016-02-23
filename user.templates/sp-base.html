@@ -155,11 +155,22 @@
                             <hr>
                             <p><em>HELIX CAPITAL INVESTMENTS LTD</em> - глобальная Международная инвестиционная компания, которая зарегистрирована в Лондоне и входит в группу компаний "HELIX™" с ее представительством в Украине (ТОВ "ХЕЛИКС КЕПИТАЛ УКРАИНА") и других странах, а также каждым отдельным бизнесом, который открывается в рамках холдинга "HELIX GROUP". Основной деятельностью компании является создание рентабельных бизнесов в странах ЕС и СНГ за счет мелких инвесторов по принципу краудфандинга (стартапы, производство, IT, недвижимость, развлекательные центры, СПА, туризм и т.д.).</p>
                         </div>
-                        <div class="row post">
-                            <figure>
-                                <a href="http://www.youtube.com/watch?v=mqXDeekZHSA" data-toggle="lightbox" data-gallery="youtubevideos"><img src="/static/images/comp.png" class="img-responsive" alt="Helix карта">
-                                </a>
-                            </figure><img src="/static/images/map_poster.png" alt="Helix карта" class="hidden-xs">
+                        <div class="row">
+							<div class="col-sm-6 col-md-6 post">
+								<figure>
+									<a href="http://www.youtube.com/watch?v=mqXDeekZHSA" data-toggle="lightbox" data-gallery="youtubevideos"><img src="/static/images/comp1.png" class="img-responsive" alt="Helix карта">
+									</a>
+								</figure>
+							</div>
+                            {% if video %}
+							<div class="col-sm-6 col-md-6 post">
+								<figure>
+									<a href="{{ video }}" data-toggle="lightbox" data-gallery="youtubevideos"><img src="/static/images/comp2.png" class="img-responsive" alt="Helix карта">
+									</a>
+								</figure>
+							</div>
+                            {% endif %}
+							<img src="/static/images/map_poster.png" alt="Helix карта" class="hidden-xs">
                         </div>
                         <hr class="gold">
                         <div id="doc" class="row post">
