@@ -1,0 +1,418 @@
+{
+  "balance": 346229279745,
+  "payments": {
+    "byUser": {
+      "8790f5bbfba8f25409b7fdc647094e0024c13b4f": [
+        {
+          "email": "hasmik@meta.ua",
+          "amount": "149",
+          "payDate": 1453213643716,
+          "transactionId": "8ec3b55403f74207f9c3b140377d611869088b23",
+          "status": "payed"
+        }
+      ],
+      "9d49f9af7910d4c74f62182c53b5087880b0488e": [
+        {
+          "email": "ladysdollar@gmail.com",
+          "amount": "99",
+          "payDate": 1453217820248,
+          "transactionId": "0506300c892801ea9e7f1faef7abc291b5e14848",
+          "status": "payed"
+        }
+      ],
+      "a35e846cb4d769ebd802b49e59bd9877cf7defb9": [
+        {
+          "email": "sasha2000@ukr.net",
+          "amount": "99",
+          "payDate": 1453812166079,
+          "transactionId": "0cfd280a9205a58c5b655cca7241940c22e57c5b",
+          "status": "payed"
+        }
+      ],
+      "939a7c9639754f47e384aefd4d54714395a993e5": [
+        {
+          "email": "viktoria.skirda@gmail.com",
+          "amount": "99",
+          "payDate": 1453889615278,
+          "transactionId": "1c29b9fa48aa371ba4a79b7f160b4229a7abb48d",
+          "status": "payed"
+        }
+      ],
+      "9c63007863c3a2f9703acb31f420c55b3a0e2d71": [
+        {
+          "email": "sptest1@ukr.net",
+          "amount": "85",
+          "payDate": 1454248726060,
+          "transactionId": "3469f999af44a1278c37ac04bf6774f206e01d1e",
+          "status": "payed"
+        }
+      ],
+      "15a366a420aaf6ccdcc66c9e8ef9f81e5e709a60": [
+        {
+          "email": "kutyuk.volodya@yandex.ru",
+          "amount": "99",
+          "payDate": 1454598479571,
+          "transactionId": "f6d16a1ac3e487f09caf800121d2f6f822bb4b83",
+          "status": "payed"
+        }
+      ],
+      "9ec7c01480c98f2c107dc37ccd60246dea5e429d": [
+        {
+          "email": "kiev777v@gmail.com",
+          "amount": "99",
+          "payDate": 1455544784051,
+          "transactionId": "6937d0875ae15df89d3459bbeb84d1dbb0cf4468",
+          "status": "payed"
+        }
+      ],
+      "e0e2aa6ca6278b294fd6e575097c1a3b2e2f5654": [
+        {
+          "email": "sp.demo.start@yandex.ru",
+          "amount": "229",
+          "payDate": 1455553271592,
+          "transactionId": "e9f5fcddc2ad1437ab6888a8853206ca405a870f",
+          "status": "payed"
+        }
+      ],
+      "491e942ef41fbc9888e1a509d3d3efda37f5847c": [
+        {
+          "email": "sp.demo.business@yandex.ru",
+          "amount": "279",
+          "payDate": 1455555365124,
+          "transactionId": "af5f1ce987ea1e462224e41b78c6c5bb36220525",
+          "status": "payed"
+        }
+      ],
+      "ae7fc95e19c66322ef012d7231c675cf7c8c7e41": [
+        {
+          "email": "sp.demo.premium@yandex.ru",
+          "amount": "349",
+          "payDate": 1455556296555,
+          "transactionId": "0bebe562f2dc4129193030b114796e55d39c444d",
+          "status": "payed"
+        }
+      ],
+      "63f4775019ee7814f019948e585f683d45016e31": [
+        {
+          "email": "frolenkon@gmail.com",
+          "amount": "99",
+          "payDate": 1455715057134,
+          "transactionId": "5a733a895b43708b2240407b835b252716502972",
+          "status": "payed"
+        }
+      ],
+      "014a8651611f56add0070c7edb0693e8e3862308": [
+        {
+          "email": "alexusss2@ukr.net",
+          "amount": "99",
+          "payDate": 1455715931247,
+          "transactionId": "f2f18ca82762beb1c7d159e936290e3c49ee1a21",
+          "status": "payed"
+        }
+      ],
+      "16e96519a9efb5203e63bf0c23010f9a57f89622": [
+        {
+          "email": "zubal-ev@ukr.net",
+          "amount": "99",
+          "payDate": 1456134694994,
+          "transactionId": "d6b43e5e1450d4c4ce37bd88873efd9e556a2124",
+          "status": "payed"
+        }
+      ],
+      "07bc31fc36884125760f36ef9144799a78d72b3d": [
+        {
+          "email": "ionic70@gmail.com",
+          "amount": "99",
+          "payDate": 1456157639859,
+          "transactionId": "57974d4a290e08fb34d668f47d20134193479076",
+          "status": "payed"
+        }
+      ]
+    },
+    "incoming": [
+      {
+        "amount": "149",
+        "payDate": 1453213643716,
+        "transactionId": "8ec3b55403f74207f9c3b140377d611869088b23",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1453217820248,
+        "transactionId": "0506300c892801ea9e7f1faef7abc291b5e14848",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1453812166079,
+        "transactionId": "0cfd280a9205a58c5b655cca7241940c22e57c5b",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1453889615278,
+        "transactionId": "1c29b9fa48aa371ba4a79b7f160b4229a7abb48d",
+        "status": "payed"
+      },
+      {
+        "amount": "85",
+        "payDate": 1454248726060,
+        "transactionId": "3469f999af44a1278c37ac04bf6774f206e01d1e",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1454598479571,
+        "transactionId": "f6d16a1ac3e487f09caf800121d2f6f822bb4b83",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1455544784051,
+        "transactionId": "6937d0875ae15df89d3459bbeb84d1dbb0cf4468",
+        "status": "payed"
+      },
+      {
+        "amount": "229",
+        "payDate": 1455553271592,
+        "transactionId": "e9f5fcddc2ad1437ab6888a8853206ca405a870f",
+        "status": "payed"
+      },
+      {
+        "amount": "279",
+        "payDate": 1455555365124,
+        "transactionId": "af5f1ce987ea1e462224e41b78c6c5bb36220525",
+        "status": "payed"
+      },
+      {
+        "amount": "349",
+        "payDate": 1455556296555,
+        "transactionId": "0bebe562f2dc4129193030b114796e55d39c444d",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1455715057134,
+        "transactionId": "5a733a895b43708b2240407b835b252716502972",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1455715931247,
+        "transactionId": "f2f18ca82762beb1c7d159e936290e3c49ee1a21",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1456134694994,
+        "transactionId": "d6b43e5e1450d4c4ce37bd88873efd9e556a2124",
+        "status": "payed"
+      },
+      {
+        "amount": "99",
+        "payDate": 1456157639859,
+        "transactionId": "57974d4a290e08fb34d668f47d20134193479076",
+        "status": "payed"
+      }
+    ],
+    "refDebt": 0
+  },
+  "statistics": {
+    "transactions": {
+      "8ec3b55403f74207f9c3b140377d611869088b23": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "1",
+          "subscription-type": "year",
+          "sum": "149",
+          "endDate": "1492595889272",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1453201078531
+        },
+        "payerHash": "8790f5bbfba8f25409b7fdc647094e0024c13b4f",
+        "payDate": 1453213643716
+      },
+      "0506300c892801ea9e7f1faef7abc291b5e14848": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1461052119819",
+          "payMethod": "cash",
+          "date": 1453193336726
+        },
+        "payerHash": "9d49f9af7910d4c74f62182c53b5087880b0488e",
+        "payDate": 1453217820248
+      },
+      "0cfd280a9205a58c5b655cca7241940c22e57c5b": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1461670240523",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1453811427412
+        },
+        "payerHash": "a35e846cb4d769ebd802b49e59bd9877cf7defb9",
+        "payDate": 1453812166079
+      },
+      "1c29b9fa48aa371ba4a79b7f160b4229a7abb48d": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "month",
+          "sum": "99",
+          "endDate": "1461748090264",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1453889334031
+        },
+        "payerHash": "939a7c9639754f47e384aefd4d54714395a993e5",
+        "payDate": 1453889615278
+      },
+      "3469f999af44a1278c37ac04bf6774f206e01d1e": {
+        "transaction": {
+          "subscription": "start",
+          "durration": "1",
+          "subscription-type": "year",
+          "sum": "85",
+          "endDate": "1488549467253",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1454248671831
+        },
+        "payerHash": "9c63007863c3a2f9703acb31f420c55b3a0e2d71",
+        "payDate": 1454248726060
+      },
+      "f6d16a1ac3e487f09caf800121d2f6f822bb4b83": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1462027184585",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1454168416963
+        },
+        "payerHash": "15a366a420aaf6ccdcc66c9e8ef9f81e5e709a60",
+        "payDate": 1454598479571
+      },
+      "6937d0875ae15df89d3459bbeb84d1dbb0cf4468": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1463161387801",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1455388993191
+        },
+        "payerHash": "9ec7c01480c98f2c107dc37ccd60246dea5e429d",
+        "payDate": 1455544784051
+      },
+      "e9f5fcddc2ad1437ab6888a8853206ca405a870f": {
+        "transaction": {
+          "subscription": "start",
+          "durration": "5",
+          "subscription-type": "year",
+          "sum": "229",
+          "endDate": "1615825059093",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1455553066977
+        },
+        "payerHash": "e0e2aa6ca6278b294fd6e575097c1a3b2e2f5654",
+        "payDate": 1455553271592
+      },
+      "af5f1ce987ea1e462224e41b78c6c5bb36220525": {
+        "transaction": {
+          "subscription": "business",
+          "durration": "5",
+          "subscription-type": "year",
+          "sum": "279",
+          "endDate": "1618505613705",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1455555218798
+        },
+        "payerHash": "491e942ef41fbc9888e1a509d3d3efda37f5847c",
+        "payDate": 1455555365124
+      },
+      "0bebe562f2dc4129193030b114796e55d39c444d": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "5",
+          "subscription-type": "year",
+          "sum": "349",
+          "endDate": "1621098583500",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1455556188253
+        },
+        "payerHash": "ae7fc95e19c66322ef012d7231c675cf7c8c7e41",
+        "payDate": 1455556296555
+      },
+      "5a733a895b43708b2240407b835b252716502972": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1463467212910",
+          "payMethod": "cash",
+          "date": 1455694855134
+        },
+        "payerHash": "63f4775019ee7814f019948e585f683d45016e31",
+        "payDate": 1455715057134
+      },
+      "f2f18ca82762beb1c7d159e936290e3c49ee1a21": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1463488214241",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1455715819012
+        },
+        "payerHash": "014a8651611f56add0070c7edb0693e8e3862308",
+        "payDate": 1455715931247
+      },
+      "d6b43e5e1450d4c4ce37bd88873efd9e556a2124": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1463847970320",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1456075613033
+        },
+        "payerHash": "16e96519a9efb5203e63bf0c23010f9a57f89622",
+        "payDate": 1456134694994
+      },
+      "57974d4a290e08fb34d668f47d20134193479076": {
+        "transaction": {
+          "subscription": "premium",
+          "durration": "0",
+          "subscription-type": "year",
+          "sum": "99",
+          "endDate": "1463929910469",
+          "payMethod": "cash",
+          "autoRenew": "true",
+          "date": 1456157525111
+        },
+        "payerHash": "07bc31fc36884125760f36ef9144799a78d72b3d",
+        "payDate": 1456157639859
+      }
+    }
+  }
+}
