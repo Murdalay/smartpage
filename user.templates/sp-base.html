@@ -162,12 +162,13 @@
 									</a>
 								</figure>
 							</div>
+                            {% if video %}
 							<div class="col-sm-6 col-md-6 post">
 								<figure>
-									<a href="http://www.youtube.com/watch?v=dMxDs7SNBV4" data-toggle="lightbox" data-gallery="youtubevideos"><img src="/static/images/comp2.png" class="img-responsive" alt="Helix карта">
-									</a>
+									<a href="{{ video }}" data-toggle="lightbox" data-gallery="youtubevideos"><img src="/static/images/comp2.png" class="img-responsive" alt="Helix карта">
 								</figure>
 							</div>
+                            {% endif %}
 							<img src="/static/images/map_poster.png" alt="Helix карта" class="hidden-xs">
                         </div>
                         <hr class="gold">

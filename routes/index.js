@@ -109,9 +109,9 @@ function onInit(err, data) {
 			});
 		}
 
-		router.post('/restore', resetPassMidleware.bind(this), goBack);
+		router.post('/restore', makeCheckEmailSubmissionMidleware(this.getMessages()), resetPassMidleware.bind(this), goBack);
 		router.post('/passUpdate/:accHash', updatePassMidleware, goBack);
-		router.get('/passwordReset', makeCheckEmailSubmissionMidleware(this.getMessages()), verifyPassTokenMidleware.bind(this), showPassUpdatePage.bind(this));
+		router.get('/passwordReset', verifyPassTokenMidleware.bind(this), showPassUpdatePage.bind(this));
 		
 		var grpoups = this.getGroups();
 		

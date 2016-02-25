@@ -321,13 +321,13 @@ function addProc(dl) {
 
 		verifyPassResetToken : function(token) {
 			return new Vow.Promise(DL('run', 'dir')(function(resolve, reject, notify) {
-				this.getProviders().app(function(err, app) {
+				this.getProviders().app((err, app) => {
 					if (err) { return reject(err); };
 
-					app.verifyPasswordResetToken(sptoken, function(err, verificationResponse) {
+					app.verifyPasswordResetToken(token, (err, verificationResponse) => {
 						if (err) { return reject(err) }
 
-					    spClient.getAccount(verificationResponse.account.href, function(err, account) {
+					    this.getAccountByUrl(verificationResponse.account.href, function(err, account) {
 					    	return resolve(account);
 					    });
 					});
