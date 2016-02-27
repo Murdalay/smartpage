@@ -58,6 +58,28 @@ var funcGroupTypesCb = {
 	}
 };
 
+
+function goBack(req, res, next) {
+	res.redirect('back');
+}
+
+
+function getMessageForError(messages, err, req) {
+	var _message;
+
+	for (let code in messages.errors.apiCodes) {
+		if(code == err.code + '') {
+			_message = messages.errors.apiCodes[code];
+			break
+		}
+	}
+
+	_message || (_message = err.userMessage ? err.userMessage : err.message);
+	log.error(_message);
+	req && req.flash('error', _message);
+}
+
+
 var funcCompTypesCb = {
 	content : function(fComp, params, fileldset) {
 		log.debug('fComp is', fComp);
@@ -197,24 +219,6 @@ function markWithCookie(name, val) {
 	};
 }
 
-function getMessageForError(messages, err, req) {
-	var _message;
-
-	log.error(err.code);
-	for (code in messages.errors.apiCodes) {
-		if(code == err.code + '') {
-			_message = messages.errors.apiCodes[code];
-			break
-		}
-	}
-
-	_message || (_message = err.userMessage ? err.userMessage : err.message);
-	req && req.flash('error', _message);
-}
-
-function goBack(req, res, next) {
-	res.redirect('back');
-}
 
 function makeUserLoginRedirectMidleware(redirectPoint) {
 	return function(req, res, next) {
@@ -374,10 +378,10 @@ var updatePassMidleware = DL('run', 'dir', 'base')(function (req, res, next) {
 		var _accToConfirm = this.getAccountByHash(_accHash);
 
 		if (_accToConfirm && makeHashForEmail(_accToConfirm.href) === _secHash) {
-			DL.proc.resetUserPass(_pass, _token).then(function(result) {
+			DL.proc.resetUserPass(_pass, _token).then((result) => {
 				req.flash('info', 'You password is successfully uptated');
 				return res.redirect(_login);
-			}, function(err) {
+			}, (err) => {
 				getMessageForError(_messages, err, req);
 				return next();
 			});
@@ -554,7 +558,7 @@ var uploader = multer({
 }).single('avatar');
 
 var checkPayRequestMidleware = DL('run', 'dir')(function (req, res, next) {
-	for (key in req.body) {
+	for (let key in req.body) {
 		if(req.body.hasOwnProperty(key)) {
 			var _accToConfirm = this.getAccountByHash(key);
 
@@ -721,7 +725,7 @@ router.get('/dashboard/payment', checkIfUserLogedIn, DL('run', 'dir')(function (
 router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 	req.user.customData.extraFields || (req.user.customData.extraFields = {});
 
-	for (key in req.body) {
+	for (let key in req.body) {
 		req.user.customData.extraFields[key] = req.body[key];
 	}
 	
@@ -738,7 +742,7 @@ router.post('/dashboard/edit', checkIfUserLogedIn, function (req, res, next) {
 router.post('/dashboard/pay', checkIfUserLogedIn, DL('run', 'dir')(function (req, res, next) {
 	req.user.customData.payRequest || (req.user.customData.payRequest = {});
 
-	for (key in req.body) {
+	for (let key in req.body) {
 		req.user.customData.payRequest[key] = req.body[key];
 	}
 
