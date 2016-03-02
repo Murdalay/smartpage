@@ -287,7 +287,7 @@ function makeVerifyGroupAccessMidleware(grpName) {
 
 				account.getGroups({ name: _grpName }, 
 					function(err, groups) {
-						groups.each(function(group, cb) {
+						groups.each((group, cb) => {
 							if (group) {
 								let _name = {};
 								
@@ -302,7 +302,7 @@ function makeVerifyGroupAccessMidleware(grpName) {
 
 							cb();
 						},
-						function(err) {
+						(err) => {
 							if (err) {
 								req.flash('error', err);
 								log.verbose('User %s login failed', req.user.username);
@@ -330,10 +330,10 @@ function resetPassMidleware(req, res, next) {
 	var _email = req.body.email;
 	var _messages = this.getMessages();
 
-	DL.proc.sendResetPassEmail(_email).then(function(response) {
+	DL.proc.sendResetPassEmail(_email).then((response) => {
 			req.flash('info', _messages.info.resetSuccess);
 			return next();
-		}, function(err) {
+		}, (err) => {
 			getMessageForError(_messages, err, req);
 			return next();
 		}
@@ -344,14 +344,14 @@ function verifyPassTokenMidleware(req, res, next) {
 	var _messages = this.getMessages();
 	var _token = req.query.sptoken;
 
-	DL.proc.verifyPassResetToken(_token).then(function(acc) {
+	DL.proc.verifyPassResetToken(_token).then((acc) => {
 			req.user || (req.user = {});
 			req.user.href = acc.href;
 			req.user.email = acc.email;
 			req.user.resetToken = _token;
 
 			return next();
-		}, function(err) {
+		}, (err) => {
 			getMessageForError(_messages, err, req);
 			return res.redirect('/verify-error.html');
 		}
@@ -401,7 +401,7 @@ var endpointCallbacks = {
 	login : function(endpoint, messages, extra) {
 		log.info('Enabling login endpoint');
 
-		router.get(endpoint.url, function(req, res, next) {
+		router.get(endpoint.url, (req, res, next) => {
 			res.render('enter', {
 				block : 'enter',
 				bundle : 'enter',
@@ -563,13 +563,13 @@ var checkPayRequestMidleware = DL('run', 'dir')(function (req, res, next) {
 			var _accToConfirm = this.getAccountByHash(key);
 
 			_accToConfirm && DL.proc.confirmPayRequest(_accToConfirm.href, req.params.payId).then(
-				function(data) {
+				data => {
 					log.info('Payment confirmed. With status: «%s»', data);
 					req.flash('info', 'Payment confirmed. With status: «' + data + '»');
 					next();
 				},
 
-				function(data) {
+				data => {
 					log.error('Payment rejected. With status: «%s»', data);
 					req.flash('error', 'Payment rejected. With status: «' + data + '»');
 					next();
@@ -823,7 +823,7 @@ function storeUserPhotoMidleware(req, res, next) {
 					} else {
 						res.redirect('back');
 
-						_oldPhoto && fs.unlink(_oldPhoto, function(err) {
+						_oldPhoto && fs.unlink(_oldPhoto, err => {
 							if (err) {
 								log.error('Unable to delete old photo', err);
 							}
@@ -861,7 +861,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 	req.body.username = req.body.username.replace(/[\ ]/g, '');
 
 	if(req.user.username !== req.body.username){
-		this.getAccounts({ username: req.body.username }, function(err, accounts) {
+		this.getAccounts({ username: req.body.username }, (err, accounts) => {
 
 			accounts.each((account, cb) => {
 				req.flash('error', this.getMessages().username + ' ' + req.body.username + ' ' + this.getMessages().errors.alreadyExists);
@@ -901,7 +901,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 		req.user.givenName = req.body.name;
 		req.user.surname = req.body.surname;
 
-		req.user.save((err) => {
+		req.user.save(err => {
 			if (err) {
 				log.error(err);
 				next(err);
@@ -911,7 +911,7 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 		// saving custom fields
 		req.user.customData.phone = req.body.phone;
 
-		req.user.customData.save(function (err) {
+		req.user.customData.save(err => {
 			if (err) {
 				next(err);
 			} else {
