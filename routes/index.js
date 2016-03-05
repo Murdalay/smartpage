@@ -779,7 +779,7 @@ router.post('/dashboard/pay', checkIfUserLogedIn, DL('run', 'dir')(function (req
 
 				mailer.sendMailTemplate(this.getDefConf().emails.Support, 
 					req.user.email, this.getMessages().pay.billingMailTheme, 
-					'payrequest-invoice.html', 
+					'../email.templates/payrequest-invoice.html', 
 					_locals);
 			}
 		}
@@ -940,7 +940,7 @@ router.post('/api/mailer', DL('run', 'dir')(function (req, res, next) {
 		supportMail : this.getDefConf().emails.Support
 	};
 
-	mailer.sendMailTemplate(this.getDefConf().emails.Support, req.body.ownerMail, 'Запись на семинар', 'form-submit.html', _locals)
+	mailer.sendMailTemplate(this.getDefConf().emails.Support, req.body.ownerMail, 'Запись на семинар', '../email.templates/form-submit.html', _locals)
 		.then(function(response) {
 				res.status(200).end();
 			}, function(response) {
