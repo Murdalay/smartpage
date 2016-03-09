@@ -220,10 +220,8 @@ function provideSpDataLayer(layers, funcGroupTypesCb, onInit) {
 	});
 
 	var _motivatorLaunchList = {
-		sixHours : [
-			{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false }
-		],
 		hourly : [
+			{ fn : DL.proc.updateAccountsRefPayment, args : [], runOnLoad : false },
 			{ fn : upAccs, args : [], runOnLoad : true }
 		],
 		threeHours : [

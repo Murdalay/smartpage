@@ -858,7 +858,8 @@ var storeUserDataMidleware = DL('run', 'dir')(function(req, res, next) {
 	});
 
 	// removing spaces from username
-	req.body.username = req.body.username.replace(/[\ ]/g, '');
+	let _uname = req.body.username.replace(/[\ ]/g, '');
+	req.body.username = _uname.toLowerCase();
 
 	if(req.user.username !== req.body.username){
 		this.getAccounts({ username: req.body.username }, (err, accounts) => {
