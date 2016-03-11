@@ -4,14 +4,14 @@ var path = require('path');
 var markedSwig = require('swig-marked'),
     extras = require('swig-extras'),
     swig = require('swig');
-
 	swig.setDefaults({ cache: 'memory' });
 	swig.setDefaults({ loader: swig.loaders.fs(path.join(__dirname, '..', 'user.templates'))});
 	
-
+	// setting swig filters
     markedSwig.useFilter( swig );
 	extras.useFilter(swig, 'batch');
 	
+	// setting swig tags
     markedSwig.useTag( swig );
  
 
